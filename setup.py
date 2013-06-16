@@ -1,15 +1,26 @@
 #!/usr/bin/env python
 
+import sys
 from os.path import abspath, dirname, join
 from setuptools import setup
 
+# Find the directory where the source distribution was unpacked.
+source_directory = dirname(abspath(__file__))
+
+# Add the directory with the source distribution to the search path.
+sys.path.append(source_directory)
+
+# Import the module to find the version number (this is safe because we don't
+# have any external dependencies).
+from humanfriendly import __version__ as version_string
+
 # Fill in the long description (for the benefit of PyPi)
 # with the contents of README.rst (rendered by GitHub).
-readme_file = join(dirname(abspath(__file__)), 'README.rst')
+readme_file = join(source_directory, 'README.rst')
 readme_text = open(readme_file, 'r').read()
 
 setup(name='humanfriendly',
-      version='1.1',
+      version=version_string,
       description="Human friendly command line output for Python",
       long_description=readme_text,
       url='https://pypi.python.org/pypi/humanfriendly',

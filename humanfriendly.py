@@ -4,6 +4,9 @@
 # Last Change: June 17, 2013
 # URL: https://github.com/xolox/python-human-friendly
 
+# Semi-standard module versioning.
+__version__ = '1.2'
+
 # Standard library modules.
 import re
 import os
@@ -23,8 +26,7 @@ def format_size(nbytes, keep_width=False):
 
     :param nbytes: The size to format in bytes (an integer).
     :param keep_width: ``True`` if trailing zeros should not be stripped,
-                       ``False`` if they can be stripped. The default is
-                       ``False``.
+                       ``False`` if they can be stripped.
     :returns: The corresponding human readable file size (a string).
     """
     for unit in reversed(disk_size_units):
@@ -68,8 +70,7 @@ def round_size(count, keep_width=False):
 
     :param nbytes: The disk size to format (a number).
     :param keep_width: ``True`` if trailing zeros should not be stripped,
-                       ``False`` if they can be stripped. The default is
-                       ``False``.
+                       ``False`` if they can be stripped.
     :returns: The formatted number as a string.
     """
     text = '%.2f' % float(count)

@@ -5,19 +5,24 @@ The functions in the ``humanfriendly`` module can be used to make text
 interfaces more user friendly by parsing and formatting file sizes and
 timestamps in a simple, human readable format.
 
-Usage
------
+Getting started
+---------------
 
 It's very simple to start using the ``humanfriendly`` module::
 
-   import humanfriendly
-   num_bytes = humanfriendly.parse_size(raw_input("Enter a readable file size: "))
-   print "You entered:", humanfriendly.format_size(num_bytes)
+   >>> import humanfriendly
+   >>> user_input = raw_input("Enter a readable file size: ")
+   Enter a readable file size: 16G
+   >>> num_bytes = humanfriendly.parse_size(user_input)
+   >>> print num_bytes
+   17179869184
+   >>> print "You entered:", humanfriendly.format_size(num_bytes)
+   You entered: 16 GB
 
 Contact
 -------
 
-The latest version of ``humanfriendly`` is available on PyPi_ and GitHub_. For
+The latest version of ``humanfriendly`` is available on PyPI_ and GitHub_. For
 bug reports please create an issue on GitHub_. If you have questions,
 suggestions, etc. feel free to send me an e-mail at `peter@peterodding.com`_.
 
@@ -32,4 +37,4 @@ This software is licensed under the `MIT license`_.
 .. _GitHub: https://github.com/xolox/python-humanfriendly
 .. _MIT license: http://en.wikipedia.org/wiki/MIT_License
 .. _peter@peterodding.com: peter@peterodding.com
-.. _PyPi: https://pypi.python.org/pypi/humanfriendly
+.. _PyPI: https://pypi.python.org/pypi/humanfriendly
