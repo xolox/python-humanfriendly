@@ -9,7 +9,7 @@ readme_file = join(dirname(abspath(__file__)), 'README.rst')
 readme_text = open(readme_file, 'r').read()
 
 setup(name='humanfriendly',
-      version='1.0',
+      version='1.1',
       description="Human friendly command line output for Python",
       long_description=readme_text,
       url='https://pypi.python.org/pypi/humanfriendly',

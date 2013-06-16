@@ -7,6 +7,7 @@
 # URL: https://github.com/xolox/python-human-friendly
 
 # Standard library modules.
+import os
 import unittest
 
 # The module we are testing.
@@ -41,6 +42,10 @@ class HumanFriendlyTestCase(unittest.TestCase):
       self.assertEqual('1', humanfriendly.round_size(1.0))
       self.assertEqual('1.00', humanfriendly.round_size(1, keep_width=True))
       self.assertEqual('3.14', humanfriendly.round_size(3.141592653589793))
+
+    def test_format_path(self):
+      abspath = os.path.join(os.environ['HOME'], '.vimrc')
+      self.assertEqual(os.path.join('~', '.vimrc'), humanfriendly.format_path(abspath))
 
 if __name__ == '__main__':
     unittest.main()

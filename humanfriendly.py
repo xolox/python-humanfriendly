@@ -1,4 +1,4 @@
-# Human friendly command line output for Python.
+# Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
 # Last Change: June 17, 2013
@@ -6,6 +6,8 @@
 
 # Standard library modules.
 import re
+import os
+import os.path
 
 # Common disk size units, used for formatting and parsing.
 disk_size_units = (dict(prefix='k', divider=1024**1, singular='KB', plural='KB'),
@@ -75,6 +77,21 @@ def round_size(count, keep_width=False):
         text = re.sub('0+$', '', text)
         text = re.sub('\.$', '', text)
     return text
+
+def format_path(pathname):
+    """
+    Given an absolute pathname, abbreviate the user's home directory to ``~/``
+    to shorten the pathname without losing information. It is not an error if
+    the pathname is not relative to the current user's home directory.
+
+    :param abspath: An absolute pathname.
+    :returns: The pathname with the user's home directory abbreviated.
+    """
+    abspath = os.path.abspath(pathname)
+    relpath = os.path.relpath(abspath, os.environ['HOME'])
+    if relpath != abspath:
+        relpath = os.path.join('~', relpath)
+    return relpath
 
 class InvalidSize(Exception):
     """
