@@ -5,7 +5,7 @@
 # URL: https://github.com/xolox/python-human-friendly
 
 # Semi-standard module versioning.
-__version__ = '1.3'
+__version__ = '1.3.1'
 
 # Standard library modules.
 import math
@@ -28,12 +28,12 @@ time_units = (dict(divider=1, singular='second', plural='seconds'),
               dict(divider=60*60*24*7, singular='week', plural='weeks'),
               dict(divider=60*60*24*7*52, singular='year', plural='years'))
 
-def format_size(nbytes, keep_width=False):
+def format_size(num_bytes, keep_width=False):
     """
     Format a byte count as a human readable file size (supports ranges from
     kilobytes to terabytes).
 
-    :param nbytes: The size to format in bytes (an integer).
+    :param num_bytes: The size to format in bytes (an integer).
     :param keep_width: ``True`` if trailing zeros should not be stripped,
                        ``False`` if they can be stripped.
     :returns: The corresponding human readable file size (a string).
@@ -53,11 +53,11 @@ def format_size(nbytes, keep_width=False):
     '4 GB'
     """
     for unit in reversed(disk_size_units):
-        if nbytes >= unit['divider']:
-            count = round_number(float(nbytes) / unit['divider'], keep_width=keep_width)
+        if num_bytes >= unit['divider']:
+            count = round_number(float(num_bytes) / unit['divider'], keep_width=keep_width)
             unit_label = unit['singular'] if count in ('1', '1.00') else unit['plural']
             return '%s %s' % (count, unit_label)
-    return '%i %s' % (nbytes, 'byte' if nbytes == 1 else 'bytes')
+    return '%i %s' % (num_bytes, 'byte' if num_bytes == 1 else 'bytes')
 
 def parse_size(size):
     """
@@ -125,11 +125,11 @@ def round_number(count, keep_width=False):
         text = re.sub('\.$', '', text)
     return text
 
-def format_timespan(seconds):
+def format_timespan(num_seconds):
     """
     Format a timespan in seconds as a human readable string.
 
-    :param seconds: Number of seconds (integer or float).
+    :param num_seconds: Number of seconds (integer or float).
     :returns: The formatted timespan as a string.
 
     Some examples:
@@ -147,17 +147,17 @@ def format_timespan(seconds):
     >>> format_timespan(week * 52 + day * 2 + hour * 3)
     '1 year, 2 days and 3 hours'
     """
-    if seconds < 60:
+    if num_seconds < 60:
         # Fast path.
-        unit_label = 'second' if math.floor(seconds) == 1 else 'seconds'
-        return '%s %s' % (round_number(seconds, keep_width=False), unit_label)
+        unit_label = 'second' if math.floor(num_seconds) == 1 else 'seconds'
+        return '%s %s' % (round_number(num_seconds, keep_width=False), unit_label)
     else:
         # Slow path.
         result = []
         for unit in reversed(time_units):
-            if seconds >= unit['divider']:
-                count = int(seconds / unit['divider'])
-                seconds %= unit['divider']
+            if num_seconds >= unit['divider']:
+                count = int(num_seconds / unit['divider'])
+                num_seconds %= unit['divider']
                 result.append('%i %s' % (count, unit['singular'] if count == 1 else unit['plural']))
         if len(result) == 1:
             # A single count/unit combination.
