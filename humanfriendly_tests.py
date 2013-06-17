@@ -7,6 +7,7 @@
 # URL: https://github.com/xolox/python-human-friendly
 
 # Standard library modules.
+import math
 import os
 import unittest
 
@@ -14,6 +15,29 @@ import unittest
 import humanfriendly
 
 class HumanFriendlyTestCase(unittest.TestCase):
+
+    def test_format_timespan(self):
+      minute = 60
+      hour = minute * 60
+      day = hour * 24
+      week = day * 7
+      year = week * 52
+      self.assertEqual('0 seconds', humanfriendly.format_timespan(0))
+      self.assertEqual('0.54 seconds', humanfriendly.format_timespan(0.54321))
+      self.assertEqual('1 second', humanfriendly.format_timespan(1))
+      self.assertEqual('3.14 seconds', humanfriendly.format_timespan(math.pi))
+      self.assertEqual('1 minute', humanfriendly.format_timespan(minute))
+      self.assertEqual('1 minute and 20 seconds', humanfriendly.format_timespan(80))
+      self.assertEqual('2 minutes', humanfriendly.format_timespan(minute * 2))
+      self.assertEqual('1 hour', humanfriendly.format_timespan(hour))
+      self.assertEqual('2 hours', humanfriendly.format_timespan(hour * 2))
+      self.assertEqual('1 day', humanfriendly.format_timespan(day))
+      self.assertEqual('2 days', humanfriendly.format_timespan(day * 2))
+      self.assertEqual('1 week', humanfriendly.format_timespan(week))
+      self.assertEqual('2 weeks', humanfriendly.format_timespan(week * 2))
+      self.assertEqual('1 year', humanfriendly.format_timespan(year))
+      self.assertEqual('2 years', humanfriendly.format_timespan(year * 2))
+      self.assertEqual('1 year, 2 weeks and 3 days', humanfriendly.format_timespan(year + week * 2 + day * 3 + hour * 12))
 
     def test_format_size(self):
       self.assertEqual('0 bytes', humanfriendly.format_size(0))
@@ -37,11 +61,11 @@ class HumanFriendlyTestCase(unittest.TestCase):
       except Exception, e:
         self.assertTrue(isinstance(e, humanfriendly.InvalidSize))
 
-    def test_round_size(self):
-      self.assertEqual('1', humanfriendly.round_size(1))
-      self.assertEqual('1', humanfriendly.round_size(1.0))
-      self.assertEqual('1.00', humanfriendly.round_size(1, keep_width=True))
-      self.assertEqual('3.14', humanfriendly.round_size(3.141592653589793))
+    def test_round_number(self):
+      self.assertEqual('1', humanfriendly.round_number(1))
+      self.assertEqual('1', humanfriendly.round_number(1.0))
+      self.assertEqual('1.00', humanfriendly.round_number(1, keep_width=True))
+      self.assertEqual('3.14', humanfriendly.round_number(3.141592653589793))
 
     def test_format_path(self):
       abspath = os.path.join(os.environ['HOME'], '.vimrc')

@@ -5,12 +5,13 @@
 # URL: https://github.com/xolox/python-human-friendly
 
 # Semi-standard module versioning.
-__version__ = '1.2'
+__version__ = '1.3'
 
 # Standard library modules.
-import re
+import math
 import os
 import os.path
+import re
 
 # Common disk size units, used for formatting and parsing.
 disk_size_units = (dict(prefix='k', divider=1024**1, singular='KB', plural='KB'),
@@ -18,6 +19,14 @@ disk_size_units = (dict(prefix='k', divider=1024**1, singular='KB', plural='KB')
                    dict(prefix='g', divider=1024**3, singular='GB', plural='GB'),
                    dict(prefix='t', divider=1024**4, singular='TB', plural='TB'),
                    dict(prefix='p', divider=1024**5, singular='PB', plural='PB'))
+
+# Common time units, used for formatting of time spans.
+time_units = (dict(divider=1, singular='second', plural='seconds'),
+              dict(divider=60, singular='minute', plural='minutes'),
+              dict(divider=60*60, singular='hour', plural='hours'),
+              dict(divider=60*60*24, singular='day', plural='days'),
+              dict(divider=60*60*24*7, singular='week', plural='weeks'),
+              dict(divider=60*60*24*7*52, singular='year', plural='years'))
 
 def format_size(nbytes, keep_width=False):
     """
@@ -31,7 +40,7 @@ def format_size(nbytes, keep_width=False):
     """
     for unit in reversed(disk_size_units):
         if nbytes >= unit['divider']:
-            count = round_size(float(nbytes) / unit['divider'], keep_width=keep_width)
+            count = round_number(float(nbytes) / unit['divider'], keep_width=keep_width)
             unit_label = unit['singular'] if count in ('1', '1.00') else unit['plural']
             return '%s %s' % (count, unit_label)
     return '%i %s' % (nbytes, 'byte' if nbytes == 1 else 'bytes')
@@ -62,13 +71,14 @@ def parse_size(size):
     msg = "Invalid disk size unit: %r"
     raise InvalidSize, msg % components[1]
 
-def round_size(count, keep_width=False):
+def round_number(count, keep_width=False):
     """
-    Helper for :py:func:`format_size()` to round a floating point number to two
-    decimal places in a human friendly format: If no decimal places are
-    required to represent the number, they will be omitted.
+    Helper for :py:func:`format_size()` and :py:func:`format_timespan()` to
+    round a floating point number to two decimal places in a human friendly
+    format. If no decimal places are required to represent the number, they
+    will be omitted.
 
-    :param nbytes: The disk size to format (a number).
+    :param count: The number to format.
     :param keep_width: ``True`` if trailing zeros should not be stripped,
                        ``False`` if they can be stripped.
     :returns: The formatted number as a string.
@@ -78,6 +88,34 @@ def round_size(count, keep_width=False):
         text = re.sub('0+$', '', text)
         text = re.sub('\.$', '', text)
     return text
+
+def format_timespan(seconds):
+    """
+    Format a timespan in seconds as a human readable string.
+
+    :param seconds: Number of seconds (integer or float).
+    :returns: The formatted timespan as a string.
+    """
+    if seconds < 60:
+        # Fast path.
+        unit_label = 'second' if math.floor(seconds) == 1 else 'seconds'
+        return '%s %s' % (round_number(seconds, keep_width=False), unit_label)
+    else:
+        # Slow path.
+        result = []
+        for unit in reversed(time_units):
+            if seconds >= unit['divider']:
+                count = int(seconds / unit['divider'])
+                seconds %= unit['divider']
+                result.append('%i %s' % (count, unit['singular'] if count == 1 else unit['plural']))
+        if len(result) == 1:
+            # A single count/unit combination.
+            return result[0]
+        else:
+            # Remove insignificant data from the formatted timespan.
+            result = result[:3]
+            # Multiple count/unit combinations.
+            return ', '.join(result[:-1]) + ' and ' + result[-1]
 
 def format_path(pathname):
     """
