@@ -5,7 +5,7 @@
 # URL: https://github.com/xolox/python-human-friendly
 
 # Semi-standard module versioning.
-__version__ = '1.3.1'
+__version__ = '1.4'
 
 # Standard library modules.
 import math
@@ -168,6 +168,54 @@ def format_timespan(num_seconds):
             # Multiple count/unit combinations.
             return ', '.join(result[:-1]) + ' and ' + result[-1]
 
+def parse_date(datestring):
+    """
+    Parse a date string in one of the formats listed below. Raises
+    :py:class:`InvalidDate` when the date cannot be parsed. Supported date/time
+    formats:
+
+    - ``YYYY-MM-DD``
+    - ``YYYY-MM-DD HH:MM:SS``
+
+    :param datestring: The date/time string to parse.
+    :returns: A tuple with the numbers ``(year, month, day, hour, minute,
+              second)`` (all numbers are integers).
+
+    Examples:
+
+    >>> from humanfriendly import parse_date
+    >>> parse_date('2013-06-17')
+    (2013, 6, 17, 0, 0, 0)
+    >>> parse_date('2013-06-17 02:47:42')
+    (2013, 6, 17, 2, 47, 42)
+
+    Here's how you convert the result to a number:
+
+    >>> import time
+    >>> components = parse_date('2013-06-17 02:47:42')
+    >>> time.mktime(components + (-1, -1, -1))
+    1371430062.0
+
+    And here's how you convert it to a :py:class:`datetime.datetime` object:
+
+    >>> import datetime
+    >>> components = parse_date('2013-06-17 02:47:42')
+    >>> datetime.datetime(*components)
+    datetime.datetime(2013, 6, 17, 2, 47, 42)
+    """
+    try:
+        tokens = map(str.strip, datestring.split())
+        if len(tokens) >= 2:
+            date_parts = map(int, tokens[0].split('-')) + [1, 1]
+            time_parts = map(int, tokens[1].split(':')) + [0, 0, 0]
+            return tuple(date_parts[0:3] + time_parts[0:3])
+        else:
+            year, month, day = (map(int, datestring.split('-')) + [1, 1])[0:3]
+            return (year, month, day, 0, 0, 0)
+    except Exception:
+        msg = "Invalid date! (expected 'YYYY-MM-DD' or 'YYYY-MM-DD HH:MM:SS' but got: %r)"
+        raise InvalidDate, msg % datestring
+
 def format_path(pathname):
     """
     Given an absolute pathname, abbreviate the user's home directory to ``~/``
@@ -206,4 +254,16 @@ class InvalidSize(Exception):
         raise InvalidSize, msg % components[1]
     humanfriendly.InvalidSize: Invalid disk size unit: 'z'
     """
-    pass
+
+class InvalidDate(Exception):
+    """
+    Raised by :py:func:`parse_date()` when a string cannot be parsed into a
+    date:
+
+    >>> from humanfriendly import parse_date
+    >>> parse_date('2013-06-XY')
+    Traceback (most recent call last):
+      File "humanfriendly.py", line 206, in parse_date
+        raise InvalidDate, msg % datestring
+    humanfriendly.InvalidDate: Invalid date! (expected 'YYYY-MM-DD' or 'YYYY-MM-DD HH:MM:SS' but got: '2013-06-XY')
+    """
