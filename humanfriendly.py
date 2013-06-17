@@ -30,13 +30,27 @@ time_units = (dict(divider=1, singular='second', plural='seconds'),
 
 def format_size(nbytes, keep_width=False):
     """
-    Format a byte count as a human readable file size
-    (supports ranges from kilobytes to terabytes).
+    Format a byte count as a human readable file size (supports ranges from
+    kilobytes to terabytes).
 
     :param nbytes: The size to format in bytes (an integer).
     :param keep_width: ``True`` if trailing zeros should not be stripped,
                        ``False`` if they can be stripped.
     :returns: The corresponding human readable file size (a string).
+
+    Some examples:
+
+    >>> from humanfriendly import format_size
+    >>> format_size(0)
+    '0 bytes'
+    >>> format_size(1)
+    '1 byte'
+    >>> format_size(5)
+    '5 bytes'
+    >>> format_size(1024 ** 2)
+    '1 MB'
+    >>> format_size(1024 ** 3 * 4)
+    '4 GB'
     """
     for unit in reversed(disk_size_units):
         if nbytes >= unit['divider']:
@@ -52,6 +66,18 @@ def parse_size(size):
 
     :param size: The human readable file size to parse (a string).
     :returns: The corresponding size in bytes (an integer).
+
+    Some examples:
+
+    >>> from humanfriendly import parse_size
+    >>> parse_size('42')
+    42
+    >>> parse_size('1 KB')
+    1024
+    >>> parse_size('5 kilobyte')
+    5120
+    >>> parse_size('1.5 GB')
+    1610612736
     """
     tokens = re.split(r'([0-9.]+)', size.lower())
     components = [s.strip() for s in tokens if s and not s.isspace()]
@@ -82,6 +108,16 @@ def round_number(count, keep_width=False):
     :param keep_width: ``True`` if trailing zeros should not be stripped,
                        ``False`` if they can be stripped.
     :returns: The formatted number as a string.
+
+    An example:
+
+    >>> from humanfriendly import round_number
+    >>> round_number(1)
+    '1'
+    >>> round_number(math.pi)
+    '3.14'
+    >>> round_number(5.001)
+    '5'
     """
     text = '%.2f' % float(count)
     if not keep_width:
@@ -95,6 +131,21 @@ def format_timespan(seconds):
 
     :param seconds: Number of seconds (integer or float).
     :returns: The formatted timespan as a string.
+
+    Some examples:
+
+    >>> from humanfriendly import format_timespan
+    >>> format_timespan(0)
+    '0 seconds'
+    >>> format_timespan(1)
+    '1 second'
+    >>> format_timespan(math.pi)
+    '3.14 seconds'
+    >>> hour = 60 * 60
+    >>> day = hour * 24
+    >>> week = day * 7
+    >>> format_timespan(week * 52 + day * 2 + hour * 3)
+    '1 year, 2 days and 3 hours'
     """
     if seconds < 60:
         # Fast path.
@@ -125,6 +176,17 @@ def format_path(pathname):
 
     :param abspath: An absolute pathname.
     :returns: The pathname with the user's home directory abbreviated.
+
+    Here's an example of its usage:
+
+    >>> from os import environ
+    >>> from os.path import join
+    >>> vimrc = join(environ['HOME'], '.vimrc')
+    >>> vimrc
+    '/home/peter/.vimrc'
+    >>> from humanfriendly import format_path
+    >>> format_path(vimrc)
+    '~/.vimrc'
     """
     abspath = os.path.abspath(pathname)
     relpath = os.path.relpath(abspath, os.environ['HOME'])
@@ -135,6 +197,13 @@ def format_path(pathname):
 class InvalidSize(Exception):
     """
     Raised by :py:func:`parse_size()` when a string cannot be parsed into a
-    file size.
+    file size:
+
+    >>> from humanfriendly import parse_size
+    >>> parse_size('5 Z')
+    Traceback (most recent call last):
+      File "humanfriendly.py", line 98, in parse_size
+        raise InvalidSize, msg % components[1]
+    humanfriendly.InvalidSize: Invalid disk size unit: 'z'
     """
     pass

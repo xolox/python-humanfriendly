@@ -1,14 +1,14 @@
 humanfriendly: Human friendly input/output in Python
 ====================================================
 
-The functions in the ``humanfriendly`` module can be used to make text
+The functions in the ``humanfriendly`` package can be used to make text
 interfaces more user friendly by parsing and formatting file sizes and
 timestamps in a simple, human readable format.
 
 Getting started
 ---------------
 
-It's very simple to start using the ``humanfriendly`` module::
+It's very simple to start using the ``humanfriendly`` package::
 
    >>> import humanfriendly
    >>> user_input = raw_input("Enter a readable file size: ")
