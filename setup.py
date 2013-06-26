@@ -1,5 +1,11 @@
 #!/usr/bin/env python
 
+# Setup script for the `humanfriendly' package.
+#
+# Author: Peter Odding <peter@peterodding.com>
+# Last Change: June 27, 2013
+# URL: https://humanfriendly.readthedocs.org
+
 import sys
 from os.path import abspath, dirname, join
 from setuptools import setup
@@ -23,7 +29,7 @@ setup(name='humanfriendly',
       version=version_string,
       description="Human friendly output for text interfaces using Python",
       long_description=readme_text,
-      url='https://github.com/xolox/python-humanfriendly',
+      url='https://humanfriendly.readthedocs.org',
       author='Peter Odding',
       author_email='peter@peterodding.com',
       py_modules=['humanfriendly', 'humanfriendly_tests'],

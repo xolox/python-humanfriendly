@@ -22,9 +22,10 @@ It's very simple to start using the ``humanfriendly`` package::
 Contact
 -------
 
-The latest version of ``humanfriendly`` is available on PyPI_ and GitHub_. For
-bug reports please create an issue on GitHub_. If you have questions,
-suggestions, etc. feel free to send me an e-mail at `peter@peterodding.com`_.
+The latest version of ``humanfriendly`` is available on PyPI_ and GitHub_. The
+documentation is hosted on `Read the Docs`_. For bug reports please create an
+issue on GitHub_. If you have questions, suggestions, etc. feel free to send me
+an e-mail at `peter@peterodding.com`_.
 
 License
 -------
@@ -38,3 +39,4 @@ This software is licensed under the `MIT license`_.
 .. _MIT license: http://en.wikipedia.org/wiki/MIT_License
 .. _peter@peterodding.com: peter@peterodding.com
 .. _PyPI: https://pypi.python.org/pypi/humanfriendly
+.. _Read the Docs: https://humanfriendly.readthedocs.org

@@ -3,8 +3,8 @@
 # Tests for the 'humanfriendly' module.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: June 26, 2013
-# URL: https://github.com/xolox/python-humanfriendly
+# Last Change: June 27, 2013
+# URL: https://humanfriendly.readthedocs.org
 
 # Standard library modules.
 import math

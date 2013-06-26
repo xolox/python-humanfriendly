@@ -2,10 +2,10 @@
 #
 # Author: Peter Odding <peter@peterodding.com>
 # Last Change: June 27, 2013
-# URL: https://github.com/xolox/python-humanfriendly
+# URL: https://humanfriendly.readthedocs.org
 
 # Semi-standard module versioning.
-__version__ = '1.4.1'
+__version__ = '1.4.2'
 
 # Standard library modules.
 import math
