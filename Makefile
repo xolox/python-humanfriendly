@@ -1,11 +1,11 @@
 # Makefile for the 'humanfriendly' module.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: June 17, 2013
-# URL: https://github.com/xolox/python-human-friendly
+# Last Change: June 26, 2013
+# URL: https://github.com/xolox/python-humanfriendly
 
 default:
-	@echo "Makefile for the 'humanfriendly' module"
+	@echo "Makefile for the 'humanfriendly' package"
 	@echo
 	@echo 'Usage:'
 	@echo

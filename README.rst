@@ -3,7 +3,7 @@ humanfriendly: Human friendly input/output in Python
 
 The functions in the ``humanfriendly`` package can be used to make text
 interfaces more user friendly by parsing and formatting file sizes and
-timestamps in a simple, human readable format.
+timestamps in simple, human readable formats.
 
 Getting started
 ---------------

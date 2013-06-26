@@ -1,11 +1,11 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: June 17, 2013
-# URL: https://github.com/xolox/python-human-friendly
+# Last Change: June 27, 2013
+# URL: https://github.com/xolox/python-humanfriendly
 
 # Semi-standard module versioning.
-__version__ = '1.4'
+__version__ = '1.4.1'
 
 # Standard library modules.
 import math
