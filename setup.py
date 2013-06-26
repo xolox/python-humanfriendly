@@ -21,7 +21,7 @@ readme_text = open(readme_file, 'r').read()
 
 setup(name='humanfriendly',
       version=version_string,
-      description="Human friendly command line output for Python",
+      description="Human friendly output for text interfaces using Python",
       long_description=readme_text,
       url='https://github.com/xolox/python-humanfriendly',
       author='Peter Odding',
