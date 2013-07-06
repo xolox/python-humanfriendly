@@ -1,17 +1,18 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: July 6, 2013
+# Last Change: July 7, 2013
 # URL: https://humanfriendly.readthedocs.org
 
 # Semi-standard module versioning.
-__version__ = '1.4.3'
+__version__ = '1.5'
 
 # Standard library modules.
 import math
 import os
 import os.path
 import re
+import time
 
 # Common disk size units, used for formatting and parsing.
 disk_size_units = (dict(prefix='k', divider=1024**1, singular='KB', plural='KB'),
@@ -191,16 +192,14 @@ def parse_date(datestring):
 
     Here's how you convert the result to a number:
 
-    >>> import time
-    >>> components = parse_date('2013-06-17 02:47:42')
-    >>> time.mktime(components + (-1, -1, -1))
+    >>> from time import mktime
+    >>> mktime(parse_date('2013-06-17 02:47:42') + (-1, -1, -1))
     1371430062.0
 
     And here's how you convert it to a :py:class:`datetime.datetime` object:
 
-    >>> import datetime
-    >>> components = parse_date('2013-06-17 02:47:42')
-    >>> datetime.datetime(*components)
+    >>> from datetime import datetime
+    >>> datetime(*parse_date('2013-06-17 02:47:42'))
     datetime.datetime(2013, 6, 17, 2, 47, 42)
     """
     try:
@@ -241,6 +240,32 @@ def format_path(pathname):
     if pathname.startswith(home):
         pathname = os.path.join('~', os.path.relpath(pathname, home))
     return pathname
+
+class Timer(object):
+
+    """
+    Easy to use timer to keep track of long during operations.
+    """
+
+    def __init__(self):
+        """
+        Remember the time when the :py:class:`Timer` was created.
+        """
+        self.start_time = time.time()
+
+    @property
+    def elapsed_time(self):
+        """
+        Get the number of seconds elapsed since the :py:class:`Timer` was created.
+        """
+        return time.time() - self.start_time
+
+    def __str__(self):
+        """
+        When a :py:class:`Timer` is coerced to a string it will show the
+        elapsed time since the :py:class:`Timer` was created.
+        """
+        return format_timespan(self.elapsed_time)
 
 class InvalidSize(Exception):
     """
