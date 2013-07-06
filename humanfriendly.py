@@ -1,11 +1,11 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: June 27, 2013
+# Last Change: July 6, 2013
 # URL: https://humanfriendly.readthedocs.org
 
 # Semi-standard module versioning.
-__version__ = '1.4.2'
+__version__ = '1.4.3'
 
 # Standard library modules.
 import math
@@ -236,11 +236,11 @@ def format_path(pathname):
     >>> format_path(vimrc)
     '~/.vimrc'
     """
-    abspath = os.path.abspath(pathname)
-    relpath = os.path.relpath(abspath, os.environ['HOME'])
-    if relpath != abspath:
-        relpath = os.path.join('~', relpath)
-    return relpath
+    home = os.path.abspath(os.environ['HOME'])
+    pathname = os.path.abspath(pathname)
+    if pathname.startswith(home):
+        pathname = os.path.join('~', os.path.relpath(pathname, home))
+    return pathname
 
 class InvalidSize(Exception):
     """
