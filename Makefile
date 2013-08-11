@@ -1,7 +1,7 @@
 # Makefile for the 'humanfriendly' module.
 #
-# Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: June 27, 2013
+# Author: Peter Odding <peter@peterodding.com>
+# Last Change: July 25, 2013
 # URL: https://humanfriendly.readthedocs.org
 
 default:
@@ -23,6 +23,9 @@ clean:
 
 docs:
 	cd docs && make html
+	if which gnome-open >/dev/null 2>&1; then \
+		gnome-open "docs/build/html/index.html"; \
+	fi
 
 publish:
 	git push origin && git push --tags origin

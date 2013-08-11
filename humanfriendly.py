@@ -1,17 +1,18 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: July 7, 2013
+# Last Change: August 12, 2013
 # URL: https://humanfriendly.readthedocs.org
 
 # Semi-standard module versioning.
-__version__ = '1.5'
+__version__ = '1.6'
 
 # Standard library modules.
 import math
 import os
 import os.path
 import re
+import sys
 import time
 
 # Common disk size units, used for formatting and parsing.
@@ -266,6 +267,43 @@ class Timer(object):
         elapsed time since the :py:class:`Timer` was created.
         """
         return format_timespan(self.elapsed_time)
+
+class Spinner(object):
+
+    """
+    Show a "spinner" on the terminal to let the user know that something is
+    happening during long running operations that would otherwise be silent.
+    """
+
+    def __init__(self, label, stream=sys.stderr):
+        self.label = label
+        self.stream = stream
+        self.states = ['-', '\\', '|', '/']
+        self.counter = 0
+        try:
+            self.interactive = stream.isatty()
+        except Exception:
+            self.interactive = False
+
+    def step(self):
+        """
+        Advance the spinner by one step without starting a new line, causing
+        an animated effect which is very simple but much nicer than waiting
+        for a prompt which is completely silent for a long time.
+        """
+        if self.interactive:
+            state = self.states[self.counter % len(self.states)]
+            self.stream.write("\r %s %s " % (state, self.label))
+            self.counter += 1
+
+    def clear(self):
+        """
+        Clear the spinner. The next line which is shown on the standard
+        output or error stream after calling this method will overwrite the
+        line that used to show the spinner.
+        """
+        if self.interactive:
+            self.stream.write("\r")
 
 class InvalidSize(Exception):
     """
