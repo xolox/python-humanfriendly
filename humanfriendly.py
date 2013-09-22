@@ -5,7 +5,7 @@
 # URL: https://humanfriendly.readthedocs.org
 
 # Semi-standard module versioning.
-__version__ = '1.7'
+__version__ = '1.7.1'
 
 # Standard library modules.
 import math
@@ -260,7 +260,12 @@ def concatenate(items):
     :param items: A list of strings.
     :returns: A single string.
     """
-    return ', '.join(items[:-1]) + ' and ' + items[-1]
+    if len(items) > 1:
+        return ', '.join(items[:-1]) + ' and ' + items[-1]
+    elif items:
+        return items[0]
+    else:
+        return ''
 
 class Timer(object):
 
