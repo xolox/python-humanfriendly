@@ -5,7 +5,7 @@
 # URL: https://humanfriendly.readthedocs.org
 
 # Semi-standard module versioning.
-__version__ = '1.6.1'
+__version__ = '1.7'
 
 # Standard library modules.
 import math
@@ -56,10 +56,9 @@ def format_size(num_bytes, keep_width=False):
     """
     for unit in reversed(disk_size_units):
         if num_bytes >= unit['divider']:
-            count = round_number(float(num_bytes) / unit['divider'], keep_width=keep_width)
-            unit_label = unit['singular'] if count in ('1', '1.00') else unit['plural']
-            return '%s %s' % (count, unit_label)
-    return '%i %s' % (num_bytes, 'byte' if num_bytes == 1 else 'bytes')
+            number = round_number(float(num_bytes) / unit['divider'], keep_width=keep_width)
+            return pluralize(number, unit['singular'], unit['plural'])
+    return pluralize(num_bytes, 'byte', 'bytes')
 
 def parse_size(size):
     """
@@ -151,8 +150,7 @@ def format_timespan(num_seconds):
     """
     if num_seconds < 60:
         # Fast path.
-        unit_label = 'second' if math.floor(num_seconds) == 1 else 'seconds'
-        return '%s %s' % (round_number(num_seconds, keep_width=False), unit_label)
+        return pluralize(round_number(num_seconds), 'second', 'seconds')
     else:
         # Slow path.
         result = []
@@ -160,15 +158,14 @@ def format_timespan(num_seconds):
             if num_seconds >= unit['divider']:
                 count = int(num_seconds / unit['divider'])
                 num_seconds %= unit['divider']
-                result.append('%i %s' % (count, unit['singular'] if count == 1 else unit['plural']))
+                result.append(pluralize(count, unit['singular'], unit['plural']))
         if len(result) == 1:
             # A single count/unit combination.
             return result[0]
         else:
-            # Remove insignificant data from the formatted timespan.
-            result = result[:3]
-            # Multiple count/unit combinations.
-            return ', '.join(result[:-1]) + ' and ' + result[-1]
+            # Remove insignificant data from the formatted timespan and format
+            # it in a readable way.
+            return concatenate(result[:3])
 
 def parse_date(datestring):
     """
@@ -244,6 +241,26 @@ def format_path(pathname):
         if pathname.startswith(home):
             pathname = os.path.join('~', os.path.relpath(pathname, home))
     return pathname
+
+def pluralize(count, singular, plural):
+    """
+    Combine a count with the singular or plural form of a word.
+
+    :param count: The count (a number).
+    :param singular: The singular of the word.
+    :param plural: The plural of the word.
+    :returns: The count and applicable word in a string.
+    """
+    return '%s %s' % (count, singular if math.floor(float(count)) == 1 else plural)
+
+def concatenate(items):
+    """
+    Concatenate a list of items in a human friendly way.
+
+    :param items: A list of strings.
+    :returns: A single string.
+    """
+    return ', '.join(items[:-1]) + ' and ' + items[-1]
 
 class Timer(object):
 
