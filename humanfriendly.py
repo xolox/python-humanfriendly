@@ -1,11 +1,11 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: August 12, 2013
+# Last Change: September 22, 2013
 # URL: https://humanfriendly.readthedocs.org
 
 # Semi-standard module versioning.
-__version__ = '1.6'
+__version__ = '1.6.1'
 
 # Standard library modules.
 import math
@@ -219,10 +219,11 @@ def parse_date(datestring):
 def format_path(pathname):
     """
     Given an absolute pathname, abbreviate the user's home directory to ``~/``
-    to shorten the pathname without losing information. It is not an error if
-    the pathname is not relative to the current user's home directory.
+    in order to shorten the pathname without losing information. It is not an
+    error if the pathname is not relative to the current user's home
+    directory.
 
-    :param abspath: An absolute pathname.
+    :param pathname: An absolute pathname.
     :returns: The pathname with the user's home directory abbreviated.
 
     Here's an example of its usage:
@@ -236,10 +237,12 @@ def format_path(pathname):
     >>> format_path(vimrc)
     '~/.vimrc'
     """
-    home = os.path.abspath(os.environ['HOME'])
     pathname = os.path.abspath(pathname)
-    if pathname.startswith(home):
-        pathname = os.path.join('~', os.path.relpath(pathname, home))
+    home = os.environ.get('HOME')
+    if home:
+        home = os.path.abspath(home)
+        if pathname.startswith(home):
+            pathname = os.path.join('~', os.path.relpath(pathname, home))
     return pathname
 
 class Timer(object):
