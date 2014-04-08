@@ -89,14 +89,14 @@ def parse_size(size):
     # Otherwise we expect to find two tokens: A number and a unit.
     if len(components) != 2:
         msg = "Expected to get two tokens, got %s!"
-        raise InvalidSize, msg % components
+        raise InvalidSize(msg % components)
     # Try to match the first letter of the unit.
     for unit in reversed(disk_size_units):
         if components[1].startswith(unit['prefix']):
             return int(float(components[0]) * unit['divider'])
     # Failed to match a unit: Explain what went wrong.
     msg = "Invalid disk size unit: %r"
-    raise InvalidSize, msg % components[1]
+    raise InvalidSize(msg % components[1])
 
 def round_number(count, keep_width=False):
     """
@@ -201,17 +201,17 @@ def parse_date(datestring):
     datetime.datetime(2013, 6, 17, 2, 47, 42)
     """
     try:
-        tokens = map(str.strip, datestring.split())
+        tokens = list(map(str.strip, datestring.split()))
         if len(tokens) >= 2:
-            date_parts = map(int, tokens[0].split('-')) + [1, 1]
-            time_parts = map(int, tokens[1].split(':')) + [0, 0, 0]
+            date_parts = list(map(int, tokens[0].split('-'))) + [1, 1]
+            time_parts = list(map(int, tokens[1].split(':'))) + [0, 0, 0]
             return tuple(date_parts[0:3] + time_parts[0:3])
         else:
-            year, month, day = (map(int, datestring.split('-')) + [1, 1])[0:3]
+            year, month, day = (list(map(int, datestring.split('-'))) + [1, 1])[0:3]
             return (year, month, day, 0, 0, 0)
     except Exception:
         msg = "Invalid date! (expected 'YYYY-MM-DD' or 'YYYY-MM-DD HH:MM:SS' but got: %r)"
-        raise InvalidDate, msg % datestring
+        raise InvalidDate(msg % datestring)
 
 def format_path(pathname):
     """
