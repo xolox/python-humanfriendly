@@ -45,7 +45,7 @@ class HumanFriendlyTestCase(unittest.TestCase):
         try:
             humanfriendly.parse_date('2013-06-XY')
             self.assertTrue(False)
-        except Exception, e:
+        except Exception as e:
             self.assertTrue(isinstance(e, humanfriendly.InvalidDate))
 
     def test_format_size(self):
@@ -67,7 +67,7 @@ class HumanFriendlyTestCase(unittest.TestCase):
         try:
             humanfriendly.parse_size('1z')
             self.assertTrue(False)
-        except Exception, e:
+        except Exception as e:
             self.assertTrue(isinstance(e, humanfriendly.InvalidSize))
 
     def test_round_number(self):
