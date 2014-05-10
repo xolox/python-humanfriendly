@@ -5,7 +5,7 @@
 # URL: https://humanfriendly.readthedocs.org
 
 # Semi-standard module versioning.
-__version__ = '1.8'
+__version__ = '1.8.1'
 
 # Standard library modules.
 import math
@@ -257,9 +257,10 @@ def concatenate(items):
     """
     Concatenate a list of items in a human friendly way.
 
-    :param items: A list of strings.
+    :param items: A sequence of strings.
     :returns: A single string.
     """
+    items = list(items)
     if len(items) > 1:
         return ', '.join(items[:-1]) + ' and ' + items[-1]
     elif items:
