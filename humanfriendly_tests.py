@@ -75,6 +75,7 @@ class HumanFriendlyTestCase(unittest.TestCase):
         self.assertEqual(os.path.join('~', '.vimrc'), humanfriendly.format_path(abspath))
 
     def test_concatenate(self):
+        self.assertEqual(humanfriendly.concatenate([]), '')
         self.assertEqual(humanfriendly.concatenate(['one']), 'one')
         self.assertEqual(humanfriendly.concatenate(['one', 'two']), 'one and two')
         self.assertEqual(humanfriendly.concatenate(['one', 'two', 'three']), 'one, two and three')
