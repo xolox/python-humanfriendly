@@ -1,11 +1,11 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: September 22, 2013
+# Last Change: May 10, 2014
 # URL: https://humanfriendly.readthedocs.org
 
 # Semi-standard module versioning.
-__version__ = '1.7.1'
+__version__ = '1.8'
 
 # Standard library modules.
 import math
