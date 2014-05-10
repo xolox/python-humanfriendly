@@ -3,7 +3,7 @@
 # Tests for the 'humanfriendly' module.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: June 27, 2013
+# Last Change: May 11, 2014
 # URL: https://humanfriendly.readthedocs.org
 
 # Standard library modules.
@@ -72,6 +72,11 @@ class HumanFriendlyTestCase(unittest.TestCase):
     def test_format_path(self):
         abspath = os.path.join(os.environ['HOME'], '.vimrc')
         self.assertEqual(os.path.join('~', '.vimrc'), humanfriendly.format_path(abspath))
+
+    def test_concatenate(self):
+        self.assertEqual(humanfriendly.concatenate(['one']), 'one')
+        self.assertEqual(humanfriendly.concatenate(['one', 'two']), 'one and two')
+        self.assertEqual(humanfriendly.concatenate(['one', 'two', 'three']), 'one, two and three')
 
 if __name__ == '__main__':
     unittest.main()
