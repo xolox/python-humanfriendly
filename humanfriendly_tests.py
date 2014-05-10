@@ -94,6 +94,10 @@ class HumanFriendlyTestCase(unittest.TestCase):
             t = humanfriendly.Timer(time.time() - seconds)
             self.assertEqual(humanfriendly.round_number(t.elapsed_time, keep_width=True), '%i.00' % seconds)
             self.assertEqual(str(t), text)
+        t = humanfriendly.Timer()
+        time.sleep(1)
+        self.assertEqual(humanfriendly.round_number(t.elapsed_time, keep_width=True), '1.00')
+        self.assertEqual(str(t), '1 second')
 
 if __name__ == '__main__':
     unittest.main()
