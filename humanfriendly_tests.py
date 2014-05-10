@@ -12,6 +12,13 @@ import os
 import time
 import unittest
 
+try:
+    # Python 2.x.
+    from StringIO import StringIO
+except ImportError:
+    # Python 3.x.
+    from io import StringIO
+
 # The module we are testing.
 import humanfriendly
 
@@ -98,6 +105,15 @@ class HumanFriendlyTestCase(unittest.TestCase):
         time.sleep(1)
         self.assertEqual(humanfriendly.round_number(t.elapsed_time, keep_width=True), '1.00')
         self.assertEqual(str(t), '1 second')
+
+    def test_spinner(self):
+        stream = StringIO()
+        spinner = humanfriendly.Spinner('test spinner', stream=stream)
+        for i in range(4):
+            spinner.step()
+        lines = stream.getvalue().splitlines()
+        self.assertTrue(all('test spinner' in l for l in lines))
+        self.assertEqual(sorted(set(lines)), sorted(lines))
 
 if __name__ == '__main__':
     unittest.main()
