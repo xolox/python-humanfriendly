@@ -9,6 +9,7 @@
 # Standard library modules.
 import math
 import os
+import time
 import unittest
 
 # The module we are testing.
@@ -77,6 +78,21 @@ class HumanFriendlyTestCase(unittest.TestCase):
         self.assertEqual(humanfriendly.concatenate(['one']), 'one')
         self.assertEqual(humanfriendly.concatenate(['one', 'two']), 'one and two')
         self.assertEqual(humanfriendly.concatenate(['one', 'two', 'three']), 'one, two and three')
+
+    def test_timer(self):
+        for seconds, text in ((1, '1 second'),
+                              (2, '2 seconds'),
+                              (60, '1 minute'),
+                              (60*2, '2 minutes'),
+                              (60*60, '1 hour'),
+                              (60*60*2, '2 hours'),
+                              (60*60*24, '1 day'),
+                              (60*60*24*2, '2 days'),
+                              (60*60*24*7, '1 week'),
+                              (60*60*24*7*2, '2 weeks')):
+            t = humanfriendly.Timer(time.time() - seconds)
+            self.assertEqual(humanfriendly.round_number(t.elapsed_time, keep_width=True), '%i.00' % seconds)
+            self.assertEqual(str(t), text)
 
 if __name__ == '__main__':
     unittest.main()

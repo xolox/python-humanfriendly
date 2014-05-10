@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: May 10, 2014
+# Last Change: May 11, 2014
 # URL: https://humanfriendly.readthedocs.org
 
 # Semi-standard module versioning.
@@ -273,11 +273,15 @@ class Timer(object):
     Easy to use timer to keep track of long during operations.
     """
 
-    def __init__(self):
+    def __init__(self, start_time=None):
         """
         Remember the time when the :py:class:`Timer` was created.
+
+        :param start_time: The start time (a float, defaults to the current time).
         """
-        self.start_time = time.time()
+        if start_time is None:
+            start_time = time.time()
+        self.start_time = start_time
 
     @property
     def elapsed_time(self):
