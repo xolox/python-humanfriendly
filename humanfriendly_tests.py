@@ -42,11 +42,7 @@ class HumanFriendlyTestCase(unittest.TestCase):
     def test_parse_date(self):
         self.assertEqual((2013, 6, 17, 0, 0, 0), humanfriendly.parse_date('2013-06-17'))
         self.assertEqual((2013, 6, 17, 2, 47, 42), humanfriendly.parse_date('2013-06-17 02:47:42'))
-        try:
-            humanfriendly.parse_date('2013-06-XY')
-            self.assertTrue(False)
-        except Exception as e:
-            self.assertTrue(isinstance(e, humanfriendly.InvalidDate))
+        self.assertRaises(humanfriendly.InvalidDate, humanfriendly.parse_date, '2013-06-XY')
 
     def test_format_size(self):
         self.assertEqual('0 bytes', humanfriendly.format_size(0))
@@ -64,11 +60,8 @@ class HumanFriendlyTestCase(unittest.TestCase):
         self.assertEqual(1024, humanfriendly.parse_size('1 KB'))
         self.assertEqual(1024, humanfriendly.parse_size('1 kilobyte'))
         self.assertEqual(1024 ** 3, humanfriendly.parse_size('1 GB'))
-        try:
-            humanfriendly.parse_size('1z')
-            self.assertTrue(False)
-        except Exception as e:
-            self.assertTrue(isinstance(e, humanfriendly.InvalidSize))
+        self.assertRaises(humanfriendly.InvalidSize, humanfriendly.parse_size, '1z')
+        self.assertRaises(humanfriendly.InvalidSize, humanfriendly.parse_size, 'a')
 
     def test_round_number(self):
         self.assertEqual('1', humanfriendly.round_number(1))
