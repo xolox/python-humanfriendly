@@ -1,11 +1,11 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: May 11, 2014
+# Last Change: June 1, 2014
 # URL: https://humanfriendly.readthedocs.org
 
 # Semi-standard module versioning.
-__version__ = '1.8.1'
+__version__ = '1.8.2'
 
 # Standard library modules.
 import math
@@ -310,6 +310,7 @@ class Spinner(object):
         self.stream = stream
         self.states = ['-', '\\', '|', '/']
         self.counter = 0
+        self.last_update = 0
         try:
             self.interactive = stream.isatty()
         except Exception:
@@ -322,9 +323,12 @@ class Spinner(object):
         for a prompt which is completely silent for a long time.
         """
         if self.interactive:
-            state = self.states[self.counter % len(self.states)]
-            self.stream.write("\r %s %s " % (state, self.label))
-            self.counter += 1
+            time_now = time.time()
+            if time_now - self.last_update >= 0.2:
+                self.last_update = time_now
+                state = self.states[self.counter % len(self.states)]
+                self.stream.write("\r %s %s " % (state, self.label))
+                self.counter += 1
 
     def clear(self):
         """
