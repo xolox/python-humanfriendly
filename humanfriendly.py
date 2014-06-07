@@ -1,11 +1,11 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: June 1, 2014
+# Last Change: June 7, 2014
 # URL: https://humanfriendly.readthedocs.org
 
 # Semi-standard module versioning.
-__version__ = '1.8.2'
+__version__ = '1.8.3'
 
 # Standard library modules.
 import math
@@ -316,7 +316,7 @@ class Spinner(object):
         except Exception:
             self.interactive = False
 
-    def step(self):
+    def step(self, label=None):
         """
         Advance the spinner by one step without starting a new line, causing
         an animated effect which is very simple but much nicer than waiting
@@ -327,7 +327,7 @@ class Spinner(object):
             if time_now - self.last_update >= 0.2:
                 self.last_update = time_now
                 state = self.states[self.counter % len(self.states)]
-                self.stream.write("\r %s %s " % (state, self.label))
+                self.stream.write("\r %s %s " % (state, label or self.label))
                 self.counter += 1
 
     def clear(self):
