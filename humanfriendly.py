@@ -5,7 +5,7 @@
 # URL: https://humanfriendly.readthedocs.org
 
 # Semi-standard module versioning.
-__version__ = '1.8.3'
+__version__ = '1.8.4'
 
 # Standard library modules.
 import math
@@ -305,7 +305,7 @@ class Spinner(object):
     happening during long running operations that would otherwise be silent.
     """
 
-    def __init__(self, label, stream=sys.stderr):
+    def __init__(self, label=None, stream=sys.stderr):
         self.label = label
         self.stream = stream
         self.states = ['-', '\\', '|', '/']
@@ -327,7 +327,10 @@ class Spinner(object):
             if time_now - self.last_update >= 0.2:
                 self.last_update = time_now
                 state = self.states[self.counter % len(self.states)]
-                self.stream.write("\r %s %s " % (state, label or self.label))
+                label = label or self.label
+                if not label:
+                    raise Exception("No label set for spinner!")
+                self.stream.write("\r %s %s " % (state, label))
                 self.counter += 1
 
     def clear(self):
