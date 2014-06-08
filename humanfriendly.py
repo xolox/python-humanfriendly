@@ -5,7 +5,7 @@
 # URL: https://humanfriendly.readthedocs.org
 
 # Semi-standard module versioning.
-__version__ = '1.8.5'
+__version__ = '1.8.6'
 
 # Standard library modules.
 import math
@@ -332,8 +332,17 @@ class Spinner(object):
     happening during long running operations that would otherwise be silent.
     """
 
-    def __init__(self, label=None, stream=sys.stderr):
+    def __init__(self, label=None, total=0, stream=sys.stderr):
+        """
+        Initialize a spinner.
+
+        :param label: The label for the spinner (a string, defaults to ``None``).
+        :param total: The expected number of steps (an integer).
+        :param stream: The output stream to show the spinner on (defaults to
+                       :py:data:`sys.stderr`).
+        """
         self.label = label
+        self.total = total
         self.stream = stream
         self.states = ['-', '\\', '|', '/']
         self.counter = 0
@@ -343,7 +352,7 @@ class Spinner(object):
         except Exception:
             self.interactive = False
 
-    def step(self, label=None):
+    def step(self, progress=0, label=None):
         """
         Advance the spinner by one step without starting a new line, causing
         an animated effect which is very simple but much nicer than waiting
@@ -357,6 +366,8 @@ class Spinner(object):
                 label = label or self.label
                 if not label:
                     raise Exception("No label set for spinner!")
+                elif self.total and progress:
+                    label = "%s: %.2f%%" % (label, progress/(self.total/100.0))
                 self.stream.write("\r %s %s " % (state, label))
                 self.counter += 1
 
