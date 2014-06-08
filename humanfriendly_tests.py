@@ -3,7 +3,7 @@
 # Tests for the 'humanfriendly' module.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: May 11, 2014
+# Last Change: June 8, 2014
 # URL: https://humanfriendly.readthedocs.org
 
 # Standard library modules.
@@ -30,9 +30,9 @@ class HumanFriendlyTestCase(unittest.TestCase):
         day = hour * 24
         week = day * 7
         year = week * 52
-        self.assertEqual('0 seconds', humanfriendly.format_timespan(0))
+        self.assertEqual('0.00 seconds', humanfriendly.format_timespan(0))
         self.assertEqual('0.54 seconds', humanfriendly.format_timespan(0.54321))
-        self.assertEqual('1 second', humanfriendly.format_timespan(1))
+        self.assertEqual('1.00 second', humanfriendly.format_timespan(1))
         self.assertEqual('3.14 seconds', humanfriendly.format_timespan(math.pi))
         self.assertEqual('1 minute', humanfriendly.format_timespan(minute))
         self.assertEqual('1 minute and 20 seconds', humanfriendly.format_timespan(80))
@@ -88,8 +88,8 @@ class HumanFriendlyTestCase(unittest.TestCase):
         self.assertEqual(humanfriendly.concatenate(['one', 'two', 'three']), 'one, two and three')
 
     def test_timer(self):
-        for seconds, text in ((1, '1 second'),
-                              (2, '2 seconds'),
+        for seconds, text in ((1, '1.00 second'),
+                              (2, '2.00 seconds'),
                               (60, '1 minute'),
                               (60*2, '2 minutes'),
                               (60*60, '1 hour'),
@@ -101,10 +101,18 @@ class HumanFriendlyTestCase(unittest.TestCase):
             t = humanfriendly.Timer(time.time() - seconds)
             self.assertEqual(humanfriendly.round_number(t.elapsed_time, keep_width=True), '%i.00' % seconds)
             self.assertEqual(str(t), text)
-        t = humanfriendly.Timer()
+        # Test automatic timer.
+        automatic_timer = humanfriendly.Timer()
         time.sleep(1)
-        self.assertEqual(humanfriendly.round_number(t.elapsed_time, keep_width=True), '1.00')
-        self.assertEqual(str(t), '1 second')
+        self.assertEqual(humanfriendly.round_number(automatic_timer.elapsed_time, keep_width=True), '1.00')
+        self.assertEqual(str(automatic_timer), '1.00 second')
+        # Test resumable timer.
+        resumable_timer = humanfriendly.Timer(resumable=True)
+        for i in range(2):
+            with resumable_timer:
+                time.sleep(1)
+        self.assertEqual(humanfriendly.round_number(resumable_timer.elapsed_time, keep_width=True), '2.00')
+        self.assertEqual(str(resumable_timer), '2.00 seconds')
 
     def test_spinner(self):
         stream = StringIO()

@@ -1,11 +1,11 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: June 7, 2014
+# Last Change: June 8, 2014
 # URL: https://humanfriendly.readthedocs.org
 
 # Semi-standard module versioning.
-__version__ = '1.8.4'
+__version__ = '1.8.5'
 
 # Standard library modules.
 import math
@@ -150,7 +150,8 @@ def format_timespan(num_seconds):
     """
     if num_seconds < 60:
         # Fast path.
-        return pluralize(round_number(num_seconds), 'second', 'seconds')
+        rounded_number = round_number(num_seconds, num_seconds < 10)
+        return pluralize(rounded_number, 'second', 'seconds')
     else:
         # Slow path.
         result = []
@@ -274,22 +275,48 @@ class Timer(object):
     Easy to use timer to keep track of long during operations.
     """
 
-    def __init__(self, start_time=None):
+    def __init__(self, start_time=None, resumable=False):
         """
         Remember the time when the :py:class:`Timer` was created.
 
         :param start_time: The start time (a float, defaults to the current time).
+        :param resumable: Create a resumable timer (defaults to ``False``).
         """
-        if start_time is None:
-            start_time = time.time()
-        self.start_time = start_time
+        self.resumable = resumable
+        if self.resumable:
+            self.start_time = 0.0
+            self.total_time = 0.0
+        else:
+            self.start_time = start_time or time.time()
+
+    def __enter__(self):
+        """
+        Start or resume counting elapsed time.
+        """
+        if not self.resumable:
+            raise ValueError("Timer is not resumable!")
+        self.start_time = time.time()
+
+    def __exit__(self, exc_type=None, exc_value=None, traceback=None):
+        """
+        Stop counting elapsed time.
+        """
+        if not self.resumable:
+            raise ValueError("Timer is not resumable!")
+        self.total_time += time.time() - self.start_time
+        self.start_time = 0
 
     @property
     def elapsed_time(self):
         """
-        Get the number of seconds elapsed since the :py:class:`Timer` was created.
+        Get the number of seconds counted so far.
         """
-        return time.time() - self.start_time
+        elapsed_time = 0
+        if self.resumable:
+            elapsed_time += self.total_time
+        if self.start_time:
+            elapsed_time += time.time() - self.start_time
+        return elapsed_time
 
     def __str__(self):
         """
