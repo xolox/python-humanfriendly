@@ -5,7 +5,7 @@
 # URL: https://humanfriendly.readthedocs.org
 
 # Semi-standard module versioning.
-__version__ = '1.9'
+__version__ = '1.9.1'
 
 # Standard library modules.
 import math
@@ -286,7 +286,10 @@ def prompt_for_choice(choices, default=None):
     choices = list(choices)
     # Present the available choices in a user friendly way.
     for i, choice in enumerate(choices, start=1):
-        print(u" %i. %s" % (i, choice))
+        text = u" %i. %s" % (i, choice)
+        if choice == default:
+            text += " (default choice)"
+        print(text)
     # Loop until a valid choice is made.
     prompt = "Enter your choice as a number or unique substring (Ctrl-C aborts): "
     while True:
