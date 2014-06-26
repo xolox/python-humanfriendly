@@ -63,7 +63,9 @@ class HumanFriendlyTestCase(unittest.TestCase):
         self.assertEqual('1 PB', humanfriendly.format_size(1024 ** 5))
 
     def test_parse_size(self):
+        self.assertEqual(0, humanfriendly.parse_size('0B'))
         self.assertEqual(42, humanfriendly.parse_size('42'))
+        self.assertEqual(42, humanfriendly.parse_size('42B'))
         self.assertEqual(1024, humanfriendly.parse_size('1k'))
         self.assertEqual(1024, humanfriendly.parse_size('1 KB'))
         self.assertEqual(1024, humanfriendly.parse_size('1 kilobyte'))
