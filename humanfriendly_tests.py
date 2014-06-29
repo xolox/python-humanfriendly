@@ -124,7 +124,6 @@ class HumanFriendlyTestCase(unittest.TestCase):
             time.sleep(0.2)
         spinner.clear()
         lines = [line for line in stream.getvalue().split('\r') if line]
-        print lines
         self.assertTrue(len(lines) > 0)
         self.assertTrue(all('test spinner' in l for l in lines))
         self.assertTrue(all('%' in l for l in lines))
