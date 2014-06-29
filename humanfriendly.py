@@ -1,11 +1,11 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: June 23, 2014
+# Last Change: June 29, 2014
 # URL: https://humanfriendly.readthedocs.org
 
 # Semi-standard module versioning.
-__version__ = '1.9.1'
+__version__ = '1.9.2'
 
 # Standard library modules.
 import math
@@ -16,7 +16,8 @@ import sys
 import time
 
 # Common disk size units, used for formatting and parsing.
-disk_size_units = (dict(prefix='k', divider=1024**1, singular='KB', plural='KB'),
+disk_size_units = (dict(prefix='b', divider=1, singular='byte', plural='bytes'),
+                   dict(prefix='k', divider=1024**1, singular='KB', plural='KB'),
                    dict(prefix='m', divider=1024**2, singular='MB', plural='MB'),
                    dict(prefix='g', divider=1024**3, singular='GB', plural='GB'),
                    dict(prefix='t', divider=1024**4, singular='TB', plural='TB'),
