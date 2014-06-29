@@ -130,33 +130,34 @@ class HumanFriendlyTestCase(unittest.TestCase):
         self.assertEqual(sorted(set(lines)), sorted(lines))
 
     def test_prompt_for_choice(self):
+        interactive_prompt = humanfriendly.interactive_prompt
         try:
             # Choice selection by full string match.
-            humanfriendly.raw_input = lambda prompt: 'foo'
+            humanfriendly.interactive_prompt = lambda prompt: 'foo'
             self.assertEqual(humanfriendly.prompt_for_choice(['foo', 'bar']), 'foo')
             # Choice selection by substring input.
-            humanfriendly.raw_input = lambda prompt: 'f'
+            humanfriendly.interactive_prompt = lambda prompt: 'f'
             self.assertEqual(humanfriendly.prompt_for_choice(['foo', 'bar']), 'foo')
             # Choice selection by number.
-            humanfriendly.raw_input = lambda prompt: '2'
+            humanfriendly.interactive_prompt = lambda prompt: '2'
             self.assertEqual(humanfriendly.prompt_for_choice(['foo', 'bar']), 'bar')
             # Choice selection by going with the default.
-            humanfriendly.raw_input = lambda prompt: ''
+            humanfriendly.interactive_prompt = lambda prompt: ''
             self.assertEqual(humanfriendly.prompt_for_choice(['foo', 'bar'], default='bar'), 'bar')
             # Invalid substrings are refused.
             responses = ['', 'q', 'z']
-            humanfriendly.raw_input = lambda prompt: responses.pop(0)
+            humanfriendly.interactive_prompt = lambda prompt: responses.pop(0)
             self.assertEqual(humanfriendly.prompt_for_choice(['foo', 'bar', 'baz']), 'baz')
             # Choice selection by substring input requires an unambiguous substring match.
             responses = ['a', 'q']
-            humanfriendly.raw_input = lambda prompt: responses.pop(0)
+            humanfriendly.interactive_prompt = lambda prompt: responses.pop(0)
             self.assertEqual(humanfriendly.prompt_for_choice(['foo', 'bar', 'baz', 'qux']), 'qux')
             # Invalid numbers are refused.
             responses = ['42', '2']
-            humanfriendly.raw_input = lambda prompt: responses.pop(0)
+            humanfriendly.interactive_prompt = lambda prompt: responses.pop(0)
             self.assertEqual(humanfriendly.prompt_for_choice(['foo', 'bar', 'baz']), 'bar')
         finally:
-            humanfriendly.raw_input = raw_input
+            humanfriendly.interactive_prompt = interactive_prompt
 
 if __name__ == '__main__':
     unittest.main()

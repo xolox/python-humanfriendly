@@ -5,7 +5,7 @@
 # URL: https://humanfriendly.readthedocs.org
 
 # Semi-standard module versioning.
-__version__ = '1.9.3'
+__version__ = '1.9.4'
 
 # Standard library modules.
 import math
@@ -14,6 +14,13 @@ import os.path
 import re
 import sys
 import time
+
+try:
+    # Python 2.x.
+    interactive_prompt = raw_input
+except NameError:
+    # Python 3.x.
+    interactive_prompt = input
 
 # Common disk size units, used for formatting and parsing.
 disk_size_units = (dict(prefix='b', divider=1, singular='byte', plural='bytes'),
@@ -294,7 +301,7 @@ def prompt_for_choice(choices, default=None):
     # Loop until a valid choice is made.
     prompt = "Enter your choice as a number or unique substring (Ctrl-C aborts): "
     while True:
-        input = raw_input(prompt).strip()
+        input = interactive_prompt(prompt).strip()
         # Make sure the user entered something.
         if not input:
             if default is not None:
