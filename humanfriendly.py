@@ -5,7 +5,7 @@
 # URL: https://humanfriendly.readthedocs.org
 
 # Semi-standard module versioning.
-__version__ = '1.9.2'
+__version__ = '1.9.3'
 
 # Standard library modules.
 import math
@@ -390,7 +390,7 @@ class Spinner(object):
     happening during long running operations that would otherwise be silent.
     """
 
-    def __init__(self, label=None, total=0, stream=sys.stderr):
+    def __init__(self, label=None, total=0, stream=sys.stderr, interactive=None):
         """
         Initialize a spinner.
 
@@ -398,6 +398,9 @@ class Spinner(object):
         :param total: The expected number of steps (an integer).
         :param stream: The output stream to show the spinner on (defaults to
                        :py:data:`sys.stderr`).
+        :param interactive: If this is ``False`` then the spinner doesn't write
+                            to the output stream at all. If defaults to the
+                            return value of ``stream.isatty()``.
         """
         self.label = label
         self.total = total
@@ -405,10 +408,12 @@ class Spinner(object):
         self.states = ['-', '\\', '|', '/']
         self.counter = 0
         self.last_update = 0
-        try:
-            self.interactive = stream.isatty()
-        except Exception:
-            self.interactive = False
+        if interactive is None:
+            try:
+                interactive = stream.isatty()
+            except Exception:
+                interactive = False
+        self.interactive = interactive
 
     def step(self, progress=0, label=None):
         """

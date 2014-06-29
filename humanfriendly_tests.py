@@ -3,7 +3,7 @@
 # Tests for the 'humanfriendly' module.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: June 8, 2014
+# Last Change: June 29, 2014
 # URL: https://humanfriendly.readthedocs.org
 
 # Standard library modules.
@@ -118,12 +118,46 @@ class HumanFriendlyTestCase(unittest.TestCase):
 
     def test_spinner(self):
         stream = StringIO()
-        spinner = humanfriendly.Spinner('test spinner', stream=stream)
-        for i in range(4):
-            spinner.step()
-        lines = stream.getvalue().splitlines()
+        spinner = humanfriendly.Spinner('test spinner', total=4, stream=stream, interactive=True)
+        for progress in [1, 2, 3, 4]:
+            spinner.step(progress=progress)
+            time.sleep(0.2)
+        spinner.clear()
+        lines = [line for line in stream.getvalue().split('\r') if line]
+        print lines
+        self.assertTrue(len(lines) > 0)
         self.assertTrue(all('test spinner' in l for l in lines))
+        self.assertTrue(all('%' in l for l in lines))
         self.assertEqual(sorted(set(lines)), sorted(lines))
+
+    def test_prompt_for_choice(self):
+        try:
+            # Choice selection by full string match.
+            humanfriendly.raw_input = lambda prompt: 'foo'
+            self.assertEqual(humanfriendly.prompt_for_choice(['foo', 'bar']), 'foo')
+            # Choice selection by substring input.
+            humanfriendly.raw_input = lambda prompt: 'f'
+            self.assertEqual(humanfriendly.prompt_for_choice(['foo', 'bar']), 'foo')
+            # Choice selection by number.
+            humanfriendly.raw_input = lambda prompt: '2'
+            self.assertEqual(humanfriendly.prompt_for_choice(['foo', 'bar']), 'bar')
+            # Choice selection by going with the default.
+            humanfriendly.raw_input = lambda prompt: ''
+            self.assertEqual(humanfriendly.prompt_for_choice(['foo', 'bar'], default='bar'), 'bar')
+            # Invalid substrings are refused.
+            responses = ['', 'q', 'z']
+            humanfriendly.raw_input = lambda prompt: responses.pop(0)
+            self.assertEqual(humanfriendly.prompt_for_choice(['foo', 'bar', 'baz']), 'baz')
+            # Choice selection by substring input requires an unambiguous substring match.
+            responses = ['a', 'q']
+            humanfriendly.raw_input = lambda prompt: responses.pop(0)
+            self.assertEqual(humanfriendly.prompt_for_choice(['foo', 'bar', 'baz', 'qux']), 'qux')
+            # Invalid numbers are refused.
+            responses = ['42', '2']
+            humanfriendly.raw_input = lambda prompt: responses.pop(0)
+            self.assertEqual(humanfriendly.prompt_for_choice(['foo', 'bar', 'baz']), 'bar')
+        finally:
+            humanfriendly.raw_input = raw_input
 
 if __name__ == '__main__':
     unittest.main()
