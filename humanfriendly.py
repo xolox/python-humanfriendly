@@ -5,7 +5,7 @@
 # URL: https://humanfriendly.readthedocs.org
 
 # Semi-standard module versioning.
-__version__ = '1.9.4'
+__version__ = '1.9.5'
 
 # Standard library modules.
 import math
