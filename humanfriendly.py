@@ -145,9 +145,9 @@ def format_timespan(num_seconds):
 
     >>> from humanfriendly import format_timespan
     >>> format_timespan(0)
-    '0 seconds'
+    '0.00 seconds'
     >>> format_timespan(1)
-    '1 second'
+    '1.00 second'
     >>> format_timespan(math.pi)
     '3.14 seconds'
     >>> hour = 60 * 60
@@ -268,6 +268,10 @@ def concatenate(items):
 
     :param items: A sequence of strings.
     :returns: A single string.
+
+    >>> from humanfriendly import concatenate
+    >>> concatenate(["eggs", "milk", "bread"])
+    'eggs, milk and bread'
     """
     items = list(items)
     if len(items) > 1:
@@ -395,6 +399,19 @@ class Spinner(object):
     """
     Show a "spinner" on the terminal to let the user know that something is
     happening during long running operations that would otherwise be silent.
+
+    >>> from time import sleep
+    >>> from humanfriendly import Spinner
+    >>> spin = Spinner(label="Downloading")
+    >>> for i in xrange(100):
+        sleep(0.1)
+        spin.step()
+    | Downloading  # cycles through | / - \
+    >>> spin = Spinner(label="Downloading", total=100)
+    >>> for i in xrange(100):
+        sleep(0.1)
+        spin.step(i)
+    | Downloading: 1.00% # travels up to 100%...
     """
 
     def __init__(self, label=None, total=0, stream=sys.stderr, interactive=None):
@@ -406,7 +423,7 @@ class Spinner(object):
         :param stream: The output stream to show the spinner on (defaults to
                        :py:data:`sys.stderr`).
         :param interactive: If this is ``False`` then the spinner doesn't write
-                            to the output stream at all. If defaults to the
+                            to the output stream at all. It defaults to the
                             return value of ``stream.isatty()``.
         """
         self.label = label
@@ -426,7 +443,9 @@ class Spinner(object):
         """
         Advance the spinner by one step without starting a new line, causing
         an animated effect which is very simple but much nicer than waiting
-        for a prompt which is completely silent for a long time.
+        for a prompt which is completely silent for a long time. Progress
+        should be the amount out of ``Spinner.total`` that is complete, not
+        a step amount.
         """
         if self.interactive:
             time_now = time.time()
