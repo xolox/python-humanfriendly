@@ -30,6 +30,13 @@ class HumanFriendlyTestCase(unittest.TestCase):
         self.assertEqual('1 box', humanfriendly.pluralize(1, 'box', 'boxes'))
         self.assertEqual('2 boxes', humanfriendly.pluralize(2, 'box', 'boxes'))
 
+    def test_boolean_coercion(self):
+        for value in [True, 'TRUE', 'True', 'true', 'on', 'yes', '1']:
+            self.assertEqual(True, humanfriendly.coerce_boolean(value))
+        for value in [False, 'FALSE', 'False', 'false', 'off', 'no', '0']:
+            self.assertEqual(False, humanfriendly.coerce_boolean(value))
+        self.assertRaises(ValueError, humanfriendly.coerce_boolean, 'not a boolean')
+
     def test_format_timespan(self):
         minute = 60
         hour = minute * 60

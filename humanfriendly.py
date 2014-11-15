@@ -5,7 +5,7 @@
 # URL: https://humanfriendly.readthedocs.org
 
 # Semi-standard module versioning.
-__version__ = '1.10'
+__version__ = '1.11'
 
 # Standard library modules.
 import math
@@ -18,9 +18,11 @@ import time
 try:
     # Python 2.x.
     interactive_prompt = raw_input
+    string_types = basestring
 except NameError:
     # Python 3.x.
     interactive_prompt = input
+    string_types = str
 
 # Common disk size units, used for formatting and parsing.
 disk_size_units = (dict(prefix='b', divider=1, singular='byte', plural='bytes'),
@@ -37,6 +39,33 @@ time_units = (dict(divider=1, singular='second', plural='seconds'),
               dict(divider=60*60*24, singular='day', plural='days'),
               dict(divider=60*60*24*7, singular='week', plural='weeks'),
               dict(divider=60*60*24*7*52, singular='year', plural='years'))
+
+def coerce_boolean(value):
+    """
+    Coerce any value to a boolean.
+
+    :param value: Any Python value. If the value is a string:
+
+                  - The strings '1', 'yes', 'true' and 'on' are coerced to ``True``.
+                  - The strings '0', 'no', 'false' and 'off' are coerced to ``False``.
+                  - Other strings raise an exception.
+
+                  Other Python values are coerced using :py:func:`bool()`.
+    :returns: A proper boolean value.
+    :raises: :py:exc:`exceptions.ValueError` when the value is a string but
+             cannot be coerced with certainty.
+    """
+    if isinstance(value, string_types):
+        normalized = value.strip().lower()
+        if normalized in ('1', 'yes', 'true', 'on'):
+            return True
+        elif normalized in ('0', 'no', 'false', 'off'):
+            return False
+        else:
+            msg = "Failed to coerce string to boolean! (%r)"
+            raise ValueError(msg % value)
+    else:
+        return bool(value)
 
 def format_size(num_bytes, keep_width=False):
     """
