@@ -3,7 +3,7 @@
 # Tests for the 'humanfriendly' module.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: June 29, 2014
+# Last Change: November 15, 2014
 # URL: https://humanfriendly.readthedocs.org
 
 # Standard library modules.
@@ -23,6 +23,12 @@ except ImportError:
 import humanfriendly
 
 class HumanFriendlyTestCase(unittest.TestCase):
+
+    def test_pluralization(self):
+        self.assertEqual('1 word', humanfriendly.pluralize(1, 'word'))
+        self.assertEqual('2 words', humanfriendly.pluralize(2, 'word'))
+        self.assertEqual('1 box', humanfriendly.pluralize(1, 'box', 'boxes'))
+        self.assertEqual('2 boxes', humanfriendly.pluralize(2, 'box', 'boxes'))
 
     def test_format_timespan(self):
         minute = 60

@@ -1,11 +1,11 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: September 14, 2014
+# Last Change: November 15, 2014
 # URL: https://humanfriendly.readthedocs.org
 
 # Semi-standard module versioning.
-__version__ = '1.9.6'
+__version__ = '1.10'
 
 # Standard library modules.
 import math
@@ -66,7 +66,7 @@ def format_size(num_bytes, keep_width=False):
         if num_bytes >= unit['divider']:
             number = round_number(float(num_bytes) / unit['divider'], keep_width=keep_width)
             return pluralize(number, unit['singular'], unit['plural'])
-    return pluralize(num_bytes, 'byte', 'bytes')
+    return pluralize(num_bytes, 'byte')
 
 def parse_size(size):
     """
@@ -159,7 +159,7 @@ def format_timespan(num_seconds):
     if num_seconds < 60:
         # Fast path.
         rounded_number = round_number(num_seconds, num_seconds < 10)
-        return pluralize(rounded_number, 'second', 'seconds')
+        return pluralize(rounded_number, 'second')
     else:
         # Slow path.
         result = []
@@ -251,15 +251,22 @@ def format_path(pathname):
             pathname = os.path.join('~', os.path.relpath(pathname, home))
     return pathname
 
-def pluralize(count, singular, plural):
+def pluralize(count, singular, plural=None):
     """
     Combine a count with the singular or plural form of a word.
 
+    If the plural form of the word is not provided it is obtained by
+    concatenating the singular form of the word with the letter "s". Of course
+    this will not always be correct, which is why you have the option to
+    specify both forms.
+
     :param count: The count (a number).
-    :param singular: The singular of the word.
-    :param plural: The plural of the word.
-    :returns: The count and applicable word in a string.
+    :param singular: The singular form of the word (a string).
+    :param plural: The plural form of the word (a string or ``None``).
+    :returns: The count and singular/plural word concatenated (a string).
     """
+    if not plural:
+        plural = singular + 's'
     return '%s %s' % (count, singular if math.floor(float(count)) == 1 else plural)
 
 def concatenate(items):
