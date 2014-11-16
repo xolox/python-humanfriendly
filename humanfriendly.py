@@ -5,7 +5,7 @@
 # URL: https://humanfriendly.readthedocs.org
 
 # Semi-standard module versioning.
-__version__ = '1.12'
+__version__ = '1.13'
 
 # Standard library modules.
 import math
@@ -454,7 +454,7 @@ class Spinner(object):
     | Downloading: 1.00% # travels up to 100%...
     """
 
-    def __init__(self, label=None, total=0, stream=sys.stderr, interactive=None):
+    def __init__(self, label=None, total=0, stream=sys.stderr, interactive=None, timer=None):
         """
         Initialize a spinner.
 
@@ -465,6 +465,9 @@ class Spinner(object):
         :param interactive: If this is ``False`` then the spinner doesn't write
                             to the output stream at all. It defaults to the
                             return value of ``stream.isatty()``.
+        :param timer: A :py:class:`Timer` object (optional). If this is given
+                      the spinner will show the elapsed time according to the
+                      timer.
         """
         self.label = label
         self.total = total
@@ -478,6 +481,7 @@ class Spinner(object):
             except Exception:
                 interactive = False
         self.interactive = interactive
+        self.timer = timer
 
     def step(self, progress=0, label=None):
         """
@@ -497,7 +501,9 @@ class Spinner(object):
                     raise Exception("No label set for spinner!")
                 elif self.total and progress:
                     label = "%s: %.2f%%" % (label, progress/(self.total/100.0))
-                self.stream.write("\r %s %s " % (state, label))
+                elif self.timer and self.timer.elapsed_time > 2:
+                    label = "%s (%s)" % (label, self.timer.rounded)
+                self.stream.write("\r %s %s .. " % (state, label))
                 self.counter += 1
 
     def clear(self):
