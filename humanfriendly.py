@@ -1,11 +1,11 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: November 15, 2014
+# Last Change: November 16, 2014
 # URL: https://humanfriendly.readthedocs.org
 
 # Semi-standard module versioning.
-__version__ = '1.11'
+__version__ = '1.12'
 
 # Standard library modules.
 import math
@@ -187,8 +187,7 @@ def format_timespan(num_seconds):
     """
     if num_seconds < 60:
         # Fast path.
-        rounded_number = round_number(num_seconds, num_seconds < 10)
-        return pluralize(rounded_number, 'second')
+        return pluralize(round_number(num_seconds), 'second')
     else:
         # Slow path.
         result = []
@@ -422,6 +421,11 @@ class Timer(object):
         if self.start_time:
             elapsed_time += time.time() - self.start_time
         return elapsed_time
+
+    @property
+    def rounded(self):
+        """Human readable timespan rounded to seconds (a string)."""
+        return format_timespan(round(self.elapsed_time))
 
     def __str__(self):
         """

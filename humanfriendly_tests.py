@@ -3,7 +3,7 @@
 # Tests for the 'humanfriendly' module.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: November 15, 2014
+# Last Change: November 16, 2014
 # URL: https://humanfriendly.readthedocs.org
 
 # Standard library modules.
@@ -43,9 +43,9 @@ class HumanFriendlyTestCase(unittest.TestCase):
         day = hour * 24
         week = day * 7
         year = week * 52
-        self.assertEqual('0.00 seconds', humanfriendly.format_timespan(0))
+        self.assertEqual('0 seconds', humanfriendly.format_timespan(0))
         self.assertEqual('0.54 seconds', humanfriendly.format_timespan(0.54321))
-        self.assertEqual('1.00 second', humanfriendly.format_timespan(1))
+        self.assertEqual('1 second', humanfriendly.format_timespan(1))
         self.assertEqual('3.14 seconds', humanfriendly.format_timespan(math.pi))
         self.assertEqual('1 minute', humanfriendly.format_timespan(minute))
         self.assertEqual('1 minute and 20 seconds', humanfriendly.format_timespan(80))
@@ -103,8 +103,8 @@ class HumanFriendlyTestCase(unittest.TestCase):
         self.assertEqual(humanfriendly.concatenate(['one', 'two', 'three']), 'one, two and three')
 
     def test_timer(self):
-        for seconds, text in ((1, '1.00 second'),
-                              (2, '2.00 seconds'),
+        for seconds, text in ((1, '1 second'),
+                              (2, '2 seconds'),
                               (60, '1 minute'),
                               (60*2, '2 minutes'),
                               (60*60, '1 hour'),
