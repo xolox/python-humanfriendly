@@ -5,7 +5,7 @@
 # URL: https://humanfriendly.readthedocs.org
 
 # Semi-standard module versioning.
-__version__ = '1.13'
+__version__ = '1.14'
 
 # Standard library modules.
 import math
@@ -257,7 +257,7 @@ def format_path(pathname):
     error if the pathname is not relative to the current user's home
     directory.
 
-    :param pathname: An absolute pathname.
+    :param pathname: An absolute pathname (a string).
     :returns: The pathname with the user's home directory abbreviated.
 
     Here's an example of its usage:
@@ -278,6 +278,19 @@ def format_path(pathname):
         if pathname.startswith(home):
             pathname = os.path.join('~', os.path.relpath(pathname, home))
     return pathname
+
+def parse_path(pathname):
+    """
+    Convert a human friendly pathname to an absolute pathname.
+
+    Expands leading tildes using :py:func:`os.path.expanduser()` and
+    environment variables using :py:func:`os.path.expandvars()` and makes the
+    resulting pathname absolute using :py:func:`os.path.abspath()`.
+
+    :param pathname: A human friendly pathname (a string).
+    :returns: An absolute pathname (a string).
+    """
+    return os.path.abspath(os.path.expanduser(os.path.expandvars(pathname)))
 
 def pluralize(count, singular, plural=None):
     """
