@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: November 16, 2014
+# Last Change: November 22, 2014
 # URL: https://humanfriendly.readthedocs.org
 
 # Semi-standard module versioning.
@@ -59,7 +59,7 @@ def coerce_boolean(value):
         normalized = value.strip().lower()
         if normalized in ('1', 'yes', 'true', 'on'):
             return True
-        elif normalized in ('0', 'no', 'false', 'off'):
+        elif normalized in ('0', 'no', 'false', 'off', ''):
             return False
         else:
             msg = "Failed to coerce string to boolean! (%r)"
