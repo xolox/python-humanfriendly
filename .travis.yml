@@ -6,7 +6,7 @@ python:
   - "3.4"
 install:
   - pip install 'coverage >= 4.0a5'
-  - pip install coveralls
+  - pip install 'coveralls >= 1.0a2'
   - python setup.py install
 script:
   - coverage run setup.py test
