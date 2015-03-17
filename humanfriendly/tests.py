@@ -122,6 +122,9 @@ class HumanFriendlyTestCase(unittest.TestCase):
             t = humanfriendly.Timer(time.time() - seconds)
             self.assertEqual(humanfriendly.round_number(t.elapsed_time, keep_width=True), '%i.00' % seconds)
             self.assertEqual(str(t), text)
+        # Test rounding to seconds.
+        t = humanfriendly.Timer(time.time() - 2.2)
+        self.assertEqual(t.rounded, '2 seconds')
         # Test automatic timer.
         automatic_timer = humanfriendly.Timer()
         time.sleep(1)
