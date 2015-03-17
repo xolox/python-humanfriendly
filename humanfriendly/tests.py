@@ -149,6 +149,15 @@ class HumanFriendlyTestCase(unittest.TestCase):
         self.assertTrue(all('%' in l for l in lines))
         self.assertEqual(sorted(set(lines)), sorted(lines))
 
+    def test_automatic_spinner(self):
+        # There's not a lot to test about the AutomaticSpinner class, but by at
+        # least running it here we are assured that the code functions on all
+        # supported Python versions. AutomaticSpinner is built on top of the
+        # Spinner class so at least we also have the tests for the Spinner
+        # class to back us up.
+        with humanfriendly.AutomaticSpinner('test spinner'):
+            time.sleep(1)
+
     def test_prompt_for_choice(self):
         interactive_prompt = humanfriendly.interactive_prompt
         try:

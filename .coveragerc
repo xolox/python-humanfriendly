@@ -1,4 +1,6 @@
 [run]
 branch = true
+parallel = True
+concurrency = multiprocessing
 source = humanfriendly
 omit = humanfriendly/tests.py

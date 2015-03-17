@@ -50,10 +50,13 @@ test: install
 	$(ACTIVATE) && python setup.py test
 
 coverage: install
-	test -x "$(VIRTUAL_ENV)/bin/coverage" || ($(ACTIVATE) && pip-accel install coverage)
+	test -x "$(VIRTUAL_ENV)/bin/coverage" || ($(ACTIVATE) && pip-accel install 'coverage >= 4.0a5')
 	$(ACTIVATE) && coverage run setup.py test
+	$(ACTIVATE) && coverage combine
 	$(ACTIVATE) && coverage html
-	if [ "`whoami`" != root ] && which gnome-open >/dev/null 2>&1; then gnome-open htmlcov/index.html; fi
+	if [ "`whoami`" != root ] && which xdg-open &>/dev/null; then \
+		xdg-open htmlcov/index.html &>/dev/null; \
+	fi
 
 docs: install
 	test -x "$(VIRTUAL_ENV)/bin/sphinx-build" || ($(ACTIVATE) && pip-accel install sphinx)

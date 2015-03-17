@@ -1,5 +1,6 @@
 *.egg-info/
 .coverage
+.coverage.*
 dist/*.tar.gz
 dist/*.zip
 docs/_build/

@@ -1,14 +1,15 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: November 22, 2014
+# Last Change: March 17, 2015
 # URL: https://humanfriendly.readthedocs.org
 
 # Semi-standard module versioning.
-__version__ = '1.14'
+__version__ = '1.15'
 
 # Standard library modules.
 import math
+import multiprocessing
 import os
 import os.path
 import re
@@ -23,6 +24,9 @@ except NameError:
     # Python 3.x.
     interactive_prompt = input
     string_types = str
+
+# Spinners are redrawn at most this many seconds.
+minimum_spinner_interval = 0.2
 
 # Common disk size units, used for formatting and parsing.
 disk_size_units = (dict(prefix='b', divider=1, singular='byte', plural='bytes'),
@@ -459,12 +463,16 @@ class Spinner(object):
     >>> for i in xrange(100):
         sleep(0.1)
         spin.step()
-    | Downloading  # cycles through | / - \
+    | Downloading  # cycles through | / - \\
     >>> spin = Spinner(label="Downloading", total=100)
     >>> for i in xrange(100):
         sleep(0.1)
         spin.step(i)
     | Downloading: 1.00% # travels up to 100%...
+
+    If you want to provide user feedback during a long running operation but
+    it's not practical to periodically call the :py:func:`~Spinner.step()`
+    method consider using :py:class:`AutomaticSpinner` instead.
     """
 
     def __init__(self, label=None, total=0, stream=sys.stderr, interactive=None, timer=None):
@@ -489,6 +497,8 @@ class Spinner(object):
         self.counter = 0
         self.last_update = 0
         if interactive is None:
+            # Try to automatically discover whether the stream is connected to
+            # a terminal, but don't fail if no isatty() method is available.
             try:
                 interactive = stream.isatty()
             except Exception:
@@ -506,7 +516,7 @@ class Spinner(object):
         """
         if self.interactive:
             time_now = time.time()
-            if time_now - self.last_update >= 0.2:
+            if time_now - self.last_update >= minimum_spinner_interval:
                 self.last_update = time_now
                 state = self.states[self.counter % len(self.states)]
                 label = label or self.label
@@ -527,6 +537,59 @@ class Spinner(object):
         """
         if self.interactive:
             self.stream.write("\r")
+
+class AutomaticSpinner(object):
+
+    """
+    Show a "spinner" on the terminal (just like :py:class:`Spinner` does) that
+    automatically starts animating. This class should be used as a context
+    manager using the :py:keyword:`with` statement. The animation continues for
+    as long as the context is active.
+
+    :py:class:`AutomaticSpinner` provides an alternative to :py:class:`Spinner`
+    for situations where it is not practical for the caller to periodically
+    call :py:func:`~Spinner.step()` to advance the animation, e.g. because
+    you're performing a blocking call and don't fancy implementing threading or
+    subprocess handling just to provide some user feedback.
+
+    This works using the :py:mod:`multiprocessing` module by spawning a
+    subprocess to render the spinner while the main process is busy doing
+    something more useful. By using the :py:keyword:`with` statement you're
+    guaranteed that the subprocess is properly terminated at the appropriate
+    time.
+    """
+
+    def __init__(self, label, show_time=True):
+        """
+        Initialize an automatic spinner.
+
+        :param label: The label for the spinner (a string).
+        :param show_time: If this is ``True`` (the default) then the spinner
+                          shows elapsed time.
+        """
+        self.shutdown_event = multiprocessing.Event()
+        self.subprocess = multiprocessing.Process(target=automatic_spinner_target,
+                                                  args=(label, show_time, self.shutdown_event))
+
+    def __enter__(self):
+        self.subprocess.start()
+
+    def __exit__(self, exc_type=None, exc_value=None, traceback=None):
+        self.shutdown_event.set()
+        self.subprocess.join()
+        sys.stderr.write("\r")
+
+def automatic_spinner_target(label, show_time, shutdown_event):
+    try:
+        timer = Timer() if show_time else None
+        spinner = Spinner(label=label, stream=sys.stderr, timer=timer)
+        while not shutdown_event.is_set():
+            spinner.step()
+            time.sleep(minimum_spinner_interval)
+    except KeyboardInterrupt:
+        # Swallow Control-C signals without producing a nasty traceback that
+        # won't make any sense to the average user.
+        pass
 
 class InvalidSize(Exception):
     """
