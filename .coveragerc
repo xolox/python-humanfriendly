@@ -1,0 +1,4 @@
+[run]
+branch = true
+source = humanfriendly
+omit = humanfriendly/tests.py
