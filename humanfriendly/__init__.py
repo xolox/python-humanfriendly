@@ -1,11 +1,11 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: March 17, 2015
+# Last Change: March 29, 2015
 # URL: https://humanfriendly.readthedocs.org
 
 # Semi-standard module versioning.
-__version__ = '1.15'
+__version__ = '1.16'
 
 # Standard library modules.
 import math
@@ -27,6 +27,10 @@ except NameError:
 
 # Spinners are redrawn at most this many seconds.
 minimum_spinner_interval = 0.2
+
+# The following ANSI escape sequence can be used to clear a line and move the
+# cursor back to the start of the line.
+erase_line_code = '\r\x1b[K'
 
 # Common disk size units, used for formatting and parsing.
 disk_size_units = (dict(prefix='b', divider=1, singular='byte', plural='bytes'),
@@ -526,7 +530,7 @@ class Spinner(object):
                     label = "%s: %.2f%%" % (label, progress/(self.total/100.0))
                 elif self.timer and self.timer.elapsed_time > 2:
                     label = "%s (%s)" % (label, self.timer.rounded)
-                self.stream.write("\r %s %s .. " % (state, label))
+                self.stream.write("%s %s %s .. " % (erase_line_code, state, label))
                 self.counter += 1
 
     def clear(self):
@@ -536,7 +540,7 @@ class Spinner(object):
         line that used to show the spinner.
         """
         if self.interactive:
-            self.stream.write("\r")
+            self.stream.write(erase_line_code)
 
 class AutomaticSpinner(object):
 
@@ -577,7 +581,7 @@ class AutomaticSpinner(object):
     def __exit__(self, exc_type=None, exc_value=None, traceback=None):
         self.shutdown_event.set()
         self.subprocess.join()
-        sys.stderr.write("\r")
+        sys.stderr.write(erase_line_code)
 
 def automatic_spinner_target(label, show_time, shutdown_event):
     try:
