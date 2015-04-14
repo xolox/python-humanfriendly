@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: March 29, 2015
+# Last Change: April 14, 2015
 # URL: https://humanfriendly.readthedocs.org
 
 # Semi-standard module versioning.
@@ -214,7 +214,7 @@ def format_timespan(num_seconds):
 
 def parse_date(datestring):
     """
-    Parse a date string in one of the formats listed below. Raises
+    Parse a date/time string in one of the formats listed below. Raises
     :py:class:`InvalidDate` when the date cannot be parsed. Supported date/time
     formats:
 
@@ -233,17 +233,32 @@ def parse_date(datestring):
     >>> parse_date('2013-06-17 02:47:42')
     (2013, 6, 17, 2, 47, 42)
 
-    Here's how you convert the result to a number:
+    Here's how you convert the result to a number (`Unix time`_):
 
+    >>> from humanfriendly import parse_date
     >>> from time import mktime
     >>> mktime(parse_date('2013-06-17 02:47:42') + (-1, -1, -1))
     1371430062.0
 
     And here's how you convert it to a :py:class:`datetime.datetime` object:
 
+    >>> from humanfriendly import parse_date
     >>> from datetime import datetime
     >>> datetime(*parse_date('2013-06-17 02:47:42'))
     datetime.datetime(2013, 6, 17, 2, 47, 42)
+
+    Here's an example that combines :py:func:`format_timespan()` and
+    :py:func:`parse_date()` to calculate a human friendly timespan since a
+    given date:
+
+    >>> from humanfriendly import format_timespan, parse_date
+    >>> from time import mktime, time
+    >>> unix_time = mktime(parse_date('2013-06-17 02:47:42') + (-1, -1, -1))
+    >>> seconds_since_then = time() - unix_time
+    >>> print(format_timespan(seconds_since_then))
+    1 year, 43 weeks and 1 day
+
+    .. _Unix time: http://en.wikipedia.org/wiki/Unix_time
     """
     try:
         tokens = list(map(str.strip, datestring.split()))
