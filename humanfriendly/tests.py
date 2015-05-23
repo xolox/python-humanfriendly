@@ -3,7 +3,7 @@
 # Tests for the 'humanfriendly' module.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: March 29, 2015
+# Last Change: May 23, 2015
 # URL: https://humanfriendly.readthedocs.org
 
 # Standard library modules.
@@ -143,7 +143,10 @@ class HumanFriendlyTestCase(unittest.TestCase):
             spinner.step(progress=progress)
             time.sleep(0.2)
         spinner.clear()
-        lines = [line for line in stream.getvalue().split(humanfriendly.erase_line_code) if line]
+        output = stream.getvalue()
+        output = (output.replace(humanfriendly.show_cursor_code, '')
+                        .replace(humanfriendly.hide_cursor_code, ''))
+        lines = [line for line in output.split(humanfriendly.erase_line_code) if line]
         self.assertTrue(len(lines) > 0)
         self.assertTrue(all('test spinner' in l for l in lines))
         self.assertTrue(all('%' in l for l in lines))

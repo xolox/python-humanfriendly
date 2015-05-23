@@ -1,11 +1,11 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: April 14, 2015
+# Last Change: May 23, 2015
 # URL: https://humanfriendly.readthedocs.org
 
 # Semi-standard module versioning.
-__version__ = '1.16'
+__version__ = '1.17'
 
 # Standard library modules.
 import math
@@ -31,6 +31,9 @@ minimum_spinner_interval = 0.2
 # The following ANSI escape sequence can be used to clear a line and move the
 # cursor back to the start of the line.
 erase_line_code = '\r\x1b[K'
+
+hide_cursor_code = '\x1b[?25l'
+show_cursor_code = '\x1b[?25h'
 
 # Common disk size units, used for formatting and parsing.
 disk_size_units = (dict(prefix='b', divider=1, singular='byte', plural='bytes'),
@@ -494,7 +497,7 @@ class Spinner(object):
     method consider using :py:class:`AutomaticSpinner` instead.
     """
 
-    def __init__(self, label=None, total=0, stream=sys.stderr, interactive=None, timer=None):
+    def __init__(self, label=None, total=0, stream=sys.stderr, interactive=None, timer=None, hide_cursor=True):
         """
         Initialize a spinner.
 
@@ -508,6 +511,8 @@ class Spinner(object):
         :param timer: A :py:class:`Timer` object (optional). If this is given
                       the spinner will show the elapsed time according to the
                       timer.
+        :param hide_cursor: If ``True`` (the default) the text cursor is hidden
+                            as long as the spinner is active.
         """
         self.label = label
         self.total = total
@@ -524,6 +529,9 @@ class Spinner(object):
                 interactive = False
         self.interactive = interactive
         self.timer = timer
+        self.hide_cursor = hide_cursor
+        if self.interactive and self.hide_cursor:
+            self.stream.write(hide_cursor_code)
 
     def step(self, progress=0, label=None):
         """
@@ -545,7 +553,7 @@ class Spinner(object):
                     label = "%s: %.2f%%" % (label, progress/(self.total/100.0))
                 elif self.timer and self.timer.elapsed_time > 2:
                     label = "%s (%s)" % (label, self.timer.rounded)
-                self.stream.write("%s %s %s .. " % (erase_line_code, state, label))
+                self.stream.write("%s %s %s ..\r" % (erase_line_code, state, label))
                 self.counter += 1
 
     def clear(self):
@@ -555,6 +563,8 @@ class Spinner(object):
         line that used to show the spinner.
         """
         if self.interactive:
+            if self.hide_cursor:
+                self.stream.write(show_cursor_code)
             self.stream.write(erase_line_code)
 
 class AutomaticSpinner(object):
