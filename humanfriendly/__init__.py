@@ -5,7 +5,7 @@
 # URL: https://humanfriendly.readthedocs.org
 
 # Semi-standard module versioning.
-__version__ = '1.18'
+__version__ = '1.19'
 
 # Standard library modules.
 import math
@@ -495,6 +495,11 @@ class Spinner(object):
     If you want to provide user feedback during a long running operation but
     it's not practical to periodically call the :py:func:`~Spinner.step()`
     method consider using :py:class:`AutomaticSpinner` instead.
+
+    :class:`Spinner` objects can be used as context managers to automatically
+    call :func:`clear()` when the spinner ends. This helps to make sure that if
+    the text cursor is hidden its visibility is restored before the spinner
+    ends (even if an exception interrupts the spinner).
     """
 
     def __init__(self, label=None, total=0, stream=sys.stderr, interactive=None, timer=None, hide_cursor=True):
@@ -575,6 +580,12 @@ class Spinner(object):
                 self.stream.write(show_cursor_code)
             self.stream.write(erase_line_code)
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type=None, exc_value=None, traceback=None):
+        self.clear()
+
 class AutomaticSpinner(object):
 
     """
@@ -614,15 +625,14 @@ class AutomaticSpinner(object):
     def __exit__(self, exc_type=None, exc_value=None, traceback=None):
         self.shutdown_event.set()
         self.subprocess.join()
-        sys.stderr.write(erase_line_code)
 
 def automatic_spinner_target(label, show_time, shutdown_event):
     try:
         timer = Timer() if show_time else None
-        spinner = Spinner(label=label, stream=sys.stderr, timer=timer)
-        while not shutdown_event.is_set():
-            spinner.step()
-            time.sleep(minimum_spinner_interval)
+        with Spinner(label=label, timer=timer) as spinner:
+            while not shutdown_event.is_set():
+                spinner.step()
+                spinner.sleep()
     except KeyboardInterrupt:
         # Swallow Control-C signals without producing a nasty traceback that
         # won't make any sense to the average user.
