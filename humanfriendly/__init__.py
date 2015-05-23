@@ -5,7 +5,7 @@
 # URL: https://humanfriendly.readthedocs.org
 
 # Semi-standard module versioning.
-__version__ = '1.17'
+__version__ = '1.18'
 
 # Standard library modules.
 import math
@@ -555,6 +555,14 @@ class Spinner(object):
                     label = "%s (%s)" % (label, self.timer.rounded)
                 self.stream.write("%s %s %s ..\r" % (erase_line_code, state, label))
                 self.counter += 1
+
+    def sleep(self):
+        """
+        Sleep for a short period (less than a second) before refreshing the
+        spinner so that the animated effect of the spinner works best (this
+        doesn't refresh the spinner, use :func:`step()` for that).
+        """
+        time.sleep(minimum_spinner_interval)
 
     def clear(self):
         """
