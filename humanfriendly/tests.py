@@ -3,7 +3,7 @@
 # Tests for the 'humanfriendly' module.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: May 25, 2015
+# Last Change: May 26, 2015
 # URL: https://humanfriendly.readthedocs.org
 
 # Standard library modules.
@@ -17,6 +17,7 @@ import unittest
 # Modules included in our package.
 import humanfriendly
 import humanfriendly.cli
+from humanfriendly import compact, dedent
 
 try:
     # Python 2.x.
@@ -27,6 +28,24 @@ except ImportError:
 
 
 class HumanFriendlyTestCase(unittest.TestCase):
+
+    def test_compact(self):
+        assert compact(' a \n\n b ') == 'a b'
+        assert compact('''
+            %s template notation
+        ''', 'Simple') == 'Simple template notation'
+        assert compact('''
+            More {type} template notation
+        ''', type='readable') == 'More readable template notation'
+
+    def test_dedent(self):
+        assert dedent('\n line 1\n  line 2\n\n') == 'line 1\n line 2\n'
+        assert dedent('''
+            Dedented, %s text
+        ''', 'interpolated') == 'Dedented, interpolated text\n'
+        assert dedent('''
+            Dedented, {op} text
+        ''', op='formatted') == 'Dedented, formatted text\n'
 
     def test_pluralization(self):
         self.assertEqual('1 word', humanfriendly.pluralize(1, 'word'))

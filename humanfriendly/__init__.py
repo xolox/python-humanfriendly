@@ -1,11 +1,11 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: May 25, 2015
+# Last Change: May 26, 2015
 # URL: https://humanfriendly.readthedocs.org
 
 # Semi-standard module versioning.
-__version__ = '1.21'
+__version__ = '1.22'
 
 # Standard library modules.
 import math
@@ -14,6 +14,7 @@ import os
 import os.path
 import re
 import sys
+import textwrap
 import time
 
 try:
@@ -51,6 +52,85 @@ time_units = (dict(divider=1, singular='second', plural='seconds'),
               dict(divider=60*60*24, singular='day', plural='days'),
               dict(divider=60*60*24*7, singular='week', plural='weeks'),
               dict(divider=60*60*24*7*52, singular='year', plural='years'))
+
+def compact(text, *args, **kw):
+    """
+    Compact whitespace in a string.
+
+    Trims leading and trailing whitespace, replaces runs of whitespace
+    characters with a single space and interpolates any arguments (using
+    :func:`format()`).
+
+    :param text: The text to compact (a string).
+    :param args: Any positional arguments are interpolated using :func:`format()`.
+    :param kw: Any keyword arguments are interpolated using :func:`format()`.
+    :returns: The compacted text (a string).
+    """
+    non_whitespace_tokens = text.split()
+    compacted_text = ' '.join(non_whitespace_tokens)
+    return format(compacted_text, *args, **kw)
+
+def dedent(text, *args, **kw):
+    """
+    Dedent a string (remove common leading whitespace from all lines).
+
+    Removes common leading whitespace from all lines in the string (using
+    :func:`textwrap.dedent()`), removes leading and trailing empty lines (using
+    :func:`trim_empty_lines()`) and interpolates any arguments (using
+    :func:`format()`).
+
+    :param text: The text to dedent (a string).
+    :param args: Any positional arguments are interpolated using :func:`format()`.
+    :param kw: Any keyword arguments are interpolated using :func:`format()`.
+    :returns: The dedented text (a string).
+    """
+    dedented_text = textwrap.dedent(text)
+    trimmed_text = trim_empty_lines(dedented_text)
+    return format(trimmed_text, *args, **kw)
+
+def trim_empty_lines(text):
+    """
+    Trim leading and trailing empty lines from the given text.
+
+    :param text: The text to trim (a string).
+    :returns: The trimmed text (a string).
+    """
+    lines = text.splitlines(True)
+    while lines and is_empty_line(lines[0]):
+        lines.pop(0)
+    while lines and is_empty_line(lines[-1]):
+        lines.pop(-1)
+    return ''.join(lines)
+
+def is_empty_line(text):
+    """
+    Check if a text is empty or contains only whitespace.
+
+    :param text: The text to check for "emptiness" (a string).
+    :returns: :data:`True` if the text is empty or contains only whitespace,
+              :data:`False` otherwise.
+    """
+    return len(text) == 0 or text.isspace()
+
+def format(text, *args, **kw):
+    """
+    Format a string using the string formatting operator and/or :func:`str.format()`.
+
+    :param text: The text to format (a string).
+    :param args: Any positional arguments are interpolated into the text using
+                 the string formatting operator (``%``). If no positional
+                 arguments are given no interpolation is done.
+    :param kw: Any keyword arguments are interpolated into the text using the
+               :func:`str.format()` function. If no keyword arguments are given
+               no interpolation is done.
+    :returns: The text with any positional and/or keyword arguments
+              interpolated (a string).
+    """
+    if args:
+        text %= args
+    if kw:
+        text = text.format(**kw)
+    return text
 
 def coerce_boolean(value):
     """
