@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: May 25, 2015
+# Last Change: May 26, 2015
 # URL: https://humanfriendly.readthedocs.org
 
 """
@@ -17,6 +17,18 @@ Supported options:
     Execute an external command (given as the positional arguments) and render
     a spinner and timer while the command is running. The exit status of the
     command is propagated.
+
+  --format-table
+
+    Read tabular data from standard input (each line is a row and each
+    whitespace separated field is a column), format the data as a table and
+    print the resulting table to standard output. See also the --delimiter
+    option.
+
+  -d, --delimiter=VALUE
+
+    Change the delimiter used by --format-table to VALUE (a string). By default
+    all whitespace is treated as a delimiter.
 
   -n, --format-number=VALUE
 
@@ -52,22 +64,34 @@ import subprocess
 import sys
 
 # Modules included in our package.
-from humanfriendly import format_number, format_size, format_timespan, parse_size, Spinner, Timer
+from humanfriendly import (
+    format_number,
+    format_size,
+    format_table,
+    format_timespan,
+    parse_size,
+    Spinner,
+    Timer,
+)
 
 
 def main():
     """Command line interface for the ``humanfriendly`` program."""
     try:
-        options, arguments = getopt.getopt(sys.argv[1:], 'chn:s:t:', [
-            'format-number=', 'format-size=', 'format-timespan=', 'help',
-            'parse-size=', 'run-command',
+        options, arguments = getopt.getopt(sys.argv[1:], 'cd:hn:s:t:', [
+            'delimiter=', 'format-number=', 'format-size=', 'format-table',
+            'format-timespan=', 'parse-size=', 'run-command', 'help',
         ])
     except getopt.GetoptError as e:
         sys.stderr.write("Error: %s\n" % e)
         sys.exit(1)
     actions = []
+    delimiter = None
+    should_format_table = False
     for option, value in options:
-        if option == '--parse-size':
+        if option in ('-d', '--delimiter'):
+            delimiter = value
+        elif option == '--parse-size':
             actions.append(functools.partial(print_parsed_size, value))
         elif option in ('-c', '--run-command'):
             actions.append(functools.partial(run_command, arguments))
@@ -75,11 +99,15 @@ def main():
             actions.append(functools.partial(print_formatted_number, value))
         elif option in ('-s', '--format-size'):
             actions.append(functools.partial(print_formatted_size, value))
+        elif option == '--format-table':
+            should_format_table = True
         elif option in ('-t', '--format-timespan'):
             actions.append(functools.partial(print_formatted_timespan, value))
         elif option in ('-h', '--help'):
             usage()
             return
+    if should_format_table:
+        actions.append(functools.partial(print_formatted_table, delimiter))
     if not actions:
         usage()
         return
@@ -114,6 +142,15 @@ def print_formatted_number(value):
 def print_formatted_size(value):
     """Print a human readable size."""
     print(format_size(int(value)))
+
+
+def print_formatted_table(delimiter):
+    """Read tabular data from standard input and print a table."""
+    data = []
+    for line in sys.stdin:
+        line = line.rstrip()
+        data.append(line.split(delimiter))
+    print(format_table(data))
 
 
 def print_formatted_timespan(value):

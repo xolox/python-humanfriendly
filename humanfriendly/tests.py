@@ -135,6 +135,31 @@ class HumanFriendlyTestCase(unittest.TestCase):
         absolute_path = os.path.join(os.environ['HOME'], '.vimrc')
         self.assertEqual(absolute_path, humanfriendly.parse_path(friendly_path))
 
+    def test_table_formatting(self):
+        data = [['Just one column']]
+        assert humanfriendly.format_table(data) == dedent("""
+            -------------------
+            | Just one column |
+            -------------------
+        """).strip()
+        data = [['One', 'Two', 'Three'], ['1', '2', '3']]
+        assert humanfriendly.format_table(data) == dedent("""
+            ---------------------
+            | One | Two | Three |
+            | 1   | 2   | 3     |
+            ---------------------
+        """).strip()
+        column_names = ['One', 'Two', 'Three']
+        data = [['1', '2', '3'], ['a', 'b', 'c']]
+        assert humanfriendly.format_table(data, column_names) == dedent("""
+            ---------------------
+            | One | Two | Three |
+            ---------------------
+            | 1   | 2   | 3     |
+            | a   | b   | c     |
+            ---------------------
+        """).strip()
+
     def test_concatenate(self):
         self.assertEqual(humanfriendly.concatenate([]), '')
         self.assertEqual(humanfriendly.concatenate(['one']), 'one')
@@ -241,6 +266,15 @@ class HumanFriendlyTestCase(unittest.TestCase):
         random_byte_count = random.randint(1024, 1024*1024)
         returncode, output = main('--format-size=%i' % random_byte_count)
         assert output.strip() == humanfriendly.format_size(random_byte_count)
+        # Test `humanfriendly --format-table'.
+        returncode, output = main('--format-table', '--delimiter=\t', input='1\t2\t3\n4\t5\t6\n7\t8\t9')
+        assert output.strip() == dedent('''
+            -------------
+            | 1 | 2 | 3 |
+            | 4 | 5 | 6 |
+            | 7 | 8 | 9 |
+            -------------
+        ''').strip()
         # Test `humanfriendly --format-timespan'.
         random_timespan = random.randint(5, 600)
         returncode, output = main('--format-timespan=%i' % random_timespan)
@@ -253,19 +287,23 @@ class HumanFriendlyTestCase(unittest.TestCase):
         assert returncode == 42
 
 
-def main(*args):
+def main(*args, **kw):
     returncode = 0
+    input_buffer = StringIO(kw.get('input', ''))
     output_buffer = StringIO()
     saved_argv = sys.argv
+    saved_stdin = sys.stdin
     saved_stdout = sys.stdout
     try:
         sys.argv = [sys.argv[0]] + list(args)
+        sys.stdin = input_buffer
         sys.stdout = output_buffer
         humanfriendly.cli.main()
     except SystemExit as e:
         returncode = e.code or 1
     finally:
         sys.argv = saved_argv
+        sys.stdin = saved_stdin
         sys.stdout = saved_stdout
     return returncode, output_buffer.getvalue()
 

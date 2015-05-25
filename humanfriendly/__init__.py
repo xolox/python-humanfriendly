@@ -5,9 +5,10 @@
 # URL: https://humanfriendly.readthedocs.org
 
 # Semi-standard module versioning.
-__version__ = '1.22'
+__version__ = '1.23'
 
 # Standard library modules.
+import collections
 import math
 import multiprocessing
 import os
@@ -131,6 +132,51 @@ def format(text, *args, **kw):
     if kw:
         text = text.format(**kw)
     return text
+
+def format_table(data, column_names=[], horizontal_bar='-', vertical_bar='|'):
+    """
+    Render a table using characters like dashes and vertical bars to emulate borders.
+
+    :param data: An iterable (e.g. a :class:`tuple` or :class:`list`)
+                 containing the rows of the table, where each row is an
+                 iterable containing the columns of the table (strings).
+    :param column_names: A iterable of column names (strings).
+    :param horizontal_bar: The character used to represent a horizontal bar (a
+                           string).
+    :param vertical_bar: The character used to represent a vertical bar (a
+                         string).
+    :returns: The rendered table (a string).
+    """
+    lines = []
+    # Normalize the input to a nested list of Unicode strings (this avoids
+    # problems when the caller passes in something like a generator that can
+    # only be iterated once).
+    data = [[unicode(column) for column in row] for row in data]
+    # Normalize the column names into a list of Unicode strings and add the
+    # list to the front of the list with table data.
+    column_names = [unicode(name) for name in column_names]
+    if column_names:
+        data.insert(0, column_names)
+    # Calculate the maximum width of each column.
+    widths = collections.defaultdict(int)
+    for row in data:
+        for column_index, column in enumerate(row):
+            widths[column_index] = max(widths[column_index], len(column))
+    # Create a horizontal bar of dashes as a delimiter.
+    line_delimiter = horizontal_bar * (sum(widths.values()) + len(widths) * 3 + 1)
+    lines.append(line_delimiter)
+    # Format the rows and columns.
+    for row_number, row in enumerate(data):
+        line = [vertical_bar]
+        for j, column in enumerate(row):
+            padding = ' ' * (widths[j] - len(column))
+            line.append(' ' + column + padding + ' ')
+            line.append(vertical_bar)
+        lines.append(u''.join(line))
+        if column_names and row_number == 0:
+            lines.append(line_delimiter)
+    lines.append(line_delimiter)
+    return u'\n'.join(lines)
 
 def coerce_boolean(value):
     """
