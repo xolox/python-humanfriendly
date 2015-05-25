@@ -3,7 +3,7 @@
 # Setup script for the `humanfriendly' package.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: March 17, 2015
+# Last Change: May 25, 2015
 # URL: https://humanfriendly.readthedocs.org
 
 import os
@@ -34,4 +34,30 @@ setuptools.setup(
     author='Peter Odding',
     author_email='peter@peterodding.com',
     packages=setuptools.find_packages(),
-    test_suite='humanfriendly.tests')
+    test_suite='humanfriendly.tests',
+    classifiers=[
+        'Development Status :: 6 - Mature',
+        'Environment :: Console',
+        'Intended Audience :: Developers',
+        'Intended Audience :: System Administrators',
+        'License :: OSI Approved :: MIT License',
+        'Natural Language :: English',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.6',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.4',
+        'Topic :: Communications',
+        'Topic :: Scientific/Engineering :: Human Machine Interfaces',
+        'Topic :: Software Development',
+        'Topic :: Software Development :: Libraries :: Python Modules',
+        'Topic :: Software Development :: User Interfaces',
+        'Topic :: System :: Shells',
+        'Topic :: System :: System Shells',
+        'Topic :: System :: Systems Administration',
+        'Topic :: Terminals',
+        'Topic :: Text Processing :: General',
+        'Topic :: Text Processing :: Linguistic',
+        'Topic :: Utilities',
+    ])
