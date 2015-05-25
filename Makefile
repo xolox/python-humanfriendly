@@ -1,7 +1,7 @@
 # Makefile for the 'humanfriendly' module.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: March 17, 2015
+# Last Change: May 25, 2015
 # URL: https://humanfriendly.readthedocs.org
 
 # The following defaults are based on my preferences, but possible for others
@@ -50,9 +50,10 @@ test: install
 	$(ACTIVATE) && python setup.py test
 
 coverage: install
-	test -x "$(VIRTUAL_ENV)/bin/coverage" || ($(ACTIVATE) && pip-accel install 'coverage >= 4.0a5')
+	$(ACTIVATE) && pip-accel install 'coverage >= 4.0a5'
 	$(ACTIVATE) && coverage run setup.py test
 	$(ACTIVATE) && coverage combine
+	$(ACTIVATE) && coverage report
 	$(ACTIVATE) && coverage html
 	if [ "`whoami`" != root ] && which xdg-open &>/dev/null; then \
 		xdg-open htmlcov/index.html &>/dev/null; \

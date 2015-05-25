@@ -34,6 +34,9 @@ setuptools.setup(
     author='Peter Odding',
     author_email='peter@peterodding.com',
     packages=setuptools.find_packages(),
+    entry_points=dict(console_scripts=[
+        'humanfriendly = humanfriendly.cli:main'
+    ]),
     test_suite='humanfriendly.tests',
     classifiers=[
         'Development Status :: 6 - Mature',

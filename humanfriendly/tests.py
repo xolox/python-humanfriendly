@@ -3,14 +3,20 @@
 # Tests for the 'humanfriendly' module.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: May 23, 2015
+# Last Change: May 25, 2015
 # URL: https://humanfriendly.readthedocs.org
 
 # Standard library modules.
 import math
 import os
+import random
+import sys
 import time
 import unittest
+
+# Modules included in our package.
+import humanfriendly
+import humanfriendly.cli
 
 try:
     # Python 2.x.
@@ -19,8 +25,6 @@ except ImportError:
     # Python 3.x.
     from io import StringIO
 
-# The module we are testing.
-import humanfriendly
 
 class HumanFriendlyTestCase(unittest.TestCase):
 
@@ -191,8 +195,52 @@ class HumanFriendlyTestCase(unittest.TestCase):
         finally:
             humanfriendly.interactive_prompt = interactive_prompt
 
+    def test_cli(self):
+        # Test that the usage message is printed by default.
+        returncode, output = main()
+        assert 'Usage:' in output
+        # Test that the usage message can be requested explicitly.
+        returncode, output = main('--help')
+        assert 'Usage:' in output
+        # Test handling of invalid command line options.
+        returncode, output = main('--unsupported-option')
+        assert returncode != 0
+        # Test `humanfriendly --parse-size'.
+        returncode, output = main('--parse-size=5 KB')
+        assert int(output) == humanfriendly.parse_size('5 KB')
+        # Test `humanfriendly --format-size'.
+        random_byte_count = random.randint(1024, 1024*1024)
+        returncode, output = main('--format-size=%i' % random_byte_count)
+        assert output.strip() == humanfriendly.format_size(random_byte_count)
+        # Test `humanfriendly --format-timespan'.
+        random_timespan = random.randint(5, 600)
+        returncode, output = main('--format-timespan=%i' % random_timespan)
+        assert output.strip() == humanfriendly.format_timespan(random_timespan)
+        # Test `humanfriendly --run-command'.
+        returncode, output = main('--run-command', 'bash', '-c', 'sleep 2 && exit 42')
+        assert returncode == 42
+
+
+def main(*args):
+    returncode = 0
+    output_buffer = StringIO()
+    saved_argv = sys.argv
+    saved_stdout = sys.stdout
+    try:
+        sys.argv = [sys.argv[0]] + list(args)
+        sys.stdout = output_buffer
+        humanfriendly.cli.main()
+    except SystemExit as e:
+        returncode = e.code or 1
+    finally:
+        sys.argv = saved_argv
+        sys.stdout = saved_stdout
+    return returncode, output_buffer.getvalue()
+
+
 def normalize_timestamp(value, ndigits=1):
     return '%.2f' % round(float(value), ndigits=ndigits)
+
 
 if __name__ == '__main__':
     unittest.main()

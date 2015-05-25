@@ -1,11 +1,11 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: May 23, 2015
+# Last Change: May 25, 2015
 # URL: https://humanfriendly.readthedocs.org
 
 # Semi-standard module versioning.
-__version__ = '1.19'
+__version__ = '1.20'
 
 # Standard library modules.
 import math
@@ -32,6 +32,7 @@ minimum_spinner_interval = 0.2
 # cursor back to the start of the line.
 erase_line_code = '\r\x1b[K'
 
+# ANSI escape sequences to hide and show the text cursor.
 hide_cursor_code = '\x1b[?25l'
 show_cursor_code = '\x1b[?25h'
 
