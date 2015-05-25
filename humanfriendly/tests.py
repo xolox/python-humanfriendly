@@ -90,6 +90,16 @@ class HumanFriendlyTestCase(unittest.TestCase):
         self.assertRaises(humanfriendly.InvalidSize, humanfriendly.parse_size, '1z')
         self.assertRaises(humanfriendly.InvalidSize, humanfriendly.parse_size, 'a')
 
+    def test_format_number(self):
+        self.assertEqual('1', humanfriendly.format_number(1))
+        self.assertEqual('1.5', humanfriendly.format_number(1.5))
+        self.assertEqual('1.56', humanfriendly.format_number(1.56789))
+        self.assertEqual('1.567', humanfriendly.format_number(1.56789, 3))
+        self.assertEqual('1,000', humanfriendly.format_number(1000))
+        self.assertEqual('1,000', humanfriendly.format_number(1000.12, 0))
+        self.assertEqual('1,000,000', humanfriendly.format_number(1000000))
+        self.assertEqual('1,000,000.42', humanfriendly.format_number(1000000.42))
+
     def test_round_number(self):
         self.assertEqual('1', humanfriendly.round_number(1))
         self.assertEqual('1', humanfriendly.round_number(1.0))
@@ -205,9 +215,9 @@ class HumanFriendlyTestCase(unittest.TestCase):
         # Test handling of invalid command line options.
         returncode, output = main('--unsupported-option')
         assert returncode != 0
-        # Test `humanfriendly --parse-size'.
-        returncode, output = main('--parse-size=5 KB')
-        assert int(output) == humanfriendly.parse_size('5 KB')
+        # Test `humanfriendly --format-number'.
+        returncode, output = main('--format-number=1234567')
+        assert output.strip() == '1,234,567'
         # Test `humanfriendly --format-size'.
         random_byte_count = random.randint(1024, 1024*1024)
         returncode, output = main('--format-size=%i' % random_byte_count)
@@ -216,6 +226,9 @@ class HumanFriendlyTestCase(unittest.TestCase):
         random_timespan = random.randint(5, 600)
         returncode, output = main('--format-timespan=%i' % random_timespan)
         assert output.strip() == humanfriendly.format_timespan(random_timespan)
+        # Test `humanfriendly --parse-size'.
+        returncode, output = main('--parse-size=5 KB')
+        assert int(output) == humanfriendly.parse_size('5 KB')
         # Test `humanfriendly --run-command'.
         returncode, output = main('--run-command', 'bash', '-c', 'sleep 2 && exit 42')
         assert returncode == 42

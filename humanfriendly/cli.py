@@ -18,15 +18,21 @@ Supported options:
     a spinner and timer while the command is running. The exit status of the
     command is propagated.
 
-  -s, --format-size=COUNT
+  -n, --format-number=VALUE
 
-    Convert a byte count (given as the integer COUNT) into a human readable
+    Format a number (given as the integer or floating point number VALUE) with
+    thousands separators and two decimal places (if needed) and print the
+    formatted number to standard output.
+
+  -s, --format-size=BYTES
+
+    Convert a byte count (given as the integer BYTES) into a human readable
     string and print that string to standard output.
 
-  -t, --format-timespan=COUNT
+  -t, --format-timespan=SECONDS
 
-    Convert a number of seconds (given as the floating point number COUNT) into
-    a human readable timespan and print that string to standard output.
+    Convert a number of seconds (given as the floating point number SECONDS)
+    into a human readable timespan and print that string to standard output.
 
   --parse-size=VALUE
 
@@ -46,15 +52,15 @@ import subprocess
 import sys
 
 # Modules included in our package.
-from humanfriendly import format_size, format_timespan, parse_size, Spinner, Timer
+from humanfriendly import format_number, format_size, format_timespan, parse_size, Spinner, Timer
 
 
 def main():
     """Command line interface for the ``humanfriendly`` program."""
     try:
-        options, arguments = getopt.getopt(sys.argv[1:], 'chs:t:', [
-            'format-size=', 'format-timespan=', 'help', 'parse-size=',
-            'run-command',
+        options, arguments = getopt.getopt(sys.argv[1:], 'chn:s:t:', [
+            'format-number=', 'format-size=', 'format-timespan=', 'help',
+            'parse-size=', 'run-command',
         ])
     except getopt.GetoptError as e:
         sys.stderr.write("Error: %s\n" % e)
@@ -65,6 +71,8 @@ def main():
             actions.append(functools.partial(print_parsed_size, value))
         elif option in ('-c', '--run-command'):
             actions.append(functools.partial(run_command, arguments))
+        elif option in ('-n', '--format-number'):
+            actions.append(functools.partial(print_formatted_number, value))
         elif option in ('-s', '--format-size'):
             actions.append(functools.partial(print_formatted_size, value))
         elif option in ('-t', '--format-timespan'):
@@ -96,6 +104,11 @@ def run_command(command_line):
             if process.poll() is not None:
                 break
     sys.exit(process.returncode)
+
+
+def print_formatted_number(value):
+    """Print large numbers in a human readable format."""
+    print(format_number(float(value)))
 
 
 def print_formatted_size(value):

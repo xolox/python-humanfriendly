@@ -5,7 +5,7 @@
 # URL: https://humanfriendly.readthedocs.org
 
 # Semi-standard module versioning.
-__version__ = '1.20'
+__version__ = '1.21'
 
 # Standard library modules.
 import math
@@ -146,6 +146,40 @@ def parse_size(size):
     # Failed to match a unit: Explain what went wrong.
     msg = "Invalid disk size unit: %r"
     raise InvalidSize(msg % components[1])
+
+def format_number(number, num_decimals=2):
+    """
+    Format a number as a string including thousands separators to make it
+    easier to recognize the order of size of the number.
+
+    :param number: The number to format (a number like an :class:`int`,
+                   :class:`long` or :class:``float`).
+    :param num_decimals: The number of decimals to render (2 by default). If no
+                         decimal places are required to represent the number
+                         they will be omitted regardless of this argument.
+    :returns: The formatted number (a string).
+
+    Here's an example:
+
+    >>> from humanfriendly import format_number
+    >>> print(format_number(6000000))
+    6,000,000
+    > print(format_number(6000000000.42))
+    6,000,000,000.42
+    > print(format_number(6000000000.42, num_decimals=0))
+    6,000,000,000
+    """
+    integer_part, _, decimal_part = str(float(number)).partition('.')
+    reversed_digits = ''.join(reversed(integer_part))
+    parts = []
+    while reversed_digits:
+        parts.append(reversed_digits[:3])
+        reversed_digits = reversed_digits[3:]
+    formatted_number = ''.join(reversed(','.join(parts)))
+    decimals_to_add = decimal_part[:num_decimals].rstrip('0')
+    if decimals_to_add:
+        formatted_number += '.' + decimals_to_add
+    return formatted_number
 
 def round_number(count, keep_width=False):
     """
