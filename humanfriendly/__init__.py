@@ -5,7 +5,7 @@
 # URL: https://humanfriendly.readthedocs.org
 
 # Semi-standard module versioning.
-__version__ = '1.23'
+__version__ = '1.23.1'
 
 # Standard library modules.
 import collections
@@ -19,13 +19,15 @@ import textwrap
 import time
 
 try:
-    # Python 2.x.
+    # Python 2.
     interactive_prompt = raw_input
     string_types = basestring
+    unicode_type = unicode
 except NameError:
-    # Python 3.x.
+    # Python 3.
     interactive_prompt = input
     string_types = str
+    unicode_type = str
 
 # Spinners are redrawn at most this many seconds.
 minimum_spinner_interval = 0.2
@@ -151,10 +153,10 @@ def format_table(data, column_names=[], horizontal_bar='-', vertical_bar='|'):
     # Normalize the input to a nested list of Unicode strings (this avoids
     # problems when the caller passes in something like a generator that can
     # only be iterated once).
-    data = [[unicode(column) for column in row] for row in data]
+    data = [[unicode_type(column) for column in row] for row in data]
     # Normalize the column names into a list of Unicode strings and add the
     # list to the front of the list with table data.
-    column_names = [unicode(name) for name in column_names]
+    column_names = [unicode_type(name) for name in column_names]
     if column_names:
         data.insert(0, column_names)
     # Calculate the maximum width of each column.
