@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: May 26, 2015
+# Last Change: May 27, 2015
 # URL: https://humanfriendly.readthedocs.org
 
 """
@@ -73,6 +73,7 @@ from humanfriendly import (
     Spinner,
     Timer,
 )
+from humanfriendly.terminal import usage
 
 
 def main():
@@ -104,20 +105,15 @@ def main():
         elif option in ('-t', '--format-timespan'):
             actions.append(functools.partial(print_formatted_timespan, value))
         elif option in ('-h', '--help'):
-            usage()
+            usage(__doc__)
             return
     if should_format_table:
         actions.append(functools.partial(print_formatted_table, delimiter))
     if not actions:
-        usage()
+        usage(__doc__)
         return
     for partial in actions:
         partial()
-
-
-def usage():
-    """Print a friendly usage message to the terminal."""
-    print(__doc__.strip())
 
 
 def run_command(command_line):

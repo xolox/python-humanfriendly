@@ -3,7 +3,7 @@
 # Tests for the 'humanfriendly' module.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: May 26, 2015
+# Last Change: May 27, 2015
 # URL: https://humanfriendly.readthedocs.org
 
 # Standard library modules.
@@ -26,7 +26,9 @@ from humanfriendly.terminal import (
     ansi_width,
     ansi_wrap,
     connected_to_terminal,
+    find_meta_variables,
     find_terminal_size,
+    format_usage,
 )
 
 try:
@@ -380,6 +382,39 @@ class HumanFriendlyTestCase(unittest.TestCase):
             assert not connected_to_terminal(handle)
         # We can also verify that objects without isatty() don't raise an exception.
         assert not connected_to_terminal(object())
+
+    def test_find_meta_variables(self):
+        assert sorted(find_meta_variables("""
+            Here's one example: --format-number=VALUE
+            Here's another example: --format-size=BYTES
+            A final example: --format-timespan=SECONDS
+            This line doesn't contain a META variable.
+        """)) == sorted(['VALUE', 'BYTES', 'SECONDS'])
+
+    def test_format_usage(self):
+        # Test that options are highlighted.
+        usage_text = "Just one --option"
+        formatted_text = format_usage(usage_text)
+        assert len(formatted_text) > len(usage_text)
+        assert formatted_text.startswith("Just one ")
+        # Test that the "Usage: ..." line is highlighted.
+        usage_text = "Usage: humanfriendly [OPTIONS]"
+        formatted_text = format_usage(usage_text)
+        assert len(formatted_text) > len(usage_text)
+        assert usage_text in formatted_text
+        assert not formatted_text.startswith(usage_text)
+        # Test that meta variables aren't erroneously highlighted.
+        usage_text = (
+            "--valid-option=VALID_METAVAR\n"
+            "VALID_METAVAR is bogus\n"
+            "INVALID_METAVAR should not be highlighted\n"
+        )
+        formatted_text = format_usage(usage_text)
+        formatted_lines = formatted_text.splitlines()
+        # Make sure the meta variable in the second line is highlighted.
+        assert ANSI_CSI in formatted_lines[1]
+        # Make sure the meta variable in the third line isn't highlighted.
+        assert ANSI_CSI not in formatted_lines[2]
 
 
 def main(*args, **kw):

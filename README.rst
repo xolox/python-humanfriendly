@@ -19,8 +19,9 @@ text interfaces more user friendly. Some example features:
 - Prompting the user to select a choice from a list of options by typing the
   option's number or a unique substring of the option.
 
-- Terminal interaction including text styling (ANSI escape sequences) and
-  querying the terminal for its size.
+- Terminal interaction including text styling (ANSI escape sequences), user
+  friendly rendering of usage messages and querying the terminal for its
+  size.
 
 The `humanfriendly` package is currently tested on Python 2.6, 2.7 and 3.4.
 

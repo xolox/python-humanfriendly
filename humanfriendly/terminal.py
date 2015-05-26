@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: May 26, 2015
+# Last Change: May 27, 2015
 # URL: https://humanfriendly.readthedocs.org
 
 """
@@ -15,6 +15,7 @@ escape sequences work.
 """
 
 # Standard library modules.
+import os
 import re
 import subprocess
 import sys
@@ -42,12 +43,6 @@ ANSI_ERASE_LINE = '%sK' % ANSI_CSI
 ANSI_RESET = '%s0%s' % (ANSI_CSI, ANSI_SGR)
 """The ANSI escape sequence to reset styling (a string)."""
 
-DEFAULT_LINES = 25
-"""The default number of lines in a terminal (an integer)."""
-
-DEFAULT_COLUMNS = 80
-"""The default number of columns in a terminal (an integer)."""
-
 ANSI_COLOR_CODES = dict(black=0, red=1, green=2, yellow=3, blue=4, magenta=5, cyan=6, white=7)
 """
 A dictionary with (name, number) pairs of `portable color codes`_. Used by
@@ -55,6 +50,39 @@ A dictionary with (name, number) pairs of `portable color codes`_. Used by
 
 .. _portable color codes: http://en.wikipedia.org/wiki/ANSI_escape_code#Colors
 """
+
+DEFAULT_LINES = 25
+"""The default number of lines in a terminal (an integer)."""
+
+DEFAULT_COLUMNS = 80
+"""The default number of columns in a terminal (an integer)."""
+
+HIGHLIGHT_COLOR = os.environ.get('HUMANFRIENDLY_HIGHLIGHT_COLOR', 'green')
+"""
+The color used to highlight important tokens in formatted text (e.g. the usage
+message of the ``humanfriendly`` program). If the environment variable
+``$HUMANFRIENDLY_HIGHLIGHT_COLOR`` is set it determines the value of
+:data:`HIGHLIGHT_COLOR`.
+"""
+
+USAGE_PATTERN = re.compile(r'''
+    # Make sure whatever we're matching isn't preceded by a non-whitespace
+    # character.
+    (?<!\S)
+    (
+        # A short command line option or a long command line option
+        # (possibly including a meta variable for a value).
+        (-\w|--\w+(-\w+)*(=\S+)?)
+        # Or ...
+        |
+        # An environment variable.
+        \$[A-Za-z_][A-Za-z0-9_]*
+        # Or ...
+        |
+        # Might be a meta variable (usage() will figure it out).
+        [A-Z][A-Z0-9_]+
+    )
+''', re.VERBOSE)
 
 
 def ansi_strip(text):
@@ -252,3 +280,107 @@ def find_terminal_size_using_stty():
     if len(tokens) != 2:
         raise Exception("Invalid output from `stty size'!")
     return tuple(map(int, tokens))
+
+
+def usage(usage_text):
+    """
+    Print a human friendly usage message to the terminal.
+
+    :param text: The usage message to print (a string).
+
+    This function does two things:
+
+    1. If :data:`sys.stdout` is connected to a terminal (see
+       :func:`connected_to_terminal()`) then the usage message is formatted
+       using :func:`format_usage()`.
+    2. The usage message is shown using a pager (see :func:`show_pager()`).
+    """
+    if connected_to_terminal(sys.stdout):
+        usage_text = format_usage(usage_text)
+    show_pager(usage_text)
+
+
+def format_usage(usage_text):
+    """
+    Highlight special items in a usage message.
+
+    :param usage_text: The usage message to process (a string).
+    :returns: The usage message with special items highlighted.
+
+    This function highlights the following special items:
+
+    - The initial line of the form "Usage: ..."
+    - Short and long command line options
+    - Environment variables
+    - Meta variables (see :func:`find_meta_variables()`)
+
+    All items are highlighted in the color defined by
+    :data:`HIGHLIGHT_COLOR`.
+    """
+    formatted_lines = []
+    meta_variables = find_meta_variables(usage_text)
+    for line in usage_text.strip().splitlines(True):
+        if line.startswith('Usage:'):
+            # Highlight the "Usage: ..." line in bold font and color.
+            formatted_lines.append(ansi_wrap(line, color=HIGHLIGHT_COLOR))
+        else:
+            # Highlight options, meta variables and environment variables.
+            def callback(match):
+                value = match.group(0)
+                is_meta_variable = re.match('^[A-Z][A-Z0-9_]+$', value)
+                if is_meta_variable and value not in meta_variables:
+                    return value
+                else:
+                    return ansi_wrap(value, color=HIGHLIGHT_COLOR)
+            formatted_lines.append(USAGE_PATTERN.sub(callback, line))
+    return ''.join(formatted_lines)
+
+
+def find_meta_variables(usage_text):
+    """
+    Find the meta variables in the given usage message.
+
+    :param usage_text: The usage message to parse (a string).
+    :returns: A list of strings with any meta variables found in the usage
+              message.
+
+    When a command line option requires an argument, the convention is to
+    format such options as ``--option=ARG``. The text ``ARG`` in this example
+    is the meta variable.
+    """
+    meta_variables = set()
+    for match in USAGE_PATTERN.finditer(usage_text):
+        token = match.group(0)
+        if token.startswith('-'):
+            option, _, value = token.partition('=')
+            if value:
+                meta_variables.add(value)
+    return list(meta_variables)
+
+
+def show_pager(formatted_text):
+    """
+    Print a large text to the terminal using a pager.
+
+    :param formatted_text: The text to print to the terminal (a string).
+
+    The use of a pager helps to avoid the wall of text effect where the user
+    has to scroll up to see where the output began (not very user friendly).
+
+    If :data:`sys.stdout` is not connected to a terminal (see
+    :func:`connected_to_terminal()`) then the text is printed directly without
+    invoking a pager.
+
+    If the given text contains ANSI escape sequences the command ``less
+    --RAW-CONTROL-CHARS`` is used, otherwise ``$PAGER`` is used (if ``$PAGER``
+    isn't set the command ``less`` is used).
+    """
+    if connected_to_terminal(sys.stdout):
+        if ANSI_CSI in formatted_text:
+            pager_command = ['less', '--RAW-CONTROL-CHARS']
+        else:
+            pager_command = [os.environ.get('PAGER', 'less')]
+        pager = subprocess.Popen(pager_command, stdin=subprocess.PIPE)
+        pager.communicate(input=formatted_text)
+    else:
+        print(formatted_text)
