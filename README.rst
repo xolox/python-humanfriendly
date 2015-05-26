@@ -7,15 +7,27 @@ humanfriendly: Human friendly input/output in Python
 .. image:: https://coveralls.io/repos/xolox/python-humanfriendly/badge.png?branch=master
    :target: https://coveralls.io/r/xolox/python-humanfriendly?branch=master
 
-The functions in the ``humanfriendly`` package can be used to make text
-interfaces more user friendly by parsing and formatting file sizes and
-timestamps in simple, human readable formats. It's currently tested on Python
-2.6, 2.7 and 3.4.
+The functions and classes in the `humanfriendly` package can be used to make
+text interfaces more user friendly. Some example features:
+
+- Parsing and formatting numbers, file sizes, pathnames and timespans in
+  simple, human friendly formats.
+
+- Easy to use timers for long running operations, with human friendly
+  formatting of the resulting timespans.
+
+- Prompting the user to select a choice from a list of options by typing the
+  option's number or a unique substring of the option.
+
+- Terminal interaction including text styling (ANSI escape sequences) and
+  querying the terminal for its size.
+
+The `humanfriendly` package is currently tested on Python 2.6, 2.7 and 3.4.
 
 Getting started
 ---------------
 
-It's very simple to start using the ``humanfriendly`` package::
+It's very simple to start using the `humanfriendly` package::
 
    >>> import humanfriendly
    >>> user_input = raw_input("Enter a readable file size: ")
@@ -29,7 +41,7 @@ It's very simple to start using the ``humanfriendly`` package::
 Contact
 -------
 
-The latest version of ``humanfriendly`` is available on PyPI_ and GitHub_. The
+The latest version of `humanfriendly` is available on PyPI_ and GitHub_. The
 documentation is hosted on `Read the Docs`_. For bug reports please create an
 issue on GitHub_. If you have questions, suggestions, etc. feel free to send me
 an e-mail at `peter@peterodding.com`_.
@@ -39,7 +51,7 @@ License
 
 This software is licensed under the `MIT license`_.
 
-© 2013 Peter Odding.
+© 2015 Peter Odding.
 
 .. External references:
 .. _GitHub: https://github.com/xolox/python-humanfriendly

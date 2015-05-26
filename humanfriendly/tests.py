@@ -18,6 +18,16 @@ import unittest
 import humanfriendly
 import humanfriendly.cli
 from humanfriendly import compact, dedent
+from humanfriendly.terminal import (
+    ANSI_CSI,
+    ANSI_RESET,
+    ANSI_SGR,
+    ansi_style,
+    ansi_width,
+    ansi_wrap,
+    connected_to_terminal,
+    find_terminal_size,
+)
 
 try:
     # Python 2.x.
@@ -285,6 +295,91 @@ class HumanFriendlyTestCase(unittest.TestCase):
         # Test `humanfriendly --run-command'.
         returncode, output = main('--run-command', 'bash', '-c', 'sleep 2 && exit 42')
         assert returncode == 42
+
+    def test_ansi_style(self):
+        assert ansi_style(bold=True) == '%s1%s' % (ANSI_CSI, ANSI_SGR)
+        assert ansi_style(faint=True) == '%s2%s' % (ANSI_CSI, ANSI_SGR)
+        assert ansi_style(underline=True) == '%s4%s' % (ANSI_CSI, ANSI_SGR)
+        assert ansi_style(inverse=True) == '%s7%s' % (ANSI_CSI, ANSI_SGR)
+        assert ansi_style(strike_through=True) == '%s9%s' % (ANSI_CSI, ANSI_SGR)
+        assert ansi_style(color='blue') == '%s34%s' % (ANSI_CSI, ANSI_SGR)
+        self.assertRaises(ValueError, ansi_style, color='unknown')
+
+    def test_ansi_width(self):
+        text = "Whatever"
+        # Make sure ansi_width() works as expected on strings without ANSI escape sequences.
+        assert len(text) == ansi_width(text)
+        # Wrap a text in ANSI escape sequences and make sure ansi_width() treats it as expected.
+        wrapped = ansi_wrap(text, bold=True)
+        # Make sure ansi_wrap() changed the text.
+        assert wrapped != text
+        # Make sure ansi_wrap() added additional bytes.
+        assert len(wrapped) > len(text)
+        # Make sure the result of ansi_width() stays the same.
+        assert len(text) == ansi_width(wrapped)
+
+    def test_ansi_wrap(self):
+        text = "Whatever"
+        # Make sure ansi_wrap() does nothing when no keyword arguments are given.
+        assert text == ansi_wrap(text)
+        # Make sure ansi_wrap() starts the text with the CSI sequence.
+        assert ansi_wrap(text, bold=True).startswith(ANSI_CSI)
+        # Make sure ansi_wrap() ends the text by resetting the ANSI styles.
+        assert ansi_wrap(text, bold=True).endswith(ANSI_RESET)
+
+    def test_find_terminal_size(self):
+        lines, columns = find_terminal_size()
+        # We really can't assert any minimum or maximum values here because it
+        # simply doesn't make any sense; it's impossible for me to anticipate
+        # on what environments this test suite will run in the future.
+        assert lines > 0
+        assert columns > 0
+        # The find_terminal_size_using_ioctl() function is the default
+        # implementation and it will likely work fine. This makes it hard to
+        # test the fall back code paths though. However there's an easy way to
+        # make find_terminal_size_using_ioctl() fail ...
+        saved_stdin = sys.stdin
+        saved_stdout = sys.stdout
+        saved_stderr = sys.stderr
+        try:
+            # What do you mean this is brute force?! ;-)
+            sys.stdin = StringIO()
+            sys.stdout = StringIO()
+            sys.stderr = StringIO()
+            # Now find_terminal_size_using_ioctl() should fail even though
+            # find_terminal_size_using_stty() might work fine.
+            lines, columns = find_terminal_size()
+            assert lines > 0
+            assert columns > 0
+            # There's also an ugly way to make `stty size' fail: The
+            # subprocess.Popen class uses os.execvp() underneath, so if we
+            # clear the $PATH it will break.
+            saved_path = os.environ['PATH']
+            try:
+                os.environ['PATH'] = ''
+                # Now find_terminal_size_using_stty() should fail.
+                lines, columns = find_terminal_size()
+                assert lines > 0
+                assert columns > 0
+            finally:
+                os.environ['PATH'] = saved_path
+        finally:
+            sys.stdin = saved_stdin
+            sys.stdout = saved_stdout
+            sys.stderr = saved_stderr
+
+    def test_connected_to_terminal(self):
+        for stream in [sys.stdin, sys.stdout, sys.stderr]:
+            result = connected_to_terminal(stream)
+            # We really can't assert a True or False value here because this
+            # test suite should be able to run both interactively and
+            # non-interactively :-).
+            assert isinstance(result, bool)
+        # We can at least verify that e.g. /dev/null is never a terminal :-).
+        with open(os.devnull) as handle:
+            assert not connected_to_terminal(handle)
+        # We can also verify that objects without isatty() don't raise an exception.
+        assert not connected_to_terminal(object())
 
 
 def main(*args, **kw):

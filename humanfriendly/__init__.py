@@ -5,7 +5,7 @@
 # URL: https://humanfriendly.readthedocs.org
 
 # Semi-standard module versioning.
-__version__ = '1.23.1'
+__version__ = '1.24'
 
 # Standard library modules.
 import collections
@@ -281,7 +281,7 @@ def format_number(number, num_decimals=2):
     easier to recognize the order of size of the number.
 
     :param number: The number to format (a number like an :class:`int`,
-                   :class:`long` or :class:``float`).
+                   :class:`long` or :class:`float`).
     :param num_decimals: The number of decimals to render (2 by default). If no
                          decimal places are required to represent the number
                          they will be omitted regardless of this argument.
