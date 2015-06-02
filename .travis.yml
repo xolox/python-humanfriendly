@@ -7,7 +7,7 @@ python:
 install:
   - pip install 'coverage >= 4.0a5'
   - pip install 'coveralls >= 1.0a2'
-  - python setup.py install
+  - LC_ALL=C pip install .
 script:
   - coverage run setup.py test
 after_success:
