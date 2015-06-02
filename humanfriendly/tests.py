@@ -3,7 +3,7 @@
 # Tests for the 'humanfriendly' module.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: May 27, 2015
+# Last Change: June 2, 2015
 # URL: https://humanfriendly.readthedocs.org
 
 # Standard library modules.
@@ -18,10 +18,16 @@ import unittest
 import humanfriendly
 import humanfriendly.cli
 from humanfriendly import compact, dedent
+from humanfriendly.tables import (
+    format_pretty_table,
+    format_robust_table,
+    format_smart_table,
+)
 from humanfriendly.terminal import (
     ANSI_CSI,
     ANSI_RESET,
     ANSI_SGR,
+    ansi_strip,
     ansi_style,
     ansi_width,
     ansi_wrap,
@@ -147,15 +153,15 @@ class HumanFriendlyTestCase(unittest.TestCase):
         absolute_path = os.path.join(os.environ['HOME'], '.vimrc')
         self.assertEqual(absolute_path, humanfriendly.parse_path(friendly_path))
 
-    def test_table_formatting(self):
+    def test_pretty_tables(self):
         data = [['Just one column']]
-        assert humanfriendly.format_table(data) == dedent("""
+        assert format_pretty_table(data) == dedent("""
             -------------------
             | Just one column |
             -------------------
         """).strip()
         data = [['One', 'Two', 'Three'], ['1', '2', '3']]
-        assert humanfriendly.format_table(data) == dedent("""
+        assert format_pretty_table(data) == dedent("""
             ---------------------
             | One | Two | Three |
             | 1   | 2   | 3     |
@@ -163,13 +169,70 @@ class HumanFriendlyTestCase(unittest.TestCase):
         """).strip()
         column_names = ['One', 'Two', 'Three']
         data = [['1', '2', '3'], ['a', 'b', 'c']]
-        assert humanfriendly.format_table(data, column_names) == dedent("""
+        assert ansi_strip(format_pretty_table(data, column_names)) == dedent("""
             ---------------------
             | One | Two | Three |
             ---------------------
             | 1   | 2   | 3     |
             | a   | b   | c     |
             ---------------------
+        """).strip()
+
+    def test_robust_tables(self):
+        column_names = ['One', 'Two', 'Three']
+        data = [['1', '2', '3'], ['a', 'b', 'c']]
+        assert ansi_strip(format_robust_table(data, column_names)) == dedent("""
+            --------
+            One: 1
+            Two: 2
+            Three: 3
+            --------
+            One: a
+            Two: b
+            Three: c
+            --------
+        """).strip()
+        column_names = ['One', 'Two', 'Three']
+        data = [['1', '2', '3'], ['a', 'b', 'Here comes a\nmulti line column!']]
+        assert ansi_strip(format_robust_table(data, column_names)) == dedent("""
+            ------------------
+            One: 1
+            Two: 2
+            Three: 3
+            ------------------
+            One: a
+            Two: b
+            Three:
+            Here comes a
+            multi line column!
+            ------------------
+        """).strip()
+
+    def test_smart_tables(self):
+        column_names = ['One', 'Two', 'Three']
+        data = [['1', '2', '3'], ['a', 'b', 'c']]
+        assert ansi_strip(format_smart_table(data, column_names)) == dedent("""
+            ---------------------
+            | One | Two | Three |
+            ---------------------
+            | 1   | 2   | 3     |
+            | a   | b   | c     |
+            ---------------------
+        """).strip()
+        column_names = ['One', 'Two', 'Three']
+        data = [['1', '2', '3'], ['a', 'b', 'Here comes a\nmulti line column!']]
+        assert ansi_strip(format_smart_table(data, column_names)) == dedent("""
+            ------------------
+            One: 1
+            Two: 2
+            Three: 3
+            ------------------
+            One: a
+            Two: b
+            Three:
+            Here comes a
+            multi line column!
+            ------------------
         """).strip()
 
     def test_concatenate(self):

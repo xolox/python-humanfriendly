@@ -5,10 +5,9 @@
 # URL: https://humanfriendly.readthedocs.org
 
 # Semi-standard module versioning.
-__version__ = '1.25.1'
+__version__ = '1.26'
 
 # Standard library modules.
-import collections
 import math
 import multiprocessing
 import os
@@ -18,16 +17,21 @@ import sys
 import textwrap
 import time
 
+# In humanfriendly 1.23 the format_table() function was added to render a table
+# using characters like dashes and vertical bars to emulate borders. Since then
+# support for other tables has been added and the name of format_table() has
+# changed. The following import statement preserves backwards compatibility.
+from humanfriendly.tables import format_pretty_table as format_table
+
+# Compatibility with Python 2 and 3.
 try:
     # Python 2.
     interactive_prompt = raw_input
     string_types = basestring
-    unicode_type = unicode
 except NameError:
     # Python 3.
     interactive_prompt = input
     string_types = str
-    unicode_type = str
 
 # Spinners are redrawn at most this many seconds.
 minimum_spinner_interval = 0.2
@@ -134,51 +138,6 @@ def format(text, *args, **kw):
     if kw:
         text = text.format(**kw)
     return text
-
-def format_table(data, column_names=[], horizontal_bar='-', vertical_bar='|'):
-    """
-    Render a table using characters like dashes and vertical bars to emulate borders.
-
-    :param data: An iterable (e.g. a :class:`tuple` or :class:`list`)
-                 containing the rows of the table, where each row is an
-                 iterable containing the columns of the table (strings).
-    :param column_names: A iterable of column names (strings).
-    :param horizontal_bar: The character used to represent a horizontal bar (a
-                           string).
-    :param vertical_bar: The character used to represent a vertical bar (a
-                         string).
-    :returns: The rendered table (a string).
-    """
-    lines = []
-    # Normalize the input to a nested list of Unicode strings (this avoids
-    # problems when the caller passes in something like a generator that can
-    # only be iterated once).
-    data = [[unicode_type(column) for column in row] for row in data]
-    # Normalize the column names into a list of Unicode strings and add the
-    # list to the front of the list with table data.
-    column_names = [unicode_type(name) for name in column_names]
-    if column_names:
-        data.insert(0, column_names)
-    # Calculate the maximum width of each column.
-    widths = collections.defaultdict(int)
-    for row in data:
-        for column_index, column in enumerate(row):
-            widths[column_index] = max(widths[column_index], len(column))
-    # Create a horizontal bar of dashes as a delimiter.
-    line_delimiter = horizontal_bar * (sum(widths.values()) + len(widths) * 3 + 1)
-    lines.append(line_delimiter)
-    # Format the rows and columns.
-    for row_number, row in enumerate(data):
-        line = [vertical_bar]
-        for j, column in enumerate(row):
-            padding = ' ' * (widths[j] - len(column))
-            line.append(' ' + column + padding + ' ')
-            line.append(vertical_bar)
-        lines.append(u''.join(line))
-        if column_names and row_number == 0:
-            lines.append(line_delimiter)
-    lines.append(line_delimiter)
-    return u'\n'.join(lines)
 
 def coerce_boolean(value):
     """
