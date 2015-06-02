@@ -3,12 +3,16 @@
 # Setup script for the `humanfriendly' package.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: May 25, 2015
+# Last Change: June 2, 2015
 # URL: https://humanfriendly.readthedocs.org
 
+# Standard library modules.
+import codecs
 import os
-import setuptools
 import sys
+
+# De-facto standard solution for Python packaging.
+from setuptools import find_packages, setup
 
 # Find the directory where the source distribution was unpacked.
 source_directory = os.path.dirname(os.path.abspath(__file__))
@@ -23,9 +27,10 @@ from humanfriendly import __version__ as version_string
 # Fill in the long description (for the benefit of PyPI)
 # with the contents of README.rst (rendered by GitHub).
 readme_file = os.path.join(source_directory, 'README.rst')
-readme_text = open(readme_file, 'r').read()
+with codecs.open(readme_file, 'r', 'utf-8') as handle:
+    readme_text = handle.read()
 
-setuptools.setup(
+setup(
     name='humanfriendly',
     version=version_string,
     description="Human friendly output for text interfaces using Python",
@@ -33,7 +38,7 @@ setuptools.setup(
     url='https://humanfriendly.readthedocs.org',
     author='Peter Odding',
     author_email='peter@peterodding.com',
-    packages=setuptools.find_packages(),
+    packages=find_packages(),
     entry_points=dict(console_scripts=[
         'humanfriendly = humanfriendly.cli:main'
     ]),
