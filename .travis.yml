@@ -4,6 +4,7 @@ python:
   - "2.6"
   - "2.7"
   - "3.4"
+  - "pypy"
 install:
   - pip install 'coverage >= 4.0a5'
   - pip install 'coveralls >= 1.0a2'
