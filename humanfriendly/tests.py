@@ -3,7 +3,7 @@
 # Tests for the 'humanfriendly' module.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: June 2, 2015
+# Last Change: June 3, 2015
 # URL: https://humanfriendly.readthedocs.org
 
 # Standard library modules.
@@ -154,12 +154,14 @@ class HumanFriendlyTestCase(unittest.TestCase):
         self.assertEqual(absolute_path, humanfriendly.parse_path(friendly_path))
 
     def test_pretty_tables(self):
+        # The simplest case possible :-).
         data = [['Just one column']]
         assert format_pretty_table(data) == dedent("""
             -------------------
             | Just one column |
             -------------------
         """).strip()
+        # A bit more complex: two rows, three columns, varying widths.
         data = [['One', 'Two', 'Three'], ['1', '2', '3']]
         assert format_pretty_table(data) == dedent("""
             ---------------------
@@ -167,6 +169,7 @@ class HumanFriendlyTestCase(unittest.TestCase):
             | 1   | 2   | 3     |
             ---------------------
         """).strip()
+        # A table including column names.
         column_names = ['One', 'Two', 'Three']
         data = [['1', '2', '3'], ['a', 'b', 'c']]
         assert ansi_strip(format_pretty_table(data, column_names)) == dedent("""
@@ -176,6 +179,17 @@ class HumanFriendlyTestCase(unittest.TestCase):
             | 1   | 2   | 3     |
             | a   | b   | c     |
             ---------------------
+        """).strip()
+        # A table that contains a column with only numeric data (will be right aligned).
+        column_names = ['Just a label', 'Important numbers']
+        data = [['Row one', '15'], ['Row two', '300']]
+        assert ansi_strip(format_pretty_table(data, column_names)) == dedent("""
+            ------------------------------------
+            | Just a label | Important numbers |
+            ------------------------------------
+            | Row one      |                15 |
+            | Row two      |               300 |
+            ------------------------------------
         """).strip()
 
     def test_robust_tables(self):

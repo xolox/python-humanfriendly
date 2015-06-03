@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: May 27, 2015
+# Last Change: June 3, 2015
 # URL: https://humanfriendly.readthedocs.org
 
 """
@@ -217,9 +217,11 @@ def find_terminal_size():
 
               `Pre-emptive snarky comment`_: It's possible to cache the result
               of this function and use :data:`signal.SIGWINCH` to refresh the
-              cached values, but as a library I don't consider it the role of
-              the :py:mod:`humanfriendly.terminal` module to install a process
-              wide signal handler...
+              cached values!
+
+              Response: As a library I don't consider it the role of the
+              :py:mod:`humanfriendly.terminal` module to install a process wide
+              signal handler ...
 
     .. _Pre-emptive snarky comment: http://blogs.msdn.com/b/oldnewthing/archive/2008/01/30/7315957.aspx
     """
