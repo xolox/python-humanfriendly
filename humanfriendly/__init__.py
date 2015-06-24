@@ -1,15 +1,16 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: June 3, 2015
+# Last Change: June 24, 2015
 # URL: https://humanfriendly.readthedocs.org
 
 # Semi-standard module versioning.
-__version__ = '1.27'
+__version__ = '1.28'
 
 # Standard library modules.
 import math
 import multiprocessing
+import numbers
 import os
 import os.path
 import re
@@ -139,6 +140,40 @@ def format(text, *args, **kw):
         text = text.format(**kw)
     return text
 
+def tokenize(text):
+    """
+    Tokenize a text into numbers and strings.
+
+    :param text: The text to tokenize (a string).
+    :returns: A list of strings and/or numbers.
+
+    This function is used to implement robust tokenization of user input in
+    functions like :func:`parse_size()` and :func:`parse_timespan()`. It
+    automatically coerces integer and floating point numbers, ignores
+    whitespace and knows how to separate numbers from strings even without
+    whitespace. Some examples to make this more concrete:
+
+    >>> from humanfriendly import tokenize
+    >>> tokenize('42')
+    [42]
+    >>> tokenize('42MB')
+    [42, 'MB']
+    >>> tokenize('42.5MB')
+    [42.5, 'MB']
+    >>> tokenize('42.5 MB')
+    [42.5, 'MB']
+    """
+    tokenized_input = []
+    for token in re.split(r'(\d+(?:\.\d+)?)', text):
+        token = token.strip()
+        if re.match(r'\d+\.\d+', token):
+            tokenized_input.append(float(token))
+        elif token.isdigit():
+            tokenized_input.append(int(token))
+        elif token:
+            tokenized_input.append(token)
+    return tokenized_input
+
 def coerce_boolean(value):
     """
     Coerce any value to a boolean.
@@ -216,23 +251,21 @@ def parse_size(size):
     >>> parse_size('1.5 GB')
     1610612736
     """
-    tokens = re.split(r'([0-9.]+)', size.lower())
-    components = [s.strip() for s in tokens if s and not s.isspace()]
-    if len(components) == 1 and components[0].isdigit():
-        # If the string contains only an integer number, it is assumed to be
-        # the number of bytes.
-        return int(components[0])
-    # Otherwise we expect to find two tokens: A number and a unit.
-    if len(components) != 2:
-        msg = "Expected to get two tokens, got %s!"
-        raise InvalidSize(msg % components)
-    # Try to match the first letter of the unit.
-    for unit in reversed(disk_size_units):
-        if components[1].startswith(unit['prefix']):
-            return int(float(components[0]) * unit['divider'])
-    # Failed to match a unit: Explain what went wrong.
-    msg = "Invalid disk size unit: %r"
-    raise InvalidSize(msg % components[1])
+    tokens = tokenize(size)
+    if tokens and isinstance(tokens[0], numbers.Number):
+        # If the input contains only a number, it's assumed to be the number of bytes.
+        if len(tokens) == 1:
+            return int(tokens[0])
+        # Otherwise we expect to find two tokens: A number and a unit.
+        if len(tokens) == 2 and isinstance(tokens[1], string_types):
+            normalized_unit = tokens[1].lower()
+            # Try to match the first letter of the unit.
+            for unit in reversed(disk_size_units):
+                if normalized_unit.startswith(unit['prefix']):
+                    return int(tokens[0] * unit['divider'])
+    # We failed to parse the size specification.
+    msg = "Failed to parse size! (input %r was tokenized as %r)"
+    raise InvalidSize(msg % (size, tokens))
 
 def format_number(number, num_decimals=2):
     """
@@ -768,9 +801,9 @@ class InvalidSize(Exception):
     >>> from humanfriendly import parse_size
     >>> parse_size('5 Z')
     Traceback (most recent call last):
-      File "humanfriendly.py", line 98, in parse_size
-        raise InvalidSize, msg % components[1]
-    humanfriendly.InvalidSize: Invalid disk size unit: 'z'
+      File "humanfriendly/__init__.py", line 267, in parse_size
+        raise InvalidSize(msg % (size, tokens))
+    humanfriendly.InvalidSize: Failed to parse size! (input '5 Z' was tokenized as [5, 'Z'])
     """
 
 class InvalidDate(Exception):
