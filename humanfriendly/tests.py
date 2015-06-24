@@ -3,7 +3,7 @@
 # Tests for the 'humanfriendly' module.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: June 3, 2015
+# Last Change: June 24, 2015
 # URL: https://humanfriendly.readthedocs.org
 
 # Standard library modules.
@@ -101,6 +101,16 @@ class HumanFriendlyTestCase(unittest.TestCase):
         self.assertEqual('2 years', humanfriendly.format_timespan(year * 2))
         self.assertEqual('1 year, 2 weeks and 3 days', humanfriendly.format_timespan(year + week * 2 + day * 3 + hour * 12))
 
+    def test_parse_timespan(self):
+        self.assertEqual(0, humanfriendly.parse_timespan('0'))
+        self.assertEqual(0, humanfriendly.parse_timespan('0s'))
+        self.assertEqual(5, humanfriendly.parse_timespan('5s'))
+        self.assertEqual(60*2, humanfriendly.parse_timespan('2m'))
+        self.assertEqual(60*60*3, humanfriendly.parse_timespan('3 h'))
+        self.assertEqual(60*60*24*4, humanfriendly.parse_timespan('4d'))
+        self.assertEqual(60*60*24*7*5, humanfriendly.parse_timespan('5 w'))
+        self.assertRaises(humanfriendly.InvalidTimespan, humanfriendly.parse_timespan, '1z')
+
     def test_parse_date(self):
         self.assertEqual((2013, 6, 17, 0, 0, 0), humanfriendly.parse_date('2013-06-17'))
         self.assertEqual((2013, 6, 17, 2, 47, 42), humanfriendly.parse_date('2013-06-17 02:47:42'))
@@ -124,6 +134,7 @@ class HumanFriendlyTestCase(unittest.TestCase):
         self.assertEqual(1024, humanfriendly.parse_size('1 KB'))
         self.assertEqual(1024, humanfriendly.parse_size('1 kilobyte'))
         self.assertEqual(1024 ** 3, humanfriendly.parse_size('1 GB'))
+        self.assertEqual(1024 ** 3 * 1.5, humanfriendly.parse_size('1.5 GB'))
         self.assertRaises(humanfriendly.InvalidSize, humanfriendly.parse_size, '1z')
         self.assertRaises(humanfriendly.InvalidSize, humanfriendly.parse_size, 'a')
 

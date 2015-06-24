@@ -5,7 +5,7 @@
 # URL: https://humanfriendly.readthedocs.org
 
 # Semi-standard module versioning.
-__version__ = '1.28'
+__version__ = '1.29'
 
 # Standard library modules.
 import math
@@ -233,11 +233,11 @@ def format_size(num_bytes, keep_width=False):
 
 def parse_size(size):
     """
-    Parse a human readable data size and return the number of bytes. Raises
-    :py:class:`InvalidSize` when the size cannot be parsed.
+    Parse a human readable data size and return the number of bytes.
 
     :param size: The human readable file size to parse (a string).
     :returns: The corresponding size in bytes (an integer).
+    :raises: :exc:`InvalidSize` when the input can't be parsed.
 
     Some examples:
 
@@ -260,7 +260,7 @@ def parse_size(size):
         if len(tokens) == 2 and isinstance(tokens[1], string_types):
             normalized_unit = tokens[1].lower()
             # Try to match the first letter of the unit.
-            for unit in reversed(disk_size_units):
+            for unit in disk_size_units:
                 if normalized_unit.startswith(unit['prefix']):
                     return int(tokens[0] * unit['divider'])
     # We failed to parse the size specification.
@@ -369,6 +369,54 @@ def format_timespan(num_seconds):
             # Remove insignificant data from the formatted timespan and format
             # it in a readable way.
             return concatenate(result[:3])
+
+def parse_timespan(timespan):
+    """
+    Parse a "human friendly" timespan into the number of seconds.
+
+    :param value: A string like ``5h`` (5 hours), ``10m`` (10 minutes) or
+                  ``42s`` (42 seconds).
+    :returns: The number of seconds as a floating point number.
+    :raises: :exc:`InvalidTimespan` when the input can't be parsed.
+
+    Note that the :func:`parse_timespan()` function is not meant to be the
+    "mirror image" of the :func:`format_timespan()` function. Instead it's
+    meant to allow humans to easily and succinctly specify a timespan with a
+    minimal amount of typing. It's very useful to accept easy to write time
+    spans as e.g. command line arguments to programs.
+
+    Some examples:
+
+    >>> from humanfriendly import parse_timespan
+    >>> parse_timespan('42')
+    42.0
+    >>> parse_timespan('42s')
+    42.0
+    >>> parse_timespan('1m')
+    60.0
+    >>> parse_timespan('1h')
+    3600.0
+    >>> parse_timespan('1d')
+    86400.0
+    """
+    tokens = tokenize(timespan)
+    if tokens and isinstance(tokens[0], numbers.Number):
+        # If the input contains only a number, it's assumed to be the number of seconds.
+        if len(tokens) == 1:
+            return float(tokens[0])
+        # Otherwise we expect to find two tokens: A number and a unit.
+        if len(tokens) == 2 and isinstance(tokens[1], string_types):
+            normalized_unit = tokens[1].lower()
+            # Try to match the first letter of the unit.
+            for unit in time_units:
+                # All of the first letters of the time units are unique, so
+                # although this check is not very strict I believe it to be
+                # sufficient.
+                if normalized_unit.startswith(unit['singular'][0]):
+                    return float(tokens[0]) * unit['divider']
+    # We failed to parse the timespan specification.
+    msg = "Failed to parse timespan! (input %r was tokenized as %r)"
+    raise InvalidTimespan(msg % (timespan, tokens))
 
 def parse_date(datestring):
     """
@@ -793,6 +841,19 @@ def automatic_spinner_target(label, show_time, shutdown_event):
         # won't make any sense to the average user.
         pass
 
+class InvalidDate(Exception):
+    """
+    Raised by :py:func:`parse_date()` when a string cannot be parsed into a
+    date:
+
+    >>> from humanfriendly import parse_date
+    >>> parse_date('2013-06-XY')
+    Traceback (most recent call last):
+      File "humanfriendly.py", line 206, in parse_date
+        raise InvalidDate, msg % datestring
+    humanfriendly.InvalidDate: Invalid date! (expected 'YYYY-MM-DD' or 'YYYY-MM-DD HH:MM:SS' but got: '2013-06-XY')
+    """
+
 class InvalidSize(Exception):
     """
     Raised by :py:func:`parse_size()` when a string cannot be parsed into a
@@ -806,15 +867,15 @@ class InvalidSize(Exception):
     humanfriendly.InvalidSize: Failed to parse size! (input '5 Z' was tokenized as [5, 'Z'])
     """
 
-class InvalidDate(Exception):
+class InvalidTimespan(Exception):
     """
-    Raised by :py:func:`parse_date()` when a string cannot be parsed into a
-    date:
+    Raised by :py:func:`parse_timespan()` when a string cannot be parsed into a
+    timespan:
 
-    >>> from humanfriendly import parse_date
-    >>> parse_date('2013-06-XY')
+    >>> from humanfriendly import parse_timespan
+    >>> parse_timespan('1 age')
     Traceback (most recent call last):
-      File "humanfriendly.py", line 206, in parse_date
-        raise InvalidDate, msg % datestring
-    humanfriendly.InvalidDate: Invalid date! (expected 'YYYY-MM-DD' or 'YYYY-MM-DD HH:MM:SS' but got: '2013-06-XY')
+      File "humanfriendly/__init__.py", line 419, in parse_timespan
+        raise InvalidTimespan(msg % (timespan, tokens))
+    humanfriendly.InvalidTimespan: Failed to parse timespan! (input '1 age' was tokenized as [1, 'age'])
     """
