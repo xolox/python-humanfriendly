@@ -5,7 +5,7 @@
 # URL: https://humanfriendly.readthedocs.org
 
 # Semi-standard module versioning.
-__version__ = '1.30'
+__version__ = '1.31'
 
 # Standard library modules.
 import multiprocessing

@@ -10,6 +10,7 @@ the `humanfriendly` package. The following modules are available:
 - :mod:`humanfriendly.text`
 - :mod:`humanfriendly.tables`
 - :mod:`humanfriendly.terminal`
+- :mod:`humanfriendly.usage`
 
 :mod:`humanfriendly`
 --------------------
@@ -33,4 +34,10 @@ the `humanfriendly` package. The following modules are available:
 -----------------------------
 
 .. automodule:: humanfriendly.terminal
+   :members:
+
+:mod:`humanfriendly.usage`
+-----------------------------
+
+.. automodule:: humanfriendly.usage
    :members:

@@ -3,7 +3,7 @@
 # Tests for the 'humanfriendly' module.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: June 24, 2015
+# Last Change: June 28, 2015
 # URL: https://humanfriendly.readthedocs.org
 
 # Standard library modules.
@@ -32,9 +32,13 @@ from humanfriendly.terminal import (
     ansi_width,
     ansi_wrap,
     connected_to_terminal,
-    find_meta_variables,
     find_terminal_size,
+)
+from humanfriendly.usage import (
+    find_meta_variables,
     format_usage,
+    import_module,
+    render_usage,
 )
 
 try:
@@ -503,6 +507,29 @@ class HumanFriendlyTestCase(unittest.TestCase):
         assert ANSI_CSI in formatted_lines[1]
         # Make sure the meta variable in the third line isn't highlighted.
         assert ANSI_CSI not in formatted_lines[2]
+
+    def test_render_usage(self):
+        assert render_usage("Usage: some-command WITH ARGS") == "**Usage:** `some-command WITH ARGS`"
+        assert render_usage("Supported options:") == "**Supported options:**"
+        assert 'code-block' in render_usage(dedent("""
+            Here comes a shell command:
+
+              $ echo test
+              test
+        """))
+        assert all(token in render_usage("""
+            Supported options:
+
+              -n, --dry-run
+
+                Don't change anything.
+        """) for token in ('`-n`', '`--dry-run`'))
+
+    def test_import_module(self):
+        import humanfriendly
+        assert humanfriendly is import_module('humanfriendly')
+        from humanfriendly import cli
+        assert cli is import_module('humanfriendly.cli')
 
 
 def main(*args, **kw):

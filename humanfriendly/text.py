@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: June 27, 2015
+# Last Change: June 28, 2015
 # URL: https://humanfriendly.readthedocs.org
 
 """
@@ -201,6 +201,35 @@ def is_empty_line(text):
               :data:`False` otherwise.
     """
     return len(text) == 0 or text.isspace()
+
+def split_paragraphs(text):
+    """
+    Split a string into paragraphs (one or more lines delimited by an empty line).
+
+    :param text: The text to split into paragraphs (a string).
+    :returns: A list of strings.
+    """
+    paragraphs = []
+    for chunk in text.split('\n\n'):
+        chunk = trim_empty_lines(chunk)
+        if chunk and not chunk.isspace():
+            paragraphs.append(chunk)
+    return paragraphs
+
+def join_lines(text):
+    """
+    Remove "hard wrapping" from the paragraphs in a string.
+
+    :param text: The text to reformat (a string).
+    :returns: The text without hard wrapping (a string).
+
+    This function works by removing line breaks when the last character before
+    a line break and the first character after the line break are both
+    non-whitespace characters. This means that common leading indentation will
+    break :func:`join_lines()` (in that case you can use :func:`dedent()`
+    before calling :func:`join_lines()`).
+    """
+    return re.sub(r'(\S)\n(\S)', r'\1 \2', text).strip()
 
 def pluralize(count, singular, plural=None):
     """

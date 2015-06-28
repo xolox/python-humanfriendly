@@ -40,6 +40,57 @@ It's very simple to start using the `humanfriendly` package::
    >>> print "You entered:", humanfriendly.format_size(num_bytes)
    You entered: 16 GB
 
+Command line
+------------
+
+.. A DRY solution to avoid duplication of the `humanfriendly --help' text:
+..
+.. [[[cog
+.. from humanfriendly.usage import inject_usage
+.. inject_usage('humanfriendly.cli')
+.. ]]]
+
+**Usage:** `humanfriendly [OPTIONS]`
+
+Human friendly input/output (text formatting) on the command line based on the Python package with the same name.
+
+**Supported options:**
+
+.. csv-table::
+   :header: Option, Description
+   :widths: 30, 70
+
+
+   "``-c``, ``--run-command``","Execute an external command (given as the positional arguments) and render
+   a spinner and timer while the command is running. The exit status of the
+   command is propagated.
+   "
+   ``--format-table``,"Read tabular data from standard input (each line is a row and each
+   whitespace separated field is a column), format the data as a table and
+   print the resulting table to standard output. See also the ``--delimiter``
+   option.
+   "
+   "``-d``, ``--delimiter=VALUE``","Change the delimiter used by ``--format-table`` to ``VALUE`` (a string). By default
+   all whitespace is treated as a delimiter.
+   "
+   "``-n``, ``--format-number=VALUE``","Format a number (given as the integer or floating point number ``VALUE``) with
+   thousands separators and two decimal places (if needed) and print the
+   formatted number to standard output.
+   "
+   "``-s``, ``--format-size=BYTES``","Convert a byte count (given as the integer ``BYTES``) into a human readable
+   string and print that string to standard output.
+   "
+   "``-t``, ``--format-timespan=SECONDS``","Convert a number of seconds (given as the floating point number ``SECONDS``)
+   into a human readable timespan and print that string to standard output.
+   "
+   ``--parse-size=VALUE``,"Parse a human readable data size (given as the string ``VALUE``) and print the
+   number of bytes to standard output.
+   "
+   "``-h``, ``--help``","Show this message and exit.
+   "
+
+.. [[[end]]]
+
 Contact
 -------
 

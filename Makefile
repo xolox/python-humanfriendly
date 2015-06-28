@@ -1,7 +1,7 @@
 # Makefile for the 'humanfriendly' module.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: May 25, 2015
+# Last Change: June 27, 2015
 # URL: https://humanfriendly.readthedocs.org
 
 # The following defaults are based on my preferences, but possible for others
@@ -58,6 +58,10 @@ coverage: install
 	if [ "`whoami`" != root ] && which xdg-open &>/dev/null; then \
 		xdg-open htmlcov/index.html &>/dev/null; \
 	fi
+
+readme:
+	test -x "$(VIRTUAL_ENV)/bin/cog.py" || ($(ACTIVATE) && pip-accel install cogapp)
+	$(ACTIVATE) && cog.py -r README.rst
 
 docs: install
 	test -x "$(VIRTUAL_ENV)/bin/sphinx-build" || ($(ACTIVATE) && pip-accel install sphinx)
