@@ -7,23 +7,30 @@ The following documentation is based on the source code of version |release| of
 the `humanfriendly` package. The following modules are available:
 
 - :mod:`humanfriendly`
+- :mod:`humanfriendly.text`
 - :mod:`humanfriendly.tables`
 - :mod:`humanfriendly.terminal`
 
-The :mod:`humanfriendly` module
--------------------------------
+:mod:`humanfriendly`
+--------------------
 
 .. automodule:: humanfriendly
    :members:
 
-The :mod:`humanfriendly.tables` module
-----------------------------------------
+:mod:`humanfriendly.text`
+-------------------------
+
+.. automodule:: humanfriendly.text
+   :members:
+
+:mod:`humanfriendly.tables`
+---------------------------
 
 .. automodule:: humanfriendly.tables
    :members:
 
-The :mod:`humanfriendly.terminal` module
-----------------------------------------
+:mod:`humanfriendly.terminal`
+-----------------------------
 
 .. automodule:: humanfriendly.terminal
    :members:

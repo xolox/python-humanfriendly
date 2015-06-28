@@ -1,28 +1,34 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: June 24, 2015
+# Last Change: June 28, 2015
 # URL: https://humanfriendly.readthedocs.org
 
 # Semi-standard module versioning.
-__version__ = '1.29'
+__version__ = '1.30'
 
 # Standard library modules.
-import math
 import multiprocessing
 import numbers
 import os
 import os.path
 import re
 import sys
-import textwrap
 import time
 
 # In humanfriendly 1.23 the format_table() function was added to render a table
 # using characters like dashes and vertical bars to emulate borders. Since then
 # support for other tables has been added and the name of format_table() has
 # changed. The following import statement preserves backwards compatibility.
-from humanfriendly.tables import format_pretty_table as format_table
+from humanfriendly.tables import format_pretty_table as format_table  # NOQA
+
+# In humanfriendly 1.30 the following text manipulation functions were moved
+# out into a separate module to enable their usage in other modules of the
+# humanfriendly package (without causing circular imports).
+from humanfriendly.text import (  # NOQA
+    compact, concatenate, dedent, format, is_empty_line,
+    pluralize, tokenize, trim_empty_lines,
+)
 
 # Compatibility with Python 2 and 3.
 try:
@@ -60,119 +66,6 @@ time_units = (dict(divider=1, singular='second', plural='seconds'),
               dict(divider=60*60*24, singular='day', plural='days'),
               dict(divider=60*60*24*7, singular='week', plural='weeks'),
               dict(divider=60*60*24*7*52, singular='year', plural='years'))
-
-def compact(text, *args, **kw):
-    """
-    Compact whitespace in a string.
-
-    Trims leading and trailing whitespace, replaces runs of whitespace
-    characters with a single space and interpolates any arguments (using
-    :func:`format()`).
-
-    :param text: The text to compact (a string).
-    :param args: Any positional arguments are interpolated using :func:`format()`.
-    :param kw: Any keyword arguments are interpolated using :func:`format()`.
-    :returns: The compacted text (a string).
-    """
-    non_whitespace_tokens = text.split()
-    compacted_text = ' '.join(non_whitespace_tokens)
-    return format(compacted_text, *args, **kw)
-
-def dedent(text, *args, **kw):
-    """
-    Dedent a string (remove common leading whitespace from all lines).
-
-    Removes common leading whitespace from all lines in the string (using
-    :func:`textwrap.dedent()`), removes leading and trailing empty lines (using
-    :func:`trim_empty_lines()`) and interpolates any arguments (using
-    :func:`format()`).
-
-    :param text: The text to dedent (a string).
-    :param args: Any positional arguments are interpolated using :func:`format()`.
-    :param kw: Any keyword arguments are interpolated using :func:`format()`.
-    :returns: The dedented text (a string).
-    """
-    dedented_text = textwrap.dedent(text)
-    trimmed_text = trim_empty_lines(dedented_text)
-    return format(trimmed_text, *args, **kw)
-
-def trim_empty_lines(text):
-    """
-    Trim leading and trailing empty lines from the given text.
-
-    :param text: The text to trim (a string).
-    :returns: The trimmed text (a string).
-    """
-    lines = text.splitlines(True)
-    while lines and is_empty_line(lines[0]):
-        lines.pop(0)
-    while lines and is_empty_line(lines[-1]):
-        lines.pop(-1)
-    return ''.join(lines)
-
-def is_empty_line(text):
-    """
-    Check if a text is empty or contains only whitespace.
-
-    :param text: The text to check for "emptiness" (a string).
-    :returns: :data:`True` if the text is empty or contains only whitespace,
-              :data:`False` otherwise.
-    """
-    return len(text) == 0 or text.isspace()
-
-def format(text, *args, **kw):
-    """
-    Format a string using the string formatting operator and/or :func:`str.format()`.
-
-    :param text: The text to format (a string).
-    :param args: Any positional arguments are interpolated into the text using
-                 the string formatting operator (``%``). If no positional
-                 arguments are given no interpolation is done.
-    :param kw: Any keyword arguments are interpolated into the text using the
-               :func:`str.format()` function. If no keyword arguments are given
-               no interpolation is done.
-    :returns: The text with any positional and/or keyword arguments
-              interpolated (a string).
-    """
-    if args:
-        text %= args
-    if kw:
-        text = text.format(**kw)
-    return text
-
-def tokenize(text):
-    """
-    Tokenize a text into numbers and strings.
-
-    :param text: The text to tokenize (a string).
-    :returns: A list of strings and/or numbers.
-
-    This function is used to implement robust tokenization of user input in
-    functions like :func:`parse_size()` and :func:`parse_timespan()`. It
-    automatically coerces integer and floating point numbers, ignores
-    whitespace and knows how to separate numbers from strings even without
-    whitespace. Some examples to make this more concrete:
-
-    >>> from humanfriendly import tokenize
-    >>> tokenize('42')
-    [42]
-    >>> tokenize('42MB')
-    [42, 'MB']
-    >>> tokenize('42.5MB')
-    [42.5, 'MB']
-    >>> tokenize('42.5 MB')
-    [42.5, 'MB']
-    """
-    tokenized_input = []
-    for token in re.split(r'(\d+(?:\.\d+)?)', text):
-        token = token.strip()
-        if re.match(r'\d+\.\d+', token):
-            tokenized_input.append(float(token))
-        elif token.isdigit():
-            tokenized_input.append(int(token))
-        elif token:
-            tokenized_input.append(token)
-    return tokenized_input
 
 def coerce_boolean(value):
     """
@@ -521,43 +414,6 @@ def parse_path(pathname):
     """
     return os.path.abspath(os.path.expanduser(os.path.expandvars(pathname)))
 
-def pluralize(count, singular, plural=None):
-    """
-    Combine a count with the singular or plural form of a word.
-
-    If the plural form of the word is not provided it is obtained by
-    concatenating the singular form of the word with the letter "s". Of course
-    this will not always be correct, which is why you have the option to
-    specify both forms.
-
-    :param count: The count (a number).
-    :param singular: The singular form of the word (a string).
-    :param plural: The plural form of the word (a string or ``None``).
-    :returns: The count and singular/plural word concatenated (a string).
-    """
-    if not plural:
-        plural = singular + 's'
-    return '%s %s' % (count, singular if math.floor(float(count)) == 1 else plural)
-
-def concatenate(items):
-    """
-    Concatenate a list of items in a human friendly way.
-
-    :param items: A sequence of strings.
-    :returns: A single string.
-
-    >>> from humanfriendly import concatenate
-    >>> concatenate(["eggs", "milk", "bread"])
-    'eggs, milk and bread'
-    """
-    items = list(items)
-    if len(items) > 1:
-        return ', '.join(items[:-1]) + ' and ' + items[-1]
-    elif items:
-        return items[0]
-    else:
-        return ''
-
 def prompt_for_choice(choices, default=None):
     """
     Prompt the user to select a choice from a list of options.
@@ -570,7 +426,7 @@ def prompt_for_choice(choices, default=None):
     # By default the raw_input() prompt is very unfriendly, for example the
     # `Home' key enters `^[OH' and the `End' key enters `^[OF'. By simply
     # importing the `readline' module the prompt becomes much friendlier.
-    import readline
+    import readline  # NOQA
     # Make sure we can use 'choices' more than once (i.e. not a generator).
     choices = list(choices)
     # Present the available choices in a user friendly way.
