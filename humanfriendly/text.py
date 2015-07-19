@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: June 28, 2015
+# Last Change: July 19, 2015
 # URL: https://humanfriendly.readthedocs.org
 
 """
@@ -29,7 +29,7 @@ def concatenate(items):
     :param items: A sequence of strings.
     :returns: A single string.
 
-    >>> from humanfriendly import concatenate
+    >>> from humanfriendly.text import concatenate
     >>> concatenate(["eggs", "milk", "bread"])
     'eggs, milk and bread'
     """
@@ -70,6 +70,7 @@ def format(text, *args, **kw):
       receives a tuple (which saves me a context switch :-). Here's an
       example:
 
+      >>> from humanfriendly.text import format
       >>> # The string formatting operator.
       >>> print('the magic number is %s' % 42)
       the magic number is 42
@@ -249,6 +250,23 @@ def pluralize(count, singular, plural=None):
         plural = singular + 's'
     return '%s %s' % (count, singular if math.floor(float(count)) == 1 else plural)
 
+def split(text):
+    """
+    Split a comma-separated list of strings.
+
+    :param text: The text to split (a string).
+    :returns: A list of zero or more strings.
+
+    **Example:**
+
+    >>> from humanfriendly.text import split
+    >>> 'foo,bar, baz,'.split(',')
+    ['foo', 'bar', ' baz', '']
+    >>> split('foo,bar, baz,')
+    ['foo', 'bar', 'baz']
+    """
+    return [token.strip() for token in text.split(',') if token and not token.isspace()]
+
 def tokenize(text):
     """
     Tokenize a text into numbers and strings.
@@ -262,7 +280,7 @@ def tokenize(text):
     whitespace and knows how to separate numbers from strings even without
     whitespace. Some examples to make this more concrete:
 
-    >>> from humanfriendly import tokenize
+    >>> from humanfriendly.text import tokenize
     >>> tokenize('42')
     [42]
     >>> tokenize('42MB')

@@ -3,7 +3,7 @@
 # Tests for the 'humanfriendly' module.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: June 28, 2015
+# Last Change: July 19, 2015
 # URL: https://humanfriendly.readthedocs.org
 
 # Standard library modules.
@@ -269,6 +269,14 @@ class HumanFriendlyTestCase(unittest.TestCase):
         self.assertEqual(humanfriendly.concatenate(['one']), 'one')
         self.assertEqual(humanfriendly.concatenate(['one', 'two']), 'one and two')
         self.assertEqual(humanfriendly.concatenate(['one', 'two', 'three']), 'one, two and three')
+
+    def test_split(self):
+        from humanfriendly.text import split
+        self.assertEqual(split(''), [])
+        self.assertEqual(split('foo'), ['foo'])
+        self.assertEqual(split('foo, bar'), ['foo', 'bar'])
+        self.assertEqual(split('foo, bar, baz'), ['foo', 'bar', 'baz'])
+        self.assertEqual(split('foo,bar,baz'), ['foo', 'bar', 'baz'])
 
     def test_timer(self):
         for seconds, text in ((1, '1 second'),
