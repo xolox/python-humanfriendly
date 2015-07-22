@@ -59,6 +59,13 @@ disk_size_units = (dict(prefix='b', divider=1, singular='byte', plural='bytes'),
                    dict(prefix='t', divider=1024**4, singular='TB', plural='TB'),
                    dict(prefix='p', divider=1024**5, singular='PB', plural='PB'))
 
+# Common length size units, used for formatting and parsing.
+length_size_units = (dict(prefix='nm', divider=1e-09, singular='nm', plural='nm'),
+                     dict(prefix='mm', divider=1e-03, singular='mm', plural='mm'),
+                     dict(prefix='cm', divider=1e-02, singular='cm', plural='cm'),
+                     dict(prefix='m', divider=1, singular='metre', plural='metres'),
+                     dict(prefix='km', divider=1000, singular='km', plural='km'))
+
 # Common time units, used for formatting of time spans.
 time_units = (dict(divider=1, singular='second', plural='seconds'),
               dict(divider=60, singular='minute', plural='minutes'),
@@ -159,6 +166,72 @@ def parse_size(size):
     # We failed to parse the size specification.
     msg = "Failed to parse size! (input %r was tokenized as %r)"
     raise InvalidSize(msg % (size, tokens))
+
+def format_length(num_metres, keep_width=False):
+    """
+    Format a metre count as a human readable length (supports ranges from
+    nanometres to kilometres).
+
+    :param num_metres: The length to format in metres (float / integer).
+    :param keep_width: ``True`` if trailing zeros should not be stripped,
+                       ``False`` if they can be stripped.
+    :returns: The corresponding human readable length (a string).
+
+    Some examples:
+
+    >>> from humanfriendly import format_length
+    >>> format_length(0)
+    '0 metres'
+    >>> format_length(1)
+    '1 metre'
+    >>> format_length(5)
+    '5 metres'
+    >>> format_length(1000)
+    '1 km'
+    >>> format_length(0.004)
+    '4 mm'
+    """
+    for unit in reversed(length_size_units):
+        if num_metres >= unit['divider']:
+            number = round_number(float(num_metres) / unit['divider'], keep_width=keep_width)
+            return pluralize(number, unit['singular'], unit['plural'])
+    return pluralize(num_metres, 'metre')
+
+def parse_length(length):
+    """
+    Parse a human readable length and return the number of metres.
+
+    :param length: The human readable length to parse (a string).
+    :returns: The corresponding length in metres (a float).
+    :raises: :exc:`InvalidLength` when the input can't be parsed.
+
+    Some examples:
+
+    >>> from humanfriendly import parse_length
+    >>> parse_length('42')
+    42
+    >>> parse_length('1 km')
+    1000
+    >>> parse_length('5mm')
+    0.005
+    >>> parse_length('15.3cm')
+    0.153
+    """
+    tokens = tokenize(length)
+    if tokens and isinstance(tokens[0], numbers.Number):
+        # If the input contains only a number, it's assumed to be the number of metres.
+        if len(tokens) == 1:
+            return int(tokens[0])
+        # Otherwise we expect to find two tokens: A number and a unit.
+        if len(tokens) == 2 and isinstance(tokens[1], string_types):
+            normalized_unit = tokens[1].lower()
+            # Try to match the first letter of the unit.
+            for unit in length_size_units:
+                if normalized_unit.startswith(unit['prefix']):
+                    return tokens[0] * unit['divider']
+    # We failed to parse the length specification.
+    msg = "Failed to parse length! (input %r was tokenized as %r)"
+    raise InvalidLength(msg % (length, tokens))
 
 def format_number(number, num_decimals=2):
     """
@@ -721,6 +794,18 @@ class InvalidSize(Exception):
       File "humanfriendly/__init__.py", line 267, in parse_size
         raise InvalidSize(msg % (size, tokens))
     humanfriendly.InvalidSize: Failed to parse size! (input '5 Z' was tokenized as [5, 'Z'])
+    """
+
+class InvalidLength(Exception):
+    """
+    Raised by :py:func:`parse_length()` when a string cannot be parsed into a length:
+
+    >>> from humanfriendly import parse_length
+    >>> parse_length('5 Z')
+    Traceback (most recent call last):
+      File "humanfriendly/__init__.py", line 267, in parse_length
+        raise InvalidLength(msg % (length, tokens))
+    humanfriendly.InvalidLength: Failed to parse length! (input '5 Z' was tokenized as [5, 'Z'])
     """
 
 class InvalidTimespan(Exception):

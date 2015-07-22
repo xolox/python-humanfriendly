@@ -142,6 +142,28 @@ class HumanFriendlyTestCase(unittest.TestCase):
         self.assertRaises(humanfriendly.InvalidSize, humanfriendly.parse_size, '1z')
         self.assertRaises(humanfriendly.InvalidSize, humanfriendly.parse_size, 'a')
 
+    def test_format_length(self):
+        self.assertEqual('0 metres', humanfriendly.format_length(0))
+        self.assertEqual('1 metre', humanfriendly.format_length(1))
+        self.assertEqual('42 metres', humanfriendly.format_length(42))
+        self.assertEqual('1 km', humanfriendly.format_length(1 * 1000))
+        self.assertEqual('15.3 cm', humanfriendly.format_length(0.153))
+        self.assertEqual('1 cm', humanfriendly.format_length(1e-02))
+        self.assertEqual('1 mm', humanfriendly.format_length(1e-03))
+        self.assertEqual('1 nm', humanfriendly.format_length(1e-09))
+
+    def test_parse_length(self):
+        self.assertEqual(0, humanfriendly.parse_length('0m'))
+        self.assertEqual(42, humanfriendly.parse_length('42'))
+        self.assertEqual(42, humanfriendly.parse_length('42m'))
+        self.assertEqual(1000, humanfriendly.parse_length('1km'))
+        self.assertEqual(0.153, humanfriendly.parse_length('15.3 cm'))
+        self.assertEqual(1e-02, humanfriendly.parse_length('1cm'))
+        self.assertEqual(1e-03, humanfriendly.parse_length('1mm'))
+        self.assertEqual(1e-09, humanfriendly.parse_length('1nm'))
+        self.assertRaises(humanfriendly.InvalidLength, humanfriendly.parse_length, '1z')
+        self.assertRaises(humanfriendly.InvalidLength, humanfriendly.parse_length, 'a')
+
     def test_format_number(self):
         self.assertEqual('1', humanfriendly.format_number(1))
         self.assertEqual('1.5', humanfriendly.format_number(1.5))

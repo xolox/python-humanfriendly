@@ -30,6 +30,11 @@ Supported options:
     Change the delimiter used by --format-table to VALUE (a string). By default
     all whitespace is treated as a delimiter.
 
+  -l, --format-length=LENGTH
+
+    Convert a length count (given as the integer or float LENGTH) into a human
+    readable string and print that string to standard output.
+
   -n, --format-number=VALUE
 
     Format a number (given as the integer or floating point number VALUE) with
@@ -51,6 +56,11 @@ Supported options:
     Parse a human readable data size (given as the string VALUE) and print the
     number of bytes to standard output.
 
+  --parse-length=VALUE
+
+    Parse a human readable length (given as the string VALUE) and print the
+    number of metres to standard output.
+
   -h, --help
 
     Show this message and exit.
@@ -65,10 +75,12 @@ import sys
 
 # Modules included in our package.
 from humanfriendly import (
+    format_length,
     format_number,
     format_size,
     format_table,
     format_timespan,
+    parse_length,
     parse_size,
     Spinner,
     Timer,
@@ -80,8 +92,9 @@ def main():
     """Command line interface for the ``humanfriendly`` program."""
     try:
         options, arguments = getopt.getopt(sys.argv[1:], 'cd:hn:s:t:', [
-            'delimiter=', 'format-number=', 'format-size=', 'format-table',
-            'format-timespan=', 'parse-size=', 'run-command', 'help',
+            'delimiter=', 'format-length=', 'format-number=', 'format-size=',
+            'format-table', 'format-timespan=', 'parse-length=',
+            'parse-size=', 'run-command', 'help',
         ])
     except getopt.GetoptError as e:
         sys.stderr.write("Error: %s\n" % e)
@@ -94,8 +107,12 @@ def main():
             delimiter = value
         elif option == '--parse-size':
             actions.append(functools.partial(print_parsed_size, value))
+        elif option == '--parse-length':
+            actions.append(functools.partial(print_parsed_length, value))
         elif option in ('-c', '--run-command'):
             actions.append(functools.partial(run_command, arguments))
+        elif option in ('-l', '--format-length'):
+            actions.append(functools.partial(print_formatted_length, value))
         elif option in ('-n', '--format-number'):
             actions.append(functools.partial(print_formatted_number, value))
         elif option in ('-s', '--format-size'):
@@ -130,6 +147,14 @@ def run_command(command_line):
     sys.exit(process.returncode)
 
 
+def print_formatted_length(value):
+    """Print a human readable length."""
+    if '.' in value:
+        print(format_length(float(value)))
+    else:
+        print(format_length(int(value)))
+
+
 def print_formatted_number(value):
     """Print large numbers in a human readable format."""
     print(format_number(float(value)))
@@ -152,6 +177,11 @@ def print_formatted_table(delimiter):
 def print_formatted_timespan(value):
     """Print a human readable timespan."""
     print(format_timespan(float(value)))
+
+
+def print_parsed_length(value):
+    """Parse a human readable length and print the number of metres."""
+    print(parse_length(value))
 
 
 def print_parsed_size(value):
