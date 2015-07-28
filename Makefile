@@ -1,7 +1,7 @@
 # Makefile for the 'humanfriendly' module.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: June 27, 2015
+# Last Change: July 28, 2015
 # URL: https://humanfriendly.readthedocs.org
 
 # The following defaults are based on my preferences, but possible for others
@@ -23,6 +23,7 @@ default:
 	@echo '    make clean      cleanup all temporary files'
 	@echo '    make test       run the unit test suite'
 	@echo '    make coverage   run the tests, report coverage'
+	@echo '    make check      check the coding style'
 	@echo '    make docs       update documentation using Sphinx'
 	@echo '    make publish    publish changes to GitHub/PyPI'
 	@echo
@@ -32,7 +33,7 @@ default:
 	@echo "    VIRTUAL_ENV = $(VIRTUAL_ENV)"
 
 install:
-	test -d "$(WORKON_HOME)" || mkdir -p "$(WORKON_HOME)"
+	test -d "$(VIRTUAL_ENV)" || mkdir -p "$(VIRTUAL_ENV)"
 	test -x "$(VIRTUAL_ENV)/bin/python" || virtualenv "$(VIRTUAL_ENV)"
 	test -x "$(VIRTUAL_ENV)/bin/pip" || ($(ACTIVATE) && easy_install pip)
 	test -x "$(VIRTUAL_ENV)/bin/pip-accel" || ($(ACTIVATE) && pip install pip-accel)
@@ -58,6 +59,10 @@ coverage: install
 	if [ "`whoami`" != root ] && which xdg-open &>/dev/null; then \
 		xdg-open htmlcov/index.html &>/dev/null; \
 	fi
+
+check: install
+	test -x "$(VIRTUAL_ENV)/bin/flake8" || ($(ACTIVATE) && pip-accel install flake8)
+	flake8
 
 readme:
 	test -x "$(VIRTUAL_ENV)/bin/cog.py" || ($(ACTIVATE) && pip-accel install cogapp)

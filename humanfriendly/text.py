@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: July 19, 2015
+# Last Change: July 27, 2015
 # URL: https://humanfriendly.readthedocs.org
 
 """
@@ -22,6 +22,7 @@ import math
 import re
 import textwrap
 
+
 def concatenate(items):
     """
     Concatenate a list of items in a human friendly way.
@@ -40,6 +41,7 @@ def concatenate(items):
         return items[0]
     else:
         return ''
+
 
 def format(text, *args, **kw):
     """
@@ -124,6 +126,7 @@ def format(text, *args, **kw):
         text = text.format(**kw)
     return text
 
+
 def compact(text, *args, **kw):
     '''
     Compact whitespace in a string.
@@ -154,6 +157,7 @@ def compact(text, *args, **kw):
     compacted_text = ' '.join(non_whitespace_tokens)
     return format(compacted_text, *args, **kw)
 
+
 def dedent(text, *args, **kw):
     """
     Dedent a string (remove common leading whitespace from all lines).
@@ -179,6 +183,7 @@ def dedent(text, *args, **kw):
     trimmed_text = trim_empty_lines(dedented_text)
     return format(trimmed_text, *args, **kw)
 
+
 def trim_empty_lines(text):
     """
     Trim leading and trailing empty lines from the given text.
@@ -193,6 +198,7 @@ def trim_empty_lines(text):
         lines.pop(-1)
     return ''.join(lines)
 
+
 def is_empty_line(text):
     """
     Check if a text is empty or contains only whitespace.
@@ -202,6 +208,7 @@ def is_empty_line(text):
               :data:`False` otherwise.
     """
     return len(text) == 0 or text.isspace()
+
 
 def split_paragraphs(text):
     """
@@ -217,6 +224,7 @@ def split_paragraphs(text):
             paragraphs.append(chunk)
     return paragraphs
 
+
 def join_lines(text):
     """
     Remove "hard wrapping" from the paragraphs in a string.
@@ -231,6 +239,7 @@ def join_lines(text):
     before calling :func:`join_lines()`).
     """
     return re.sub(r'(\S)\n(\S)', r'\1 \2', text).strip()
+
 
 def pluralize(count, singular, plural=None):
     """
@@ -250,6 +259,7 @@ def pluralize(count, singular, plural=None):
         plural = singular + 's'
     return '%s %s' % (count, singular if math.floor(float(count)) == 1 else plural)
 
+
 def split(text):
     """
     Split a comma-separated list of strings.
@@ -266,6 +276,7 @@ def split(text):
     ['foo', 'bar', 'baz']
     """
     return [token.strip() for token in text.split(',') if token and not token.isspace()]
+
 
 def tokenize(text):
     """

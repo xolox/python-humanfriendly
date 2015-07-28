@@ -74,6 +74,7 @@ time_units = (dict(divider=1, singular='second', plural='seconds'),
               dict(divider=60*60*24*7, singular='week', plural='weeks'),
               dict(divider=60*60*24*7*52, singular='year', plural='years'))
 
+
 def coerce_boolean(value):
     """
     Coerce any value to a boolean.
@@ -100,6 +101,7 @@ def coerce_boolean(value):
             raise ValueError(msg % value)
     else:
         return bool(value)
+
 
 def format_size(num_bytes, keep_width=False):
     """
@@ -130,6 +132,7 @@ def format_size(num_bytes, keep_width=False):
             number = round_number(float(num_bytes) / unit['divider'], keep_width=keep_width)
             return pluralize(number, unit['singular'], unit['plural'])
     return pluralize(num_bytes, 'byte')
+
 
 def parse_size(size):
     """
@@ -167,6 +170,7 @@ def parse_size(size):
     msg = "Failed to parse size! (input %r was tokenized as %r)"
     raise InvalidSize(msg % (size, tokens))
 
+
 def format_length(num_metres, keep_width=False):
     """
     Format a metre count as a human readable length (supports ranges from
@@ -196,6 +200,7 @@ def format_length(num_metres, keep_width=False):
             number = round_number(float(num_metres) / unit['divider'], keep_width=keep_width)
             return pluralize(number, unit['singular'], unit['plural'])
     return pluralize(num_metres, 'metre')
+
 
 def parse_length(length):
     """
@@ -233,6 +238,7 @@ def parse_length(length):
     msg = "Failed to parse length! (input %r was tokenized as %r)"
     raise InvalidLength(msg % (length, tokens))
 
+
 def format_number(number, num_decimals=2):
     """
     Format a number as a string including thousands separators to make it
@@ -267,6 +273,7 @@ def format_number(number, num_decimals=2):
         formatted_number += '.' + decimals_to_add
     return formatted_number
 
+
 def round_number(count, keep_width=False):
     """
     Helper for :py:func:`format_size()` and :py:func:`format_timespan()` to
@@ -294,6 +301,7 @@ def round_number(count, keep_width=False):
         text = re.sub('0+$', '', text)
         text = re.sub('\.$', '', text)
     return text
+
 
 def format_timespan(num_seconds):
     """
@@ -335,6 +343,7 @@ def format_timespan(num_seconds):
             # Remove insignificant data from the formatted timespan and format
             # it in a readable way.
             return concatenate(result[:3])
+
 
 def parse_timespan(timespan):
     """
@@ -383,6 +392,7 @@ def parse_timespan(timespan):
     # We failed to parse the timespan specification.
     msg = "Failed to parse timespan! (input %r was tokenized as %r)"
     raise InvalidTimespan(msg % (timespan, tokens))
+
 
 def parse_date(datestring):
     """
@@ -445,6 +455,7 @@ def parse_date(datestring):
         msg = "Invalid date! (expected 'YYYY-MM-DD' or 'YYYY-MM-DD HH:MM:SS' but got: %r)"
         raise InvalidDate(msg % datestring)
 
+
 def format_path(pathname):
     """
     Given an absolute pathname, abbreviate the user's home directory to ``~/``
@@ -474,6 +485,7 @@ def format_path(pathname):
             pathname = os.path.join('~', os.path.relpath(pathname, home))
     return pathname
 
+
 def parse_path(pathname):
     """
     Convert a human friendly pathname to an absolute pathname.
@@ -486,6 +498,7 @@ def parse_path(pathname):
     :returns: An absolute pathname (a string).
     """
     return os.path.abspath(os.path.expanduser(os.path.expandvars(pathname)))
+
 
 def prompt_for_choice(choices, default=None):
     """
@@ -543,6 +556,7 @@ def prompt_for_choice(choices, default=None):
             print("Error: The number %i is not a valid choice." % int(input))
         else:
             print("Error: The string '%s' doesn't match any choices." % input)
+
 
 class Timer(object):
 
@@ -604,6 +618,7 @@ class Timer(object):
         elapsed time since the :py:class:`Timer` was created.
         """
         return format_timespan(self.elapsed_time)
+
 
 class Spinner(object):
 
@@ -718,6 +733,7 @@ class Spinner(object):
     def __exit__(self, exc_type=None, exc_value=None, traceback=None):
         self.clear()
 
+
 class AutomaticSpinner(object):
 
     """
@@ -758,6 +774,7 @@ class AutomaticSpinner(object):
         self.shutdown_event.set()
         self.subprocess.join()
 
+
 def automatic_spinner_target(label, show_time, shutdown_event):
     try:
         timer = Timer() if show_time else None
@@ -769,6 +786,7 @@ def automatic_spinner_target(label, show_time, shutdown_event):
         # Swallow Control-C signals without producing a nasty traceback that
         # won't make any sense to the average user.
         pass
+
 
 class InvalidDate(Exception):
     """
@@ -783,6 +801,7 @@ class InvalidDate(Exception):
     humanfriendly.InvalidDate: Invalid date! (expected 'YYYY-MM-DD' or 'YYYY-MM-DD HH:MM:SS' but got: '2013-06-XY')
     """
 
+
 class InvalidSize(Exception):
     """
     Raised by :py:func:`parse_size()` when a string cannot be parsed into a
@@ -796,6 +815,7 @@ class InvalidSize(Exception):
     humanfriendly.InvalidSize: Failed to parse size! (input '5 Z' was tokenized as [5, 'Z'])
     """
 
+
 class InvalidLength(Exception):
     """
     Raised by :py:func:`parse_length()` when a string cannot be parsed into a length:
@@ -807,6 +827,7 @@ class InvalidLength(Exception):
         raise InvalidLength(msg % (length, tokens))
     humanfriendly.InvalidLength: Failed to parse length! (input '5 Z' was tokenized as [5, 'Z'])
     """
+
 
 class InvalidTimespan(Exception):
     """

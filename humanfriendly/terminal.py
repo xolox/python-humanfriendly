@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: June 27, 2015
+# Last Change: July 27, 2015
 # URL: https://humanfriendly.readthedocs.org
 
 """
@@ -245,9 +245,7 @@ def find_terminal_size_using_ioctl(stream):
     """
     if not HAVE_IOCTL:
         raise NotImplementedError("It looks like the `fcntl' module is not available!")
-    h, w, hp, wp = struct.unpack('HHHH',
-        fcntl.ioctl(stream, termios.TIOCGWINSZ,
-        struct.pack('HHHH', 0, 0, 0, 0)))
+    h, w, hp, wp = struct.unpack('HHHH', fcntl.ioctl(stream, termios.TIOCGWINSZ, struct.pack('HHHH', 0, 0, 0, 0)))
     return h, w
 
 

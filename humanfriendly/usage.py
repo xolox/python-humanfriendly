@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: June 28, 2015
+# Last Change: July 28, 2015
 # URL: https://humanfriendly.readthedocs.org
 
 """
@@ -32,6 +32,7 @@ details.
 
 # Standard library modules.
 import csv
+import functools
 import logging
 import re
 
@@ -70,6 +71,7 @@ OPTION_PATTERN = re.compile('(^\s+-{1,2}\w.*$)', re.MULTILINE)
 # Initialize a logger for this module.
 logger = logging.getLogger(__name__)
 
+
 def format_usage(usage_text):
     """
     Highlight special items in a usage message.
@@ -98,15 +100,12 @@ def format_usage(usage_text):
             formatted_lines.append(ansi_wrap(line, color=HIGHLIGHT_COLOR))
         else:
             # Highlight options, meta variables and environment variables.
-            def callback(match):
-                value = match.group(0)
-                is_meta_variable = re.match('^[A-Z][A-Z0-9_]+$', value)
-                if is_meta_variable and value not in meta_variables:
-                    return value
-                else:
-                    return ansi_wrap(value, color=HIGHLIGHT_COLOR)
-            formatted_lines.append(USAGE_PATTERN.sub(callback, line))
+            formatted_lines.append(replace_special_tokens(
+                line, meta_variables,
+                lambda token: ansi_wrap(token, color=HIGHLIGHT_COLOR),
+            ))
     return ''.join(formatted_lines)
+
 
 def find_meta_variables(usage_text):
     """
@@ -128,6 +127,7 @@ def find_meta_variables(usage_text):
             if value:
                 meta_variables.add(value)
     return list(meta_variables)
+
 
 def parse_usage(text):
     """
@@ -188,6 +188,7 @@ def parse_usage(text):
     logger.debug("Parsed options: %s", chunks)
     return introduction, chunks
 
+
 def render_usage(text):
     """
     Reformat a command line program's usage message to reStructuredText_.
@@ -219,33 +220,6 @@ def render_usage(text):
     logger.debug("Rendered output: %s", output)
     return '\n\n'.join(trim_empty_lines(o) for o in output)
 
-def render_paragraph(paragraph, meta_variables):
-    # Reformat the "Usage:" line to highlight "Usage:" in bold and show the
-    # remainder of the line as pre-formatted text.
-    if paragraph.startswith('Usage:'):
-        tokens = paragraph.split()
-        return "**%s** `%s`" % (tokens[0], ' '.join(tokens[1:]))
-    # Reformat the "Supported options:" line to highlight it in bold.
-    if paragraph == 'Supported options:':
-        return "**%s**" % paragraph
-    # Reformat shell transcripts into code blocks.
-    if re.match(r'^\$\s+\S', paragraph):
-        lines = ['   %s' % line for line in paragraph.splitlines()]
-        lines.insert(0, '.. code-block:: sh')
-        lines.insert(1, '')
-        return "\n".join(lines)
-    # Change `quoting' so it doesn't trip up DocUtils.
-    paragraph = re.sub("`(.+?)'", r'"\1"', paragraph)
-    # Escape asterisks.
-    paragraph = paragraph.replace('*', r'\*')
-    # Reformat inline tokens.
-    def callback(match):
-        value = match.group(0)
-        if re.match('^[A-Z][A-Z0-9_]+$', value):
-            return '``%s``' % value if value in meta_variables else value
-        else:
-            return '``%s``' % value
-    return USAGE_PATTERN.sub(callback, paragraph)
 
 def inject_usage(module_name):
     """
@@ -283,6 +257,7 @@ def inject_usage(module_name):
     usage_text = import_module(module_name).__doc__
     cog.out("\n" + render_usage(usage_text) + "\n\n")
 
+
 def import_module(name):
     """
     Simplified version of :func:`importlib.import_module()` (which isn't available in Python 2.6).
@@ -302,3 +277,42 @@ def import_module(name):
     while identifiers:
         module = getattr(module, identifiers.pop(0))
     return module
+
+
+def render_paragraph(paragraph, meta_variables):
+    # Reformat the "Usage:" line to highlight "Usage:" in bold and show the
+    # remainder of the line as pre-formatted text.
+    if paragraph.startswith('Usage:'):
+        tokens = paragraph.split()
+        return "**%s** `%s`" % (tokens[0], ' '.join(tokens[1:]))
+    # Reformat the "Supported options:" line to highlight it in bold.
+    if paragraph == 'Supported options:':
+        return "**%s**" % paragraph
+    # Reformat shell transcripts into code blocks.
+    if re.match(r'^\$\s+\S', paragraph):
+        lines = ['   %s' % line for line in paragraph.splitlines()]
+        lines.insert(0, '.. code-block:: sh')
+        lines.insert(1, '')
+        return "\n".join(lines)
+    # Change `quoting' so it doesn't trip up DocUtils.
+    paragraph = re.sub("`(.+?)'", r'"\1"', paragraph)
+    # Escape asterisks.
+    paragraph = paragraph.replace('*', r'\*')
+    # Reformat inline tokens.
+    return replace_special_tokens(paragraph, meta_variables,
+                                  lambda token: '``%s``' % token)
+
+
+def replace_special_tokens(text, meta_variables, replace_fn):
+    return USAGE_PATTERN.sub(functools.partial(
+        replace_tokens_callback,
+        meta_variables=meta_variables,
+        replace_fn=replace_fn
+    ), text)
+
+
+def replace_tokens_callback(match, meta_variables, replace_fn):
+    token = match.group(0)
+    if not (re.match('^[A-Z][A-Z0-9_]+$', token) and token not in meta_variables):
+        token = replace_fn(token)
+    return token

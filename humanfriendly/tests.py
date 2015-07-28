@@ -3,7 +3,7 @@
 # Tests for the 'humanfriendly' module.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: July 19, 2015
+# Last Change: July 27, 2015
 # URL: https://humanfriendly.readthedocs.org
 
 # Standard library modules.
@@ -103,7 +103,9 @@ class HumanFriendlyTestCase(unittest.TestCase):
         self.assertEqual('2 weeks', humanfriendly.format_timespan(week * 2))
         self.assertEqual('1 year', humanfriendly.format_timespan(year))
         self.assertEqual('2 years', humanfriendly.format_timespan(year * 2))
-        self.assertEqual('1 year, 2 weeks and 3 days', humanfriendly.format_timespan(year + week * 2 + day * 3 + hour * 12))
+        self.assertEqual(
+            '1 year, 2 weeks and 3 days',
+            humanfriendly.format_timespan(year + week * 2 + day * 3 + hour * 12))
 
     def test_parse_timespan(self):
         self.assertEqual(0, humanfriendly.parse_timespan('0'))
@@ -320,13 +322,19 @@ class HumanFriendlyTestCase(unittest.TestCase):
         # Test automatic timer.
         automatic_timer = humanfriendly.Timer()
         time.sleep(1)
-        self.assertEqual(normalize_timestamp(humanfriendly.round_number(automatic_timer.elapsed_time, keep_width=True)), '1.00')
+        self.assertEqual(normalize_timestamp(humanfriendly.round_number(
+            automatic_timer.elapsed_time,
+            keep_width=True,
+        )), '1.00')
         # Test resumable timer.
         resumable_timer = humanfriendly.Timer(resumable=True)
         for i in range(2):
             with resumable_timer:
                 time.sleep(1)
-        self.assertEqual(normalize_timestamp(humanfriendly.round_number(resumable_timer.elapsed_time, keep_width=True)), '2.00')
+        self.assertEqual(normalize_timestamp(humanfriendly.round_number(
+            resumable_timer.elapsed_time,
+            keep_width=True,
+        )), '2.00')
 
     def test_spinner(self):
         stream = StringIO()

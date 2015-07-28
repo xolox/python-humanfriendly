@@ -10,6 +10,7 @@ install:
   - pip install 'coveralls >= 1.0a2'
   - LC_ALL=C pip install .
 script:
+  - make check
   - coverage run setup.py test
 after_success:
   - coverage combine
