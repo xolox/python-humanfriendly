@@ -62,7 +62,7 @@ coverage: install
 
 check: install
 	test -x "$(VIRTUAL_ENV)/bin/flake8" || ($(ACTIVATE) && pip-accel install flake8)
-	flake8
+	$(ACTIVATE) && flake8 --verbose --verbose
 
 readme:
 	test -x "$(VIRTUAL_ENV)/bin/cog.py" || ($(ACTIVATE) && pip-accel install cogapp)
