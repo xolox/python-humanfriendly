@@ -61,7 +61,7 @@ coverage: install
 	fi
 
 check: install
-	test -x "$(VIRTUAL_ENV)/bin/flake8" || ($(ACTIVATE) && pip-accel install flake8)
+	test -x "$(VIRTUAL_ENV)/bin/flake8" || ($(ACTIVATE) && pip-accel install flake8-pep257)
 	$(ACTIVATE) && flake8
 
 readme:

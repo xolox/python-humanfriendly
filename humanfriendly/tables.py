@@ -1,10 +1,12 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: June 3, 2015
+# Last Change: July 28, 2015
 # URL: https://humanfriendly.readthedocs.org
 
 """
+Functions that render ASCII tables.
+
 Some generic notes about the table formatting functions in this module:
 
 - These functions were not written with performance in mind (*at all*) because
@@ -20,6 +22,12 @@ Some generic notes about the table formatting functions in this module:
   to highlight certain column's values if you feel like it (for example to
   highlight deviations from the norm in an overview of calculated values).
 """
+
+__all__ = (
+    'format_pretty_table',
+    'format_robust_table',
+    'format_smart_table',
+)
 
 # Standard library modules.
 import collections

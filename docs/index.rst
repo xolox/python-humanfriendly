@@ -4,40 +4,58 @@ API documentation
 =================
 
 The following documentation is based on the source code of version |release| of
-the `humanfriendly` package. The following modules are available:
+the `humanfriendly` package.
 
-- :mod:`humanfriendly`
-- :mod:`humanfriendly.text`
-- :mod:`humanfriendly.tables`
-- :mod:`humanfriendly.terminal`
-- :mod:`humanfriendly.usage`
+.. contents::
+   :local:
 
-:mod:`humanfriendly`
---------------------
+A note about backwards compatibility
+------------------------------------
+
+The `humanfriendly` package started out as a single :mod:`humanfriendly`
+module. Eventually this module grew to a size that necessitated splitting up
+the code into multiple modules (see e.g. :mod:`~humanfriendly.tables`,
+:mod:`~humanfriendly.terminal`, :mod:`~humanfriendly.text` and
+:mod:`~humanfriendly.usage`). Most of the functionality that remains in the
+:mod:`humanfriendly` module will eventually be moved to submodules as well (as
+time permits and a logical subdivision of functionality presents itself to me).
+
+While moving functionality around like this my goal is to always preserve
+backwards compatibility. For example if a function is moved to a submodule an
+import of that function is added in the main module so that backwards
+compatibility with previously written import statements is preserved.
+
+If backwards compatibility of documented functionality has to be broken then
+the major version number will be bumped. So if you're using the `humanfriendly`
+package in your project, make sure to at least pin the major version number in
+order to avoid unexpected surprises.
+
+The :mod:`humanfriendly` module
+-------------------------------
 
 .. automodule:: humanfriendly
    :members:
 
-:mod:`humanfriendly.text`
--------------------------
+The :mod:`humanfriendly.text` module
+------------------------------------
 
 .. automodule:: humanfriendly.text
    :members:
 
-:mod:`humanfriendly.tables`
----------------------------
+The :mod:`humanfriendly.tables` module
+--------------------------------------
 
 .. automodule:: humanfriendly.tables
    :members:
 
-:mod:`humanfriendly.terminal`
------------------------------
+The :mod:`humanfriendly.terminal` module
+----------------------------------------
 
 .. automodule:: humanfriendly.terminal
    :members:
 
-:mod:`humanfriendly.usage`
------------------------------
+The :mod:`humanfriendly.usage` module
+-------------------------------------
 
 .. automodule:: humanfriendly.usage
    :members:

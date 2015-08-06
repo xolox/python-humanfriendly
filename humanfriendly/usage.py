@@ -5,6 +5,8 @@
 # URL: https://humanfriendly.readthedocs.org
 
 """
+Parsing and reformatting of usage messages.
+
 The :mod:`~humanfriendly.usage` module parses and reformats usage messages:
 
 - The :func:`format_usage()` function takes a usage message and inserts ANSI
@@ -29,6 +31,16 @@ details.
 .. _DRY: https://en.wikipedia.org/wiki/Don%27t_repeat_yourself
 .. _reStructuredText: https://en.wikipedia.org/wiki/ReStructuredText
 """
+
+# Public functions that require documentation (PEP-257).
+__all__ = (
+    'find_meta_variables',
+    'format_usage',
+    'import_module',
+    'inject_usage',
+    'parse_usage',
+    'render_usage',
+)
 
 # Standard library modules.
 import csv

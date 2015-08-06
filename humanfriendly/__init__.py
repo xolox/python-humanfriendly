@@ -1,11 +1,13 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: July 27, 2015
+# Last Change: August 6, 2015
 # URL: https://humanfriendly.readthedocs.org
 
+"""The main module of the `humanfriendly` package."""
+
 # Semi-standard module versioning.
-__version__ = '1.33'
+__version__ = '1.34'
 
 # Standard library modules.
 import multiprocessing
@@ -105,13 +107,14 @@ def coerce_boolean(value):
 
 def format_size(num_bytes, keep_width=False):
     """
-    Format a byte count as a human readable file size (supports ranges from
-    kilobytes to terabytes).
+    Format a byte count as a human readable file size.
 
     :param num_bytes: The size to format in bytes (an integer).
     :param keep_width: ``True`` if trailing zeros should not be stripped,
                        ``False`` if they can be stripped.
     :returns: The corresponding human readable file size (a string).
+
+    This function supports ranges from kilobytes to terabytes.
 
     Some examples:
 
@@ -173,13 +176,14 @@ def parse_size(size):
 
 def format_length(num_metres, keep_width=False):
     """
-    Format a metre count as a human readable length (supports ranges from
-    nanometres to kilometres).
+    Format a metre count as a human readable length.
 
     :param num_metres: The length to format in metres (float / integer).
     :param keep_width: ``True`` if trailing zeros should not be stripped,
                        ``False`` if they can be stripped.
     :returns: The corresponding human readable length (a string).
+
+    This function supports ranges from nanometres to kilometres.
 
     Some examples:
 
@@ -241,8 +245,7 @@ def parse_length(length):
 
 def format_number(number, num_decimals=2):
     """
-    Format a number as a string including thousands separators to make it
-    easier to recognize the order of size of the number.
+    Format a number as a string including thousands separators.
 
     :param number: The number to format (a number like an :class:`int`,
                    :class:`long` or :class:`float`).
@@ -250,6 +253,9 @@ def format_number(number, num_decimals=2):
                          decimal places are required to represent the number
                          they will be omitted regardless of this argument.
     :returns: The formatted number (a string).
+
+    This function is intended to make it easier to recognize the order of size
+    of the number being formatted.
 
     Here's an example:
 
@@ -276,17 +282,19 @@ def format_number(number, num_decimals=2):
 
 def round_number(count, keep_width=False):
     """
-    Helper for :py:func:`format_size()` and :py:func:`format_timespan()` to
-    round a floating point number to two decimal places in a human friendly
-    format. If no decimal places are required to represent the number, they
-    will be omitted.
+    Round a floating point number to two decimal places in a human friendly format.
 
     :param count: The number to format.
     :param keep_width: ``True`` if trailing zeros should not be stripped,
                        ``False`` if they can be stripped.
-    :returns: The formatted number as a string.
+    :returns: The formatted number as a string. If no decimal places are
+              required to represent the number, they will be omitted.
 
-    An example:
+    The main purpose of this function is to be used by functions like
+    :func:`format_length()`, :func:`format_size()` and
+    :func:`format_timespan()`.
+
+    Here are some examples:
 
     >>> from humanfriendly import round_number
     >>> round_number(1)
@@ -396,16 +404,24 @@ def parse_timespan(timespan):
 
 def parse_date(datestring):
     """
-    Parse a date/time string in one of the formats listed below. Raises
-    :py:class:`InvalidDate` when the date cannot be parsed. Supported date/time
-    formats:
-
-    - ``YYYY-MM-DD``
-    - ``YYYY-MM-DD HH:MM:SS``
+    Parse a date/time string into a tuple of integers.
 
     :param datestring: The date/time string to parse.
     :returns: A tuple with the numbers ``(year, month, day, hour, minute,
               second)`` (all numbers are integers).
+    :raises: :exc:`InvalidDate` when the date cannot be parsed.
+
+    Supported date/time formats:
+
+    - ``YYYY-MM-DD``
+    - ``YYYY-MM-DD HH:MM:SS``
+
+    .. note:: If you want to parse date/time strings with a fixed, known
+              format and :func:`parse_date()` isn't useful to you, consider
+              :func:`time.strptime()` or :meth:`datetime.datetime.strptime()`,
+              both of which are included in the Python standard library.
+              Alternatively for more complex tasks consider using the date/time
+              parsing module in the dateutil_ package.
 
     Examples:
 
@@ -440,6 +456,7 @@ def parse_date(datestring):
     >>> print(format_timespan(seconds_since_then))
     1 year, 43 weeks and 1 day
 
+    .. _dateutil: https://dateutil.readthedocs.org/en/latest/parser.html
     .. _Unix time: http://en.wikipedia.org/wiki/Unix_time
     """
     try:
@@ -458,13 +475,15 @@ def parse_date(datestring):
 
 def format_path(pathname):
     """
-    Given an absolute pathname, abbreviate the user's home directory to ``~/``
-    in order to shorten the pathname without losing information. It is not an
-    error if the pathname is not relative to the current user's home
-    directory.
+    Shorten a pathname to make it more human friendly.
 
     :param pathname: An absolute pathname (a string).
     :returns: The pathname with the user's home directory abbreviated.
+
+    Given an absolute pathname, this function abbreviates the user's home
+    directory to ``~/`` in order to shorten the pathname without losing
+    information. It is not an error if the pathname is not relative to the
+    current user's home directory.
 
     Here's an example of its usage:
 
@@ -613,40 +632,99 @@ class Timer(object):
         return format_timespan(round(self.elapsed_time))
 
     def __str__(self):
-        """
-        When a :py:class:`Timer` is coerced to a string it will show the
-        elapsed time since the :py:class:`Timer` was created.
-        """
+        """Show the elapsed time since the :class:`Timer` was created."""
         return format_timespan(self.elapsed_time)
 
 
 class Spinner(object):
 
     """
-    Show a "spinner" on the terminal to let the user know that something is
-    happening during long running operations that would otherwise be silent.
+    Show a spinner on the terminal as a simple means of feedback to the user.
 
-    >>> from time import sleep
-    >>> from humanfriendly import Spinner
-    >>> spin = Spinner(label="Downloading")
-    >>> for i in xrange(100):
-        sleep(0.1)
-        spin.step()
-    | Downloading  # cycles through | / - \\
-    >>> spin = Spinner(label="Downloading", total=100)
-    >>> for i in xrange(100):
-        sleep(0.1)
-        spin.step(i)
-    | Downloading: 1.00% # travels up to 100%...
+    The :class:`Spinner` class shows a "spinner" on the terminal to let the
+    user know that something is happening during long running operations that
+    would otherwise be silent (leaving the user to wonder what they're waiting
+    for). Below are some visual examples that should illustrate the point.
+
+    **Simple spinners:**
+
+     Here's a screen capture that shows the simplest form of spinner:
+
+      .. image:: images/spinner-basic.gif
+         :alt: Animated screen capture of a simple spinner.
+
+     The following code was used to create the spinner above:
+
+     .. code-block:: python
+
+        import itertools
+        import time
+        from humanfriendly import Spinner
+
+        with Spinner(label="Downloading") as spinner:
+            for i in itertools.count():
+                # Do something useful here.
+                time.sleep(0.1)
+                # Advance the spinner.
+                spinner.step()
+
+    **Spinners that show elapsed time:**
+
+     Here's a spinner that shows the elapsed time since it started:
+
+      .. image:: images/spinner-with-timer.gif
+         :alt: Animated screen capture of a spinner showing elapsed time.
+
+     The following code was used to create the spinner above:
+
+     .. code-block:: python
+
+        import itertools
+        import time
+        from humanfriendly import Spinner, Timer
+
+        with Spinner(label="Downloading", timer=Timer()) as spinner:
+            for i in itertools.count():
+                # Do something useful here.
+                time.sleep(0.1)
+                # Advance the spinner.
+                spinner.step()
+
+    **Spinners that show progress:**
+
+     Here's a spinner that shows a progress percentage:
+
+      .. image:: images/spinner-with-progress.gif
+         :alt: Animated screen capture of spinner showing progress.
+
+     The following code was used to create the spinner above:
+
+     .. code-block:: python
+
+        import itertools
+        import random
+        import time
+        from humanfriendly import Spinner, Timer
+
+        with Spinner(label="Downloading", total=100) as spinner:
+            progress = 0
+            while progress < 100:
+                # Do something useful here.
+                time.sleep(0.1)
+                # Advance the spinner.
+                spinner.step(progress)
+                # Determine the new progress value.
+                progress += random.random() * 5
 
     If you want to provide user feedback during a long running operation but
     it's not practical to periodically call the :py:func:`~Spinner.step()`
     method consider using :py:class:`AutomaticSpinner` instead.
 
-    :class:`Spinner` objects can be used as context managers to automatically
-    call :func:`clear()` when the spinner ends. This helps to make sure that if
-    the text cursor is hidden its visibility is restored before the spinner
-    ends (even if an exception interrupts the spinner).
+    As you may already have noticed in the examples above, :class:`Spinner`
+    objects can be used as context managers to automatically call
+    :func:`clear()` when the spinner ends. This helps to make sure that if the
+    text cursor is hidden its visibility is restored before the spinner ends
+    (even if an exception interrupts the spinner).
     """
 
     def __init__(self, label=None, total=0, stream=sys.stderr, interactive=None, timer=None, hide_cursor=True):
@@ -687,11 +765,26 @@ class Spinner(object):
 
     def step(self, progress=0, label=None):
         """
-        Advance the spinner by one step without starting a new line, causing
-        an animated effect which is very simple but much nicer than waiting
-        for a prompt which is completely silent for a long time. Progress
-        should be the amount out of ``Spinner.total`` that is complete, not
-        a step amount.
+        Advance the spinner by one step and redraw it.
+
+        :param progress: The number of the current step, relative to the total
+                         given to the :class:`Spinner` constructor (an integer,
+                         optional). If not provided the spinner will not show
+                         progress.
+        :param label: The label to use while redrawing (a string, optional). If
+                      not provided the label given to the :class:`Spinner`
+                      constructor is used instead.
+
+        This method advances the spinner by one step without starting a new
+        line, causing an animated effect which is very simple but much nicer
+        than waiting for a prompt which is completely silent for a long time.
+
+        .. note:: This method uses time based rate limiting to avoid redrawing
+                  the spinner too frequently. If you know you're dealing with
+                  code that will call :func:`step()` at a high frequency,
+                  consider using :func:`sleep()` to avoid creating the
+                  equivalent of a busy loop that's rate limiting the spinner
+                  99% of the time.
         """
         if self.interactive:
             time_now = time.time()
@@ -710,17 +803,26 @@ class Spinner(object):
 
     def sleep(self):
         """
-        Sleep for a short period (less than a second) before refreshing the
-        spinner so that the animated effect of the spinner works best (this
-        doesn't refresh the spinner, use :func:`step()` for that).
+        Sleep for a short period before redrawing the spinner.
+
+        This method is useful when you know you're dealing with code that will
+        call :func:`step()` at a high frequency. It will sleep for the interval
+        with which the spinner is redrawn (less than a second). This avoids
+        creating the equivalent of a busy loop that's rate limiting the
+        spinner 99% of the time.
+
+        This method doesn't redraw the spinner, you still have to call
+        :func:`step()` in order to do that.
         """
         time.sleep(minimum_spinner_interval)
 
     def clear(self):
         """
-        Clear the spinner. The next line which is shown on the standard
-        output or error stream after calling this method will overwrite the
-        line that used to show the spinner.
+        Clear the spinner.
+
+        The next line which is shown on the standard output or error stream
+        after calling this method will overwrite the line that used to show the
+        spinner. Also the visibility of the text cursor is restored.
         """
         if self.interactive:
             if self.hide_cursor:
@@ -728,19 +830,23 @@ class Spinner(object):
             self.stream.write(erase_line_code)
 
     def __enter__(self):
+        """Enable the use of spinners as context managers."""
         return self
 
     def __exit__(self, exc_type=None, exc_value=None, traceback=None):
+        """Enable the use of spinners as context managers."""
         self.clear()
 
 
 class AutomaticSpinner(object):
 
     """
-    Show a "spinner" on the terminal (just like :py:class:`Spinner` does) that
-    automatically starts animating. This class should be used as a context
-    manager using the :py:keyword:`with` statement. The animation continues for
-    as long as the context is active.
+    Show a spinner on the terminal that automatically starts animating.
+
+    This class shows a spinner on the terminal (just like :py:class:`Spinner`
+    does) that automatically starts animating. This class should be used as a
+    context manager using the :py:keyword:`with` statement. The animation
+    continues for as long as the context is active.
 
     :py:class:`AutomaticSpinner` provides an alternative to :py:class:`Spinner`
     for situations where it is not practical for the caller to periodically
@@ -763,35 +869,39 @@ class AutomaticSpinner(object):
         :param show_time: If this is ``True`` (the default) then the spinner
                           shows elapsed time.
         """
+        self.label = label
+        self.show_time = show_time
         self.shutdown_event = multiprocessing.Event()
-        self.subprocess = multiprocessing.Process(target=automatic_spinner_target,
-                                                  args=(label, show_time, self.shutdown_event))
+        self.subprocess = multiprocessing.Process(target=self._target)
 
     def __enter__(self):
+        """Enable the use of automatic spinners as context managers."""
         self.subprocess.start()
 
     def __exit__(self, exc_type=None, exc_value=None, traceback=None):
+        """Enable the use of automatic spinners as context managers."""
         self.shutdown_event.set()
         self.subprocess.join()
 
-
-def automatic_spinner_target(label, show_time, shutdown_event):
-    try:
-        timer = Timer() if show_time else None
-        with Spinner(label=label, timer=timer) as spinner:
-            while not shutdown_event.is_set():
-                spinner.step()
-                spinner.sleep()
-    except KeyboardInterrupt:
-        # Swallow Control-C signals without producing a nasty traceback that
-        # won't make any sense to the average user.
-        pass
+    def _target(self):
+        try:
+            timer = Timer() if self.show_time else None
+            with Spinner(label=self.label, timer=timer) as spinner:
+                while not self.shutdown_event.is_set():
+                    spinner.step()
+                    spinner.sleep()
+        except KeyboardInterrupt:
+            # Swallow Control-C signals without producing a nasty traceback that
+            # won't make any sense to the average user.
+            pass
 
 
 class InvalidDate(Exception):
+
     """
-    Raised by :py:func:`parse_date()` when a string cannot be parsed into a
-    date:
+    Raised when a string cannot be parsed into a date.
+
+    For example:
 
     >>> from humanfriendly import parse_date
     >>> parse_date('2013-06-XY')
@@ -803,9 +913,11 @@ class InvalidDate(Exception):
 
 
 class InvalidSize(Exception):
+
     """
-    Raised by :py:func:`parse_size()` when a string cannot be parsed into a
-    file size:
+    Raised when a string cannot be parsed into a file size.
+
+    For example:
 
     >>> from humanfriendly import parse_size
     >>> parse_size('5 Z')
@@ -817,8 +929,11 @@ class InvalidSize(Exception):
 
 
 class InvalidLength(Exception):
+
     """
-    Raised by :py:func:`parse_length()` when a string cannot be parsed into a length:
+    Raised when a string cannot be parsed into a length.
+
+    For example:
 
     >>> from humanfriendly import parse_length
     >>> parse_length('5 Z')
@@ -830,9 +945,11 @@ class InvalidLength(Exception):
 
 
 class InvalidTimespan(Exception):
+
     """
-    Raised by :py:func:`parse_timespan()` when a string cannot be parsed into a
-    timespan:
+    Raised when a string cannot be parsed into a timespan.
+
+    For example:
 
     >>> from humanfriendly import parse_timespan
     >>> parse_timespan('1 age')

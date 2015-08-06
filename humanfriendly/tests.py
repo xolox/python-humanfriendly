@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 
-# Tests for the 'humanfriendly' module.
+# Tests for the `humanfriendly' package.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: July 27, 2015
+# Last Change: July 28, 2015
 # URL: https://humanfriendly.readthedocs.org
+
+"""Test suite for the `humanfriendly` package."""
 
 # Standard library modules.
 import math
@@ -51,7 +53,10 @@ except ImportError:
 
 class HumanFriendlyTestCase(unittest.TestCase):
 
+    """Container for the `humanfriendly` test suite."""
+
     def test_compact(self):
+        """Test :func:`humanfriendly.text.compact()`."""
         assert compact(' a \n\n b ') == 'a b'
         assert compact('''
             %s template notation
@@ -61,6 +66,7 @@ class HumanFriendlyTestCase(unittest.TestCase):
         ''', type='readable') == 'More readable template notation'
 
     def test_dedent(self):
+        """Test :func:`humanfriendly.text.dedent()`."""
         assert dedent('\n line 1\n  line 2\n\n') == 'line 1\n line 2\n'
         assert dedent('''
             Dedented, %s text
@@ -70,12 +76,14 @@ class HumanFriendlyTestCase(unittest.TestCase):
         ''', op='formatted') == 'Dedented, formatted text\n'
 
     def test_pluralization(self):
+        """Test :func:`humanfriendly.pluralize()`."""
         self.assertEqual('1 word', humanfriendly.pluralize(1, 'word'))
         self.assertEqual('2 words', humanfriendly.pluralize(2, 'word'))
         self.assertEqual('1 box', humanfriendly.pluralize(1, 'box', 'boxes'))
         self.assertEqual('2 boxes', humanfriendly.pluralize(2, 'box', 'boxes'))
 
     def test_boolean_coercion(self):
+        """Test :func:`humanfriendly.coerce_boolean()`."""
         for value in [True, 'TRUE', 'True', 'true', 'on', 'yes', '1']:
             self.assertEqual(True, humanfriendly.coerce_boolean(value))
         for value in [False, 'FALSE', 'False', 'false', 'off', 'no', '0']:
@@ -83,6 +91,7 @@ class HumanFriendlyTestCase(unittest.TestCase):
         self.assertRaises(ValueError, humanfriendly.coerce_boolean, 'not a boolean')
 
     def test_format_timespan(self):
+        """Test :func:`humanfriendly.format_timespan()`."""
         minute = 60
         hour = minute * 60
         day = hour * 24
@@ -108,6 +117,7 @@ class HumanFriendlyTestCase(unittest.TestCase):
             humanfriendly.format_timespan(year + week * 2 + day * 3 + hour * 12))
 
     def test_parse_timespan(self):
+        """Test :func:`humanfriendly.parse_timespan()`."""
         self.assertEqual(0, humanfriendly.parse_timespan('0'))
         self.assertEqual(0, humanfriendly.parse_timespan('0s'))
         self.assertEqual(5, humanfriendly.parse_timespan('5s'))
@@ -118,11 +128,13 @@ class HumanFriendlyTestCase(unittest.TestCase):
         self.assertRaises(humanfriendly.InvalidTimespan, humanfriendly.parse_timespan, '1z')
 
     def test_parse_date(self):
+        """Test :func:`humanfriendly.parse_date()`."""
         self.assertEqual((2013, 6, 17, 0, 0, 0), humanfriendly.parse_date('2013-06-17'))
         self.assertEqual((2013, 6, 17, 2, 47, 42), humanfriendly.parse_date('2013-06-17 02:47:42'))
         self.assertRaises(humanfriendly.InvalidDate, humanfriendly.parse_date, '2013-06-XY')
 
     def test_format_size(self):
+        """Test :func:`humanfriendly.format_size()`."""
         self.assertEqual('0 bytes', humanfriendly.format_size(0))
         self.assertEqual('1 byte', humanfriendly.format_size(1))
         self.assertEqual('42 bytes', humanfriendly.format_size(42))
@@ -133,6 +145,7 @@ class HumanFriendlyTestCase(unittest.TestCase):
         self.assertEqual('1 PB', humanfriendly.format_size(1024 ** 5))
 
     def test_parse_size(self):
+        """Test :func:`humanfriendly.parse_size()`."""
         self.assertEqual(0, humanfriendly.parse_size('0B'))
         self.assertEqual(42, humanfriendly.parse_size('42'))
         self.assertEqual(42, humanfriendly.parse_size('42B'))
@@ -145,6 +158,7 @@ class HumanFriendlyTestCase(unittest.TestCase):
         self.assertRaises(humanfriendly.InvalidSize, humanfriendly.parse_size, 'a')
 
     def test_format_length(self):
+        """Test :func:`humanfriendly.format_length()`."""
         self.assertEqual('0 metres', humanfriendly.format_length(0))
         self.assertEqual('1 metre', humanfriendly.format_length(1))
         self.assertEqual('42 metres', humanfriendly.format_length(42))
@@ -155,6 +169,7 @@ class HumanFriendlyTestCase(unittest.TestCase):
         self.assertEqual('1 nm', humanfriendly.format_length(1e-09))
 
     def test_parse_length(self):
+        """Test :func:`humanfriendly.parse_length()`."""
         self.assertEqual(0, humanfriendly.parse_length('0m'))
         self.assertEqual(42, humanfriendly.parse_length('42'))
         self.assertEqual(42, humanfriendly.parse_length('42m'))
@@ -167,6 +182,7 @@ class HumanFriendlyTestCase(unittest.TestCase):
         self.assertRaises(humanfriendly.InvalidLength, humanfriendly.parse_length, 'a')
 
     def test_format_number(self):
+        """Test :func:`humanfriendly.format_number()`."""
         self.assertEqual('1', humanfriendly.format_number(1))
         self.assertEqual('1.5', humanfriendly.format_number(1.5))
         self.assertEqual('1.56', humanfriendly.format_number(1.56789))
@@ -177,22 +193,26 @@ class HumanFriendlyTestCase(unittest.TestCase):
         self.assertEqual('1,000,000.42', humanfriendly.format_number(1000000.42))
 
     def test_round_number(self):
+        """Test :func:`humanfriendly.round_number()`."""
         self.assertEqual('1', humanfriendly.round_number(1))
         self.assertEqual('1', humanfriendly.round_number(1.0))
         self.assertEqual('1.00', humanfriendly.round_number(1, keep_width=True))
         self.assertEqual('3.14', humanfriendly.round_number(3.141592653589793))
 
     def test_format_path(self):
+        """Test :func:`humanfriendly.format_path()`."""
         friendly_path = os.path.join('~', '.vimrc')
         absolute_path = os.path.join(os.environ['HOME'], '.vimrc')
         self.assertEqual(friendly_path, humanfriendly.format_path(absolute_path))
 
     def test_parse_path(self):
+        """Test :func:`humanfriendly.parse_path()`."""
         friendly_path = os.path.join('~', '.vimrc')
         absolute_path = os.path.join(os.environ['HOME'], '.vimrc')
         self.assertEqual(absolute_path, humanfriendly.parse_path(friendly_path))
 
     def test_pretty_tables(self):
+        """Test :func:`humanfriendly.tables.format_pretty_table()`."""
         # The simplest case possible :-).
         data = [['Just one column']]
         assert format_pretty_table(data) == dedent("""
@@ -232,6 +252,7 @@ class HumanFriendlyTestCase(unittest.TestCase):
         """).strip()
 
     def test_robust_tables(self):
+        """Test :func:`humanfriendly.tables.format_robust_table()`."""
         column_names = ['One', 'Two', 'Three']
         data = [['1', '2', '3'], ['a', 'b', 'c']]
         assert ansi_strip(format_robust_table(data, column_names)) == dedent("""
@@ -262,6 +283,7 @@ class HumanFriendlyTestCase(unittest.TestCase):
         """).strip()
 
     def test_smart_tables(self):
+        """Test :func:`humanfriendly.tables.format_smart_table()`."""
         column_names = ['One', 'Two', 'Three']
         data = [['1', '2', '3'], ['a', 'b', 'c']]
         assert ansi_strip(format_smart_table(data, column_names)) == dedent("""
@@ -289,12 +311,14 @@ class HumanFriendlyTestCase(unittest.TestCase):
         """).strip()
 
     def test_concatenate(self):
+        """Test :func:`humanfriendly.concatenate()`."""
         self.assertEqual(humanfriendly.concatenate([]), '')
         self.assertEqual(humanfriendly.concatenate(['one']), 'one')
         self.assertEqual(humanfriendly.concatenate(['one', 'two']), 'one and two')
         self.assertEqual(humanfriendly.concatenate(['one', 'two', 'three']), 'one, two and three')
 
     def test_split(self):
+        """Test :func:`humanfriendly.text.split()`."""
         from humanfriendly.text import split
         self.assertEqual(split(''), [])
         self.assertEqual(split('foo'), ['foo'])
@@ -303,6 +327,7 @@ class HumanFriendlyTestCase(unittest.TestCase):
         self.assertEqual(split('foo,bar,baz'), ['foo', 'bar', 'baz'])
 
     def test_timer(self):
+        """Test :func:`humanfriendly.Timer`."""
         for seconds, text in ((1, '1 second'),
                               (2, '2 seconds'),
                               (60, '1 minute'),
@@ -337,6 +362,7 @@ class HumanFriendlyTestCase(unittest.TestCase):
         )), '2.00')
 
     def test_spinner(self):
+        """Test :func:`humanfriendly.Spinner`."""
         stream = StringIO()
         spinner = humanfriendly.Spinner('test spinner', total=4, stream=stream, interactive=True)
         for progress in [1, 2, 3, 4]:
@@ -353,15 +379,20 @@ class HumanFriendlyTestCase(unittest.TestCase):
         self.assertEqual(sorted(set(lines)), sorted(lines))
 
     def test_automatic_spinner(self):
-        # There's not a lot to test about the AutomaticSpinner class, but by at
-        # least running it here we are assured that the code functions on all
-        # supported Python versions. AutomaticSpinner is built on top of the
-        # Spinner class so at least we also have the tests for the Spinner
-        # class to back us up.
+        """
+        Test :func:`humanfriendly.AutomaticSpinner`.
+
+        There's not a lot to test about the :class:`.AutomaticSpinner` class,
+        but by at least running it here we are assured that the code functions
+        on all supported Python versions. :class:`.AutomaticSpinner` is built
+        on top of the :class:`.Spinner` class so at least we also have the
+        tests for the :class:`.Spinner` class to back us up.
+        """
         with humanfriendly.AutomaticSpinner('test spinner'):
             time.sleep(1)
 
     def test_prompt_for_choice(self):
+        """Test :func:`humanfriendly.prompt_for_choice`."""
         interactive_prompt = humanfriendly.interactive_prompt
         try:
             # Choice selection by full string match.
@@ -392,6 +423,7 @@ class HumanFriendlyTestCase(unittest.TestCase):
             humanfriendly.interactive_prompt = interactive_prompt
 
     def test_cli(self):
+        """Test the command line interface."""
         # Test that the usage message is printed by default.
         returncode, output = main()
         assert 'Usage:' in output
@@ -429,6 +461,7 @@ class HumanFriendlyTestCase(unittest.TestCase):
         assert returncode == 42
 
     def test_ansi_style(self):
+        """Test :func:`humanfriendly.terminal.ansi_style()`."""
         assert ansi_style(bold=True) == '%s1%s' % (ANSI_CSI, ANSI_SGR)
         assert ansi_style(faint=True) == '%s2%s' % (ANSI_CSI, ANSI_SGR)
         assert ansi_style(underline=True) == '%s4%s' % (ANSI_CSI, ANSI_SGR)
@@ -438,6 +471,7 @@ class HumanFriendlyTestCase(unittest.TestCase):
         self.assertRaises(ValueError, ansi_style, color='unknown')
 
     def test_ansi_width(self):
+        """Test :func:`humanfriendly.terminal.ansi_width()`."""
         text = "Whatever"
         # Make sure ansi_width() works as expected on strings without ANSI escape sequences.
         assert len(text) == ansi_width(text)
@@ -451,6 +485,7 @@ class HumanFriendlyTestCase(unittest.TestCase):
         assert len(text) == ansi_width(wrapped)
 
     def test_ansi_wrap(self):
+        """Test :func:`humanfriendly.terminal.ansi_wrap()`."""
         text = "Whatever"
         # Make sure ansi_wrap() does nothing when no keyword arguments are given.
         assert text == ansi_wrap(text)
@@ -460,6 +495,7 @@ class HumanFriendlyTestCase(unittest.TestCase):
         assert ansi_wrap(text, bold=True).endswith(ANSI_RESET)
 
     def test_find_terminal_size(self):
+        """Test :func:`humanfriendly.terminal.find_terminal_size()`."""
         lines, columns = find_terminal_size()
         # We really can't assert any minimum or maximum values here because it
         # simply doesn't make any sense; it's impossible for me to anticipate
@@ -501,6 +537,7 @@ class HumanFriendlyTestCase(unittest.TestCase):
             sys.stderr = saved_stderr
 
     def test_connected_to_terminal(self):
+        """Test :func:`humanfriendly.terminal.connected_to_terminal()`."""
         for stream in [sys.stdin, sys.stdout, sys.stderr]:
             result = connected_to_terminal(stream)
             # We really can't assert a True or False value here because this
@@ -514,6 +551,7 @@ class HumanFriendlyTestCase(unittest.TestCase):
         assert not connected_to_terminal(object())
 
     def test_find_meta_variables(self):
+        """Test :func:`humanfriendly.usage.find_meta_variables()`."""
         assert sorted(find_meta_variables("""
             Here's one example: --format-number=VALUE
             Here's another example: --format-size=BYTES
@@ -522,6 +560,7 @@ class HumanFriendlyTestCase(unittest.TestCase):
         """)) == sorted(['VALUE', 'BYTES', 'SECONDS'])
 
     def test_format_usage(self):
+        """Test :func:`humanfriendly.usage.format_usage()`."""
         # Test that options are highlighted.
         usage_text = "Just one --option"
         formatted_text = format_usage(usage_text)
@@ -547,6 +586,7 @@ class HumanFriendlyTestCase(unittest.TestCase):
         assert ANSI_CSI not in formatted_lines[2]
 
     def test_render_usage(self):
+        """Test :func:`humanfriendly.usage.render_usage()`."""
         assert render_usage("Usage: some-command WITH ARGS") == "**Usage:** `some-command WITH ARGS`"
         assert render_usage("Supported options:") == "**Supported options:**"
         assert 'code-block' in render_usage(dedent("""
@@ -564,6 +604,7 @@ class HumanFriendlyTestCase(unittest.TestCase):
         """) for token in ('`-n`', '`--dry-run`'))
 
     def test_import_module(self):
+        """Test :func:`humanfriendly.usage.import_module()`."""
         import humanfriendly
         assert humanfriendly is import_module('humanfriendly')
         from humanfriendly import cli
@@ -571,6 +612,7 @@ class HumanFriendlyTestCase(unittest.TestCase):
 
 
 def main(*args, **kw):
+    """Utility function to test the command line interface without invoking a subprocess."""
     returncode = 0
     input_buffer = StringIO(kw.get('input', ''))
     output_buffer = StringIO()
@@ -592,6 +634,12 @@ def main(*args, **kw):
 
 
 def normalize_timestamp(value, ndigits=1):
+    """
+    Utility function to round timestamps to the given number of digits.
+
+    This helps to make the test suite less sensitive to timing issues caused by
+    multitasking, processor scheduling, etc.
+    """
     return '%.2f' % round(float(value), ndigits=ndigits)
 
 

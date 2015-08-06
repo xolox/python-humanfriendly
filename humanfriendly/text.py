@@ -1,10 +1,12 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: July 27, 2015
+# Last Change: August 6, 2015
 # URL: https://humanfriendly.readthedocs.org
 
 """
+Simple text manipulation functions.
+
 The :mod:`~humanfriendly.text` module contains simple functions to manipulate text:
 
 - The :func:`concatenate()` and :func:`pluralize()` functions make it easy to
@@ -175,8 +177,8 @@ def dedent(text, *args, **kw):
     The :func:`compact()` function's documentation contains an example of how I
     like to use the :func:`compact()` and :func:`dedent()` functions. The main
     difference is that I use :func:`compact()` for text that will be presented
-    to the user (where whitespace is les significant) and :func:`dedent()` for
-    all data file and code generation tasks (where newlines and indentation are
+    to the user (where whitespace is not so significant) and :func:`dedent()`
+    for data file and code generation tasks (where newlines and indentation are
     very significant).
     """
     dedented_text = textwrap.dedent(text)

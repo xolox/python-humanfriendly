@@ -1,10 +1,12 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: July 27, 2015
+# Last Change: July 28, 2015
 # URL: https://humanfriendly.readthedocs.org
 
 """
+Interaction with UNIX terminals.
+
 The :mod:`~humanfriendly.terminal` module makes it easy to interact with UNIX
 terminals and format text for rendering on UNIX terminals. If the terms used in
 the documentation of this module don't make sense to you then please refer to

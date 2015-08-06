@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
-#
-# documentation build configuration file for the 'humanfriendly' package. This
-# file is execfile()d with the current directory set to its containing dir.
+
+"""Documentation build configuration file for the `humanfriendly` package."""
 
 import os
 import sys
