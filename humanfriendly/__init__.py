@@ -1,13 +1,13 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: August 6, 2015
+# Last Change: September 10, 2015
 # URL: https://humanfriendly.readthedocs.org
 
 """The main module of the `humanfriendly` package."""
 
 # Semi-standard module versioning.
-__version__ = '1.34'
+__version__ = '1.35'
 
 # Standard library modules.
 import multiprocessing
@@ -69,12 +69,13 @@ length_size_units = (dict(prefix='nm', divider=1e-09, singular='nm', plural='nm'
                      dict(prefix='km', divider=1000, singular='km', plural='km'))
 
 # Common time units, used for formatting of time spans.
-time_units = (dict(divider=1, singular='second', plural='seconds'),
-              dict(divider=60, singular='minute', plural='minutes'),
-              dict(divider=60*60, singular='hour', plural='hours'),
-              dict(divider=60*60*24, singular='day', plural='days'),
-              dict(divider=60*60*24*7, singular='week', plural='weeks'),
-              dict(divider=60*60*24*7*52, singular='year', plural='years'))
+time_units = (dict(divider=1e-3, singular='millisecond', plural='milliseconds', abbreviation='ms'),
+              dict(divider=1, singular='second', plural='seconds', abbreviation='s'),
+              dict(divider=60, singular='minute', plural='minutes', abbreviation='m'),
+              dict(divider=60*60, singular='hour', plural='hours', abbreviation='h'),
+              dict(divider=60*60*24, singular='day', plural='days', abbreviation='d'),
+              dict(divider=60*60*24*7, singular='week', plural='weeks', abbreviation='w'),
+              dict(divider=60*60*24*7*52, singular='year', plural='years', abbreviation='y'))
 
 
 def coerce_boolean(value):
@@ -311,20 +312,24 @@ def round_number(count, keep_width=False):
     return text
 
 
-def format_timespan(num_seconds):
+def format_timespan(num_seconds, detailed=False):
     """
     Format a timespan in seconds as a human readable string.
 
     :param num_seconds: Number of seconds (integer or float).
+    :param detailed: If :data:`True` milliseconds are represented separately
+                     instead of being represented as fractional seconds
+                     (defaults to :data:`False`).
     :returns: The formatted timespan as a string.
 
     Some examples:
 
     >>> from humanfriendly import format_timespan
     >>> format_timespan(0)
-    '0.00 seconds'
+    '0 seconds'
     >>> format_timespan(1)
-    '1.00 second'
+    '1 second'
+    >>> import math
     >>> format_timespan(math.pi)
     '3.14 seconds'
     >>> hour = 60 * 60
@@ -333,7 +338,7 @@ def format_timespan(num_seconds):
     >>> format_timespan(week * 52 + day * 2 + hour * 3)
     '1 year, 2 days and 3 hours'
     """
-    if num_seconds < 60:
+    if num_seconds < 60 and not detailed:
         # Fast path.
         return pluralize(round_number(num_seconds), 'second')
     else:
@@ -348,9 +353,11 @@ def format_timespan(num_seconds):
             # A single count/unit combination.
             return result[0]
         else:
-            # Remove insignificant data from the formatted timespan and format
-            # it in a readable way.
-            return concatenate(result[:3])
+            if not detailed:
+                # Remove insignificant data from the formatted timespan.
+                result = result[:3]
+            # Format the timespan in a readable way.
+            return concatenate(result)
 
 
 def parse_timespan(timespan):
@@ -390,12 +397,8 @@ def parse_timespan(timespan):
         # Otherwise we expect to find two tokens: A number and a unit.
         if len(tokens) == 2 and isinstance(tokens[1], string_types):
             normalized_unit = tokens[1].lower()
-            # Try to match the first letter of the unit.
             for unit in time_units:
-                # All of the first letters of the time units are unique, so
-                # although this check is not very strict I believe it to be
-                # sufficient.
-                if normalized_unit.startswith(unit['singular'][0]):
+                if normalized_unit in (unit['singular'], unit['plural'], unit['abbreviation']):
                     return float(tokens[0]) * unit['divider']
     # We failed to parse the timespan specification.
     msg = "Failed to parse timespan! (input %r was tokenized as %r)"

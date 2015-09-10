@@ -1,9 +1,10 @@
 #!/usr/bin/env python
+# vim: fileencoding=utf-8 :
 
 # Tests for the `humanfriendly' package.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: July 28, 2015
+# Last Change: September 10, 2015
 # URL: https://humanfriendly.readthedocs.org
 
 """Test suite for the `humanfriendly` package."""
@@ -97,6 +98,9 @@ class HumanFriendlyTestCase(unittest.TestCase):
         day = hour * 24
         week = day * 7
         year = week * 52
+        self.assertEqual('1 millisecond', humanfriendly.format_timespan(0.001, detailed=True))
+        self.assertEqual('500 milliseconds', humanfriendly.format_timespan(0.5, detailed=True))
+        self.assertEqual('0.5 seconds', humanfriendly.format_timespan(0.5, detailed=False))
         self.assertEqual('0 seconds', humanfriendly.format_timespan(0))
         self.assertEqual('0.54 seconds', humanfriendly.format_timespan(0.54321))
         self.assertEqual('1 second', humanfriendly.format_timespan(1))
@@ -112,6 +116,9 @@ class HumanFriendlyTestCase(unittest.TestCase):
         self.assertEqual('2 weeks', humanfriendly.format_timespan(week * 2))
         self.assertEqual('1 year', humanfriendly.format_timespan(year))
         self.assertEqual('2 years', humanfriendly.format_timespan(year * 2))
+        self.assertEqual('6 years, 5 weeks, 4 days, 3 hours, 2 minutes and 500 milliseconds',
+                         humanfriendly.format_timespan(year*6 + week*5 + day*4 + hour*3 + minute*2 + 0.5,
+                                                       detailed=True))
         self.assertEqual(
             '1 year, 2 weeks and 3 days',
             humanfriendly.format_timespan(year + week * 2 + day * 3 + hour * 12))
@@ -120,11 +127,20 @@ class HumanFriendlyTestCase(unittest.TestCase):
         """Test :func:`humanfriendly.parse_timespan()`."""
         self.assertEqual(0, humanfriendly.parse_timespan('0'))
         self.assertEqual(0, humanfriendly.parse_timespan('0s'))
+        self.assertEqual(0.001, humanfriendly.parse_timespan('1ms'))
+        self.assertEqual(0.001, humanfriendly.parse_timespan('1 millisecond'))
+        self.assertEqual(0.5, humanfriendly.parse_timespan('500 milliseconds'))
+        self.assertEqual(0.5, humanfriendly.parse_timespan('0.5 seconds'))
         self.assertEqual(5, humanfriendly.parse_timespan('5s'))
+        self.assertEqual(5, humanfriendly.parse_timespan('5 seconds'))
         self.assertEqual(60*2, humanfriendly.parse_timespan('2m'))
+        self.assertEqual(60*2, humanfriendly.parse_timespan('2 minutes'))
         self.assertEqual(60*60*3, humanfriendly.parse_timespan('3 h'))
+        self.assertEqual(60*60*3, humanfriendly.parse_timespan('3 hours'))
         self.assertEqual(60*60*24*4, humanfriendly.parse_timespan('4d'))
+        self.assertEqual(60*60*24*4, humanfriendly.parse_timespan('4 days'))
         self.assertEqual(60*60*24*7*5, humanfriendly.parse_timespan('5 w'))
+        self.assertEqual(60*60*24*7*5, humanfriendly.parse_timespan('5 weeks'))
         self.assertRaises(humanfriendly.InvalidTimespan, humanfriendly.parse_timespan, '1z')
 
     def test_parse_date(self):
