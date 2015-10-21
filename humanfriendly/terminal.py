@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: July 28, 2015
+# Last Change: October 21, 2015
 # URL: https://humanfriendly.readthedocs.org
 
 """
@@ -36,6 +36,7 @@ except ImportError:
 # Modules included in our package. We import find_meta_variables() here to
 # preserve backwards compatibility with older versions of humanfriendly where
 # that function was defined in this module.
+from humanfriendly.text import format
 from humanfriendly.usage import find_meta_variables, format_usage  # NOQA
 
 ANSI_CSI = '\x1b['
@@ -71,6 +72,37 @@ message of the ``humanfriendly`` program). If the environment variable
 ``$HUMANFRIENDLY_HIGHLIGHT_COLOR`` is set it determines the value of
 :data:`HIGHLIGHT_COLOR`.
 """
+
+
+def message(*args, **kw):
+    """
+    Show an informational message on the terminal.
+
+    :param args: Any position arguments are passed on to :func:`format()`.
+    :param kw: Any keyword arguments are passed on to :func:`format()`.
+
+    Renders the message using :func:`format()` and writes the resulting
+    string to :data:`sys.stderr` (followed by a newline).
+    """
+    sys.stderr.write(format(*args, **kw) + '\n')
+
+
+def warning(*args, **kw):
+    """
+    Show a warning message on the terminal.
+
+    :param args: Any position arguments are passed on to :func:`format()`.
+    :param kw: Any keyword arguments are passed on to :func:`format()`.
+
+    Renders the message using :func:`format()` and writes the resulting string
+    to :data:`sys.stderr` (followed by a newline). If :data:`sys.stderr` is
+    connected to a terminal :func:`ansi_wrap()` is used to color the message in
+    a red font (to make the warning stand out from surrounding text).
+    """
+    text = format(*args, **kw)
+    if connected_to_terminal(sys.stderr):
+        text = ansi_wrap(text, color='red')
+    sys.stderr.write(text + '\n')
 
 
 def ansi_strip(text):

@@ -1,13 +1,13 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: September 10, 2015
+# Last Change: October 21, 2015
 # URL: https://humanfriendly.readthedocs.org
 
 """The main module of the `humanfriendly` package."""
 
 # Semi-standard module versioning.
-__version__ = '1.35'
+__version__ = '1.36'
 
 # Standard library modules.
 import multiprocessing
