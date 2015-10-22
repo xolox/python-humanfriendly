@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: October 22, 2015
+# Last Change: October 23, 2015
 # URL: https://humanfriendly.readthedocs.org
 
 """
@@ -39,7 +39,7 @@ from humanfriendly.terminal import (
     ansi_strip,
     ansi_width,
     ansi_wrap,
-    connected_to_terminal,
+    terminal_supports_colors,
     find_terminal_size,
     HIGHLIGHT_COLOR,
 )
@@ -155,7 +155,7 @@ def format_pretty_table(data, column_names=None, horizontal_bar='-', vertical_ba
     if column_names is not None:
         column_names = normalize_columns(column_names)
         if column_names:
-            if connected_to_terminal():
+            if terminal_supports_colors():
                 column_names = [highlight_column_name(n) for n in column_names]
             data.insert(0, column_names)
     # Calculate the maximum width of each column.
@@ -238,7 +238,7 @@ def format_robust_table(data, column_names):
     """
     blocks = []
     column_names = ["%s:" % n for n in normalize_columns(column_names)]
-    if connected_to_terminal():
+    if terminal_supports_colors():
         column_names = [highlight_column_name(n) for n in column_names]
     # Convert each row into one or more `name: value' lines (one per column)
     # and group each `row of lines' into a block (i.e. rows become blocks).

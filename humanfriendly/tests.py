@@ -4,7 +4,7 @@
 # Tests for the `humanfriendly' package.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: October 22, 2015
+# Last Change: October 23, 2015
 # URL: https://humanfriendly.readthedocs.org
 
 """Test suite for the `humanfriendly` package."""
@@ -44,6 +44,7 @@ from humanfriendly.terminal import (
     ansi_wrap,
     connected_to_terminal,
     find_terminal_size,
+    terminal_supports_colors,
 )
 from humanfriendly.usage import (
     find_meta_variables,
@@ -618,17 +619,26 @@ class HumanFriendlyTestCase(unittest.TestCase):
 
     def test_connected_to_terminal(self):
         """Test :func:`humanfriendly.terminal.connected_to_terminal()`."""
-        for stream in [sys.stdin, sys.stdout, sys.stderr]:
-            result = connected_to_terminal(stream)
-            # We really can't assert a True or False value here because this
-            # test suite should be able to run both interactively and
-            # non-interactively :-).
-            assert isinstance(result, bool)
-        # We can at least verify that e.g. /dev/null is never a terminal :-).
+        self.check_terminal_capabilities(connected_to_terminal)
+
+    def test_terminal_supports_colors(self):
+        """Test :func:`humanfriendly.terminal.terminal_supports_colors()`."""
+        self.check_terminal_capabilities(terminal_supports_colors)
+
+    def check_terminal_capabilities(self, test_stream):
+        """Helper for :func:`test_connected_to_terminal()` and func:`test_terminal_supports_colors()`."""
+        # This test suite should be able to run interactively as well as
+        # non-interactively, so we can't expect or demand that standard streams
+        # will always be connected to a terminal. Fortunately Capturer enables
+        # us to fake it :-).
+        for stream in sys.stdout, sys.stderr:
+            with CaptureOutput():
+                assert test_stream(stream)
+        # Test something that we know can never be a terminal.
         with open(os.devnull) as handle:
-            assert not connected_to_terminal(handle)
-        # We can also verify that objects without isatty() don't raise an exception.
-        assert not connected_to_terminal(object())
+            assert not test_stream(handle)
+        # Verify that objects without isatty() don't raise an exception.
+        assert not test_stream(object())
 
     def test_find_meta_variables(self):
         """Test :func:`humanfriendly.usage.find_meta_variables()`."""

@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: October 22, 2015
+# Last Change: October 23, 2015
 # URL: https://humanfriendly.readthedocs.org
 
 """
@@ -107,7 +107,7 @@ def warning(*args, **kw):
     a red font (to make the warning stand out from surrounding text).
     """
     text = format(*args, **kw)
-    if connected_to_terminal(sys.stderr):
+    if terminal_supports_colors(sys.stderr):
         text = ansi_wrap(text, color='red')
     sys.stderr.write(text + '\n')
 
@@ -231,20 +231,36 @@ def connected_to_terminal(stream=None):
     """
     Check if a stream is connected to a terminal.
 
-    If this function returns :data:`True` on a UNIX system it generally means
-    that ANSI escape sequences are supported and can be used.
-
-    :param stream: The stream to check (a :class:`file` object, defaults to
-                   :data:`sys.stdout`).
+    :param stream: The stream to check (a file-like object,
+                   defaults to :data:`sys.stdout`).
     :returns: :data:`True` if the stream is connected to a terminal,
               :data:`False` otherwise.
+
+    See also :func:`terminal_supports_colors()`.
     """
-    if stream is None:
-        stream = sys.stdout
+    stream = sys.stdout if stream is None else stream
     try:
         return stream.isatty()
     except Exception:
         return False
+
+
+def terminal_supports_colors(stream=None):
+    """
+    Check if a stream is connected to a terminal that supports ANSI escape sequences.
+
+    :param stream: The stream to check (a file-like object,
+                   defaults to :data:`sys.stdout`).
+    :returns: :data:`True` if the terminal supports ANSI escape sequences,
+              :data:`False` otherwise.
+
+    This function is inspired by the implementation of
+    `django.core.management.color.supports_color()
+    <https://github.com/django/django/blob/master/django/core/management/color.py>`_.
+    """
+    return (sys.platform != 'Pocket PC'
+            and (sys.platform != 'win32' or 'ANSICON' in os.environ)
+            and connected_to_terminal(stream))
 
 
 def find_terminal_size():
@@ -345,7 +361,7 @@ def usage(usage_text):
        using :func:`.format_usage()`.
     2. The usage message is shown using a pager (see :func:`show_pager()`).
     """
-    if connected_to_terminal(sys.stdout):
+    if terminal_supports_colors(sys.stdout):
         usage_text = format_usage(usage_text)
     show_pager(usage_text)
 

@@ -3,7 +3,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: October 22, 2015
+# Last Change: October 23, 2015
 # URL: https://humanfriendly.readthedocs.org
 
 """
@@ -21,7 +21,7 @@ import sys
 
 # Modules included in our package.
 from humanfriendly.compat import interactive_prompt
-from humanfriendly.terminal import HIGHLIGHT_COLOR, ansi_wrap, ansi_strip, connected_to_terminal, warning
+from humanfriendly.terminal import HIGHLIGHT_COLOR, ansi_wrap, ansi_strip, terminal_supports_colors, warning
 from humanfriendly.text import compact, format, concatenate
 
 MAX_ATTEMPTS = 10
@@ -70,11 +70,11 @@ def prompt_for_confirmation(question, default=None, padding=True):
     """
     # Generate the text for the prompt.
     prompt_text = question
-    if connected_to_terminal():
+    if terminal_supports_colors():
         prompt_text = ansi_wrap(prompt_text, bold=True, readline_hints=True)
     # Append the valid replies (and default reply) to the prompt text.
     hint = "[Y/n]" if default else "[y/N]" if default is not None else "[y/n]"
-    if connected_to_terminal():
+    if terminal_supports_colors():
         hint = ansi_wrap(hint, color=HIGHLIGHT_COLOR, readline_hints=True)
     prompt_text += " %s " % hint
     # Loop until a valid response is given.
@@ -166,7 +166,7 @@ def prompt_for_choice(choices, default=None, padding=True):
         # Instructions for the user.
         "Enter your choice as a number or unique substring (Control-C aborts): ",
     ])
-    if connected_to_terminal():
+    if terminal_supports_colors():
         prompt_text = ansi_wrap(prompt_text, bold=True, readline_hints=True)
     # Loop until a valid choice is made.
     logger.debug("Requesting interactive choice on terminal (options are %s) ..",
