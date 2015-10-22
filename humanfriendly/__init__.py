@@ -7,7 +7,7 @@
 """The main module of the `humanfriendly` package."""
 
 # Semi-standard module versioning.
-__version__ = '1.40'
+__version__ = '1.41'
 
 # Standard library modules.
 import multiprocessing

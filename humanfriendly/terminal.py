@@ -36,7 +36,7 @@ except ImportError:
 # Modules included in our package. We import find_meta_variables() here to
 # preserve backwards compatibility with older versions of humanfriendly where
 # that function was defined in this module.
-from humanfriendly.text import format
+from humanfriendly.text import concatenate, format
 from humanfriendly.usage import find_meta_variables, format_usage  # NOQA
 
 ANSI_CSI = '\x1b['
@@ -57,6 +57,13 @@ A dictionary with (name, number) pairs of `portable color codes`_. Used by
 :func:`ansi_style()` to generate ANSI escape sequences that change font color.
 
 .. _portable color codes: http://en.wikipedia.org/wiki/ANSI_escape_code#Colors
+"""
+
+ANSI_TEXT_STYLES = dict(bold=1, faint=2, underline=4, inverse=7, strike_through=9)
+"""
+A dictionary with (name, number) pairs of text styles (effects). Used by
+:func:`ansi_style()` to generate ANSI escape sequences that change text
+styles. Only widely supported text styles are included here.
 """
 
 DEFAULT_LINES = 25
@@ -122,8 +129,7 @@ def ansi_strip(text, readline_hints=True):
     return text
 
 
-def ansi_style(color=None, bold=False, faint=False, underline=False,
-               inverse=False, strike_through=False, readline_hints=False):
+def ansi_style(**kw):
     """
     Generate ANSI escape sequences for the given color and/or style(s).
 
@@ -131,40 +137,30 @@ def ansi_style(color=None, bold=False, faint=False, underline=False,
                   'green', 'yellow', 'blue', 'magenta', 'cyan' or 'white') or
                   :data:`None` (the default) which means no escape sequence to
                   switch color will be emitted.
-    :param bold: :data:`True` enables bold font (the default is :data:`False`).
-    :param faint: :data:`True` enables faint font (the default is
-                  :data:`False`).
-    :param underline: :data:`True` enables underline font (the default is
-                      :data:`False`).
-    :param inverse: :data:`True` enables inverse font (the default is
-                    :data:`False`).
-    :param strike_through: :data:`True` enables crossed-out / strike-through
-                           font (the default is :data:`False`).
     :param readline_hints: If :data:`True` then :func:`readline_wrap()` is
-                           applied to the generated ANSI escape sequences.
+                           applied to the generated ANSI escape sequences (the
+                           default is :data:`False`).
+    :param kw: Any additional keyword arguments are expected to match an entry
+               in the :data:`ANSI_TEXT_STYLES` dictionary. If the argument's
+               value evaluates to :data:`True` the respective style will be
+               enabled.
     :returns: The ANSI escape sequences to enable the requested text styles or
               an empty string if no styles were requested.
     :raises: :py:exc:`~exceptions.ValueError` when an invalid color name is given.
     """
-    sequences = []
-    if bold:
-        sequences.append('1')
-    if faint:
-        sequences.append('2')
-    if underline:
-        sequences.append('4')
-    if inverse:
-        sequences.append('7')
-    if strike_through:
-        sequences.append('9')
-    if color:
-        if color not in ANSI_COLOR_CODES:
+    # Start with sequences that change text styles.
+    sequences = [str(ANSI_TEXT_STYLES[k]) for k, v in kw.items() if k in ANSI_TEXT_STYLES and v]
+    # Append the color code (if any).
+    color_name = kw.get('color')
+    if color_name:
+        # Validate the color name.
+        if color_name not in ANSI_COLOR_CODES:
             msg = "Invalid color name %r! (expected one of %s)"
-            raise ValueError(msg % (color, ", ".join(sorted(ANSI_COLOR_CODES))))
-        sequences.append('3%i' % ANSI_COLOR_CODES[color])
+            raise ValueError(msg % (color_name, concatenate(sorted(ANSI_COLOR_CODES))))
+        sequences.append('3%i' % ANSI_COLOR_CODES[color_name])
     if sequences:
         encoded = ANSI_CSI + ';'.join(sequences) + ANSI_SGR
-        return readline_wrap(encoded) if readline_hints else encoded
+        return readline_wrap(encoded) if kw.get('readline_hints') else encoded
     else:
         return ''
 
