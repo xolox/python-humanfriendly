@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: August 6, 2015
+# Last Change: October 22, 2015
 # URL: https://humanfriendly.readthedocs.org
 
 """
@@ -262,22 +262,40 @@ def pluralize(count, singular, plural=None):
     return '%s %s' % (count, singular if math.floor(float(count)) == 1 else plural)
 
 
-def split(text):
+def split(text, delimiter=','):
     """
     Split a comma-separated list of strings.
 
     :param text: The text to split (a string).
-    :returns: A list of zero or more strings.
+    :param delimiter: The delimiter to split on (a string).
+    :returns: A list of zero or more nonempty strings.
 
-    **Example:**
+    Here's the default behavior of Python's built in :func:`str.split()`
+    function:
 
-    >>> from humanfriendly.text import split
     >>> 'foo,bar, baz,'.split(',')
     ['foo', 'bar', ' baz', '']
+
+    In contrast here's the default behavior of the :func:`split()` function:
+
+    >>> from humanfriendly.text import split
     >>> split('foo,bar, baz,')
     ['foo', 'bar', 'baz']
+
+    Here is an example that parses a nested data structure (a mapping of
+    logging level names to one or more styles per level) that's encoded in a
+    string so it can be set as an environment variable:
+
+    >>> from pprint import pprint
+    >>> encoded_data = 'debug=green;warning=yellow;error=red;critical=red,bold'
+    >>> parsed_data = dict((k, split(v, ',')) for k, v in (split(kv, '=') for kv in split(encoded_data, ';')))
+    >>> pprint(parsed_data)
+    {'debug': ['green'],
+     'warning': ['yellow'],
+     'error': ['red'],
+     'critical': ['red', 'bold']}
     """
-    return [token.strip() for token in text.split(',') if token and not token.isspace()]
+    return [token.strip() for token in text.split(delimiter) if token and not token.isspace()]
 
 
 def tokenize(text):
