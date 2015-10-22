@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: October 21, 2015
+# Last Change: October 22, 2015
 # URL: https://humanfriendly.readthedocs.org
 
 """
@@ -105,19 +105,25 @@ def warning(*args, **kw):
     sys.stderr.write(text + '\n')
 
 
-def ansi_strip(text):
+def ansi_strip(text, readline_hints=True):
     """
     Strip ANSI escape sequences from the given string.
 
     :param text: The text from which ANSI escape sequences should be removed (a
                  string).
+    :param readline_hints: If :data:`True` then :func:`readline_strip()` is
+                           used to remove `readline hints`_ from the string.
     :returns: The text without ANSI escape sequences (a string).
     """
     pattern = '%s.*?%s' % (re.escape(ANSI_CSI), re.escape(ANSI_SGR))
-    return re.sub(pattern, '', text)
+    text = re.sub(pattern, '', text)
+    if readline_hints:
+        text = readline_strip(text)
+    return text
 
 
-def ansi_style(color=None, bold=False, faint=False, underline=False, inverse=False, strike_through=False):
+def ansi_style(color=None, bold=False, faint=False, underline=False,
+               inverse=False, strike_through=False, readline_hints=False):
     """
     Generate ANSI escape sequences for the given color and/or style(s).
 
@@ -134,6 +140,8 @@ def ansi_style(color=None, bold=False, faint=False, underline=False, inverse=Fal
                     :data:`False`).
     :param strike_through: :data:`True` enables crossed-out / strike-through
                            font (the default is :data:`False`).
+    :param readline_hints: If :data:`True` then :func:`readline_wrap()` is
+                           applied to the generated ANSI escape sequences.
     :returns: The ANSI escape sequences to enable the requested text styles or
               an empty string if no styles were requested.
     :raises: :py:exc:`~exceptions.ValueError` when an invalid color name is given.
@@ -155,7 +163,8 @@ def ansi_style(color=None, bold=False, faint=False, underline=False, inverse=Fal
             raise ValueError(msg % (color, ", ".join(sorted(ANSI_COLOR_CODES))))
         sequences.append('3%i' % ANSI_COLOR_CODES[color])
     if sequences:
-        return ANSI_CSI + ';'.join(sequences) + ANSI_SGR
+        encoded = ANSI_CSI + ';'.join(sequences) + ANSI_SGR
+        return readline_wrap(encoded) if readline_hints else encoded
     else:
         return ''
 
@@ -192,9 +201,34 @@ def ansi_wrap(text, **kw):
     """
     start_sequence = ansi_style(**kw)
     if start_sequence:
-        return start_sequence + text + ANSI_RESET
+        end_sequence = ANSI_RESET
+        if kw.get('readline_hints'):
+            end_sequence = readline_wrap(end_sequence)
+        return start_sequence + text + end_sequence
     else:
         return text
+
+
+def readline_wrap(expr):
+    """
+    Wrap an ANSI escape sequence in `readline hints`_.
+
+    :param text: The text with the escape sequence to wrap (a string).
+    :returns: The wrapped text.
+
+    .. _readline hints: http://superuser.com/a/301355
+    """
+    return '\001' + expr + '\002'
+
+
+def readline_strip(expr):
+    """
+    Remove `readline hints`_ from a string.
+
+    :param text: The text to strip (a string).
+    :returns: The stripped text.
+    """
+    return expr.replace('\001', '').replace('\002', '')
 
 
 def connected_to_terminal(stream=None):
