@@ -1,7 +1,7 @@
-# Makefile for the 'humanfriendly' module.
+# Makefile for the 'humanfriendly' package.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: July 28, 2015
+# Last Change: October 22, 2015
 # URL: https://humanfriendly.readthedocs.org
 
 # The following defaults are based on my preferences, but possible for others
@@ -21,7 +21,7 @@ default:
 	@echo '    make install    install the package in a virtual environment'
 	@echo '    make reset      recreate the virtual environment'
 	@echo '    make clean      cleanup all temporary files'
-	@echo '    make test       run the unit test suite'
+	@echo '    make test       run the test suite'
 	@echo '    make coverage   run the tests, report coverage'
 	@echo '    make check      check the coding style'
 	@echo '    make docs       update documentation using Sphinx'
@@ -38,17 +38,18 @@ install:
 	test -x "$(VIRTUAL_ENV)/bin/pip" || ($(ACTIVATE) && easy_install pip)
 	test -x "$(VIRTUAL_ENV)/bin/pip-accel" || ($(ACTIVATE) && pip install pip-accel)
 	$(ACTIVATE) && pip uninstall --yes humanfriendly &>/dev/null || true
-	$(ACTIVATE) && pip install --editable .
+	$(ACTIVATE) && pip install --quiet --editable .
 
 reset:
 	rm -Rf "$(VIRTUAL_ENV)"
-	make --no-print-directory install
+	make --no-print-directory clean install
 
 clean:
 	rm -Rf build dist docs/build htmlcov
 
 test: install
-	$(ACTIVATE) && python setup.py test
+	test -x "$(VIRTUAL_ENV)/bin/py.test" || ($(ACTIVATE) && pip-accel install pytest)
+	$(ACTIVATE) && py.test
 
 coverage: install
 	$(ACTIVATE) && pip-accel install 'coverage >= 4.0a5'

@@ -3,7 +3,7 @@
 """Setup script for the `humanfriendly` package."""
 
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: July 28, 2015
+# Last Change: October 22, 2015
 # URL: https://humanfriendly.readthedocs.org
 
 # Standard library modules.
@@ -43,6 +43,10 @@ setup(
         'humanfriendly = humanfriendly.cli:main'
     ]),
     test_suite='humanfriendly.tests',
+    tests_require=[
+        'capturer >= 2.1',
+        'coloredlogs >= 2.0',
+    ],
     classifiers=[
         'Development Status :: 6 - Mature',
         'Environment :: Console',

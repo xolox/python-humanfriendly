@@ -4,12 +4,13 @@
 # Tests for the `humanfriendly' package.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: September 10, 2015
+# Last Change: October 22, 2015
 # URL: https://humanfriendly.readthedocs.org
 
 """Test suite for the `humanfriendly` package."""
 
 # Standard library modules.
+import logging
 import math
 import os
 import random
@@ -19,8 +20,14 @@ import unittest
 
 # Modules included in our package.
 import humanfriendly
-import humanfriendly.cli
+from humanfriendly import cli, prompts
 from humanfriendly import compact, dedent
+from humanfriendly.prompts import (
+    TooManyInvalidReplies,
+    prompt_for_confirmation,
+    prompt_for_choice,
+    prompt_for_input,
+)
 from humanfriendly.tables import (
     format_pretty_table,
     format_robust_table,
@@ -44,17 +51,30 @@ from humanfriendly.usage import (
     render_usage,
 )
 
+# Test dependencies.
+from capturer import CaptureOutput
+
+# Compatibility with Python 2 and 3.
 try:
-    # Python 2.x.
     from StringIO import StringIO
 except ImportError:
-    # Python 3.x.
     from io import StringIO
 
 
 class HumanFriendlyTestCase(unittest.TestCase):
 
     """Container for the `humanfriendly` test suite."""
+
+    def setUp(self):
+        """Configure logging to the terminal."""
+        try:
+            import coloredlogs
+            coloredlogs.install(level=logging.DEBUG)
+        except ImportError:
+            logging.basicConfig(
+                level=logging.DEBUG,
+                format='%(asctime)s %(name)s[%(process)d] %(levelname)s %(message)s',
+                datefmt='%Y-%m-%d %H:%M:%S')
 
     def test_compact(self):
         """Test :func:`humanfriendly.text.compact()`."""
@@ -408,35 +428,84 @@ class HumanFriendlyTestCase(unittest.TestCase):
             time.sleep(1)
 
     def test_prompt_for_choice(self):
-        """Test :func:`humanfriendly.prompt_for_choice`."""
-        interactive_prompt = humanfriendly.interactive_prompt
-        try:
-            # Choice selection by full string match.
-            humanfriendly.interactive_prompt = lambda prompt: 'foo'
-            self.assertEqual(humanfriendly.prompt_for_choice(['foo', 'bar']), 'foo')
-            # Choice selection by substring input.
-            humanfriendly.interactive_prompt = lambda prompt: 'f'
-            self.assertEqual(humanfriendly.prompt_for_choice(['foo', 'bar']), 'foo')
-            # Choice selection by number.
-            humanfriendly.interactive_prompt = lambda prompt: '2'
-            self.assertEqual(humanfriendly.prompt_for_choice(['foo', 'bar']), 'bar')
-            # Choice selection by going with the default.
-            humanfriendly.interactive_prompt = lambda prompt: ''
-            self.assertEqual(humanfriendly.prompt_for_choice(['foo', 'bar'], default='bar'), 'bar')
-            # Invalid substrings are refused.
-            responses = ['', 'q', 'z']
-            humanfriendly.interactive_prompt = lambda prompt: responses.pop(0)
-            self.assertEqual(humanfriendly.prompt_for_choice(['foo', 'bar', 'baz']), 'baz')
-            # Choice selection by substring input requires an unambiguous substring match.
-            responses = ['a', 'q']
-            humanfriendly.interactive_prompt = lambda prompt: responses.pop(0)
-            self.assertEqual(humanfriendly.prompt_for_choice(['foo', 'bar', 'baz', 'qux']), 'qux')
-            # Invalid numbers are refused.
-            responses = ['42', '2']
-            humanfriendly.interactive_prompt = lambda prompt: responses.pop(0)
-            self.assertEqual(humanfriendly.prompt_for_choice(['foo', 'bar', 'baz']), 'bar')
-        finally:
-            humanfriendly.interactive_prompt = interactive_prompt
+        """Test :func:`humanfriendly.prompts.prompt_for_choice()`."""
+        # Choice selection without any options should raise an exception.
+        self.assertRaises(ValueError, prompt_for_choice, [])
+        # If there's only one option no prompt should be rendered so we expect
+        # the following code to not raise an EOFError exception (despite
+        # connecting standard input to /dev/null).
+        with open(os.devnull) as handle:
+            with PatchedAttribute(sys, 'stdin', handle):
+                only_option = 'only one option (shortcut)'
+                assert prompt_for_choice([only_option]) == only_option
+        # Choice selection by full string match.
+        with PatchedAttribute(prompts, 'interactive_prompt', lambda p: 'foo'):
+            assert prompt_for_choice(['foo', 'bar']) == 'foo'
+        # Choice selection by substring input.
+        with PatchedAttribute(prompts, 'interactive_prompt', lambda p: 'f'):
+            assert prompt_for_choice(['foo', 'bar']) == 'foo'
+        # Choice selection by number.
+        with PatchedAttribute(prompts, 'interactive_prompt', lambda p: '2'):
+            assert prompt_for_choice(['foo', 'bar']) == 'bar'
+        # Choice selection by going with the default.
+        with PatchedAttribute(prompts, 'interactive_prompt', lambda p: ''):
+            assert prompt_for_choice(['foo', 'bar'], default='bar') == 'bar'
+        # Invalid substrings are refused.
+        replies = ['', 'q', 'z']
+        with PatchedAttribute(prompts, 'interactive_prompt', lambda p: replies.pop(0)):
+            assert prompt_for_choice(['foo', 'bar', 'baz']) == 'baz'
+        # Choice selection by substring input requires an unambiguous substring match.
+        replies = ['a', 'q']
+        with PatchedAttribute(prompts, 'interactive_prompt', lambda p: replies.pop(0)):
+            assert prompt_for_choice(['foo', 'bar', 'baz', 'qux']) == 'qux'
+        # Invalid numbers are refused.
+        replies = ['42', '2']
+        with PatchedAttribute(prompts, 'interactive_prompt', lambda p: replies.pop(0)):
+            assert prompt_for_choice(['foo', 'bar', 'baz']) == 'bar'
+        # Test that interactive prompts eventually give up on invalid replies.
+        with PatchedAttribute(prompts, 'interactive_prompt', lambda p: ''):
+            self.assertRaises(TooManyInvalidReplies, prompt_for_choice, ['a', 'b', 'c'])
+
+    def test_prompt_for_confirmation(self):
+        """Test :func:`humanfriendly.prompts.prompt_for_confirmation()`."""
+        # Test some (more or less) reasonable replies that indicate agreement.
+        for reply in 'yes', 'Yes', 'YES', 'y', 'Y':
+            with PatchedAttribute(prompts, 'interactive_prompt', lambda p: reply):
+                assert prompt_for_confirmation("Are you sure?") is True
+        # Test some (more or less) reasonable replies that indicate disagreement.
+        for reply in 'no', 'No', 'NO', 'n', 'N':
+            with PatchedAttribute(prompts, 'interactive_prompt', lambda p: reply):
+                assert prompt_for_confirmation("Are you sure?") is False
+        # Test that empty replies select the default choice.
+        for default_choice in True, False:
+            with PatchedAttribute(prompts, 'interactive_prompt', lambda p: ''):
+                assert prompt_for_confirmation("Are you sure?", default=default_choice) is default_choice
+        # Test that a warning is shown when no input nor a default is given.
+        replies = ['', 'y']
+        with PatchedAttribute(prompts, 'interactive_prompt', lambda p: replies.pop(0)):
+            with CaptureOutput() as capturer:
+                assert prompt_for_confirmation("Are you sure?") is True
+                assert "there's no default choice" in capturer.get_text()
+        # Test that the default reply is shown in uppercase.
+        with PatchedAttribute(prompts, 'interactive_prompt', lambda p: 'y'):
+            for default_value, expected_text in (True, 'Y/n'), (False, 'y/N'), (None, 'y/n'):
+                with CaptureOutput() as capturer:
+                    assert prompt_for_confirmation("Are you sure?", default=default_value) is True
+                    assert expected_text in capturer.get_text()
+        # Test that interactive prompts eventually give up on invalid replies.
+        with PatchedAttribute(prompts, 'interactive_prompt', lambda p: ''):
+            self.assertRaises(TooManyInvalidReplies, prompt_for_confirmation, "Are you sure?")
+
+    def test_prompt_for_input(self):
+        """Test :func:`humanfriendly.prompts.prompt_for_input()`."""
+        with open(os.devnull) as handle:
+            with PatchedAttribute(sys, 'stdin', handle):
+                # If standard input isn't connected to a terminal the default value should be returned.
+                default_value = "To seek the holy grail!"
+                assert prompt_for_input("What is your quest?", default=default_value) == default_value
+                # If standard input isn't connected to a terminal and no default value
+                # is given the EOFError exception should be propagated to the caller.
+                self.assertRaises(EOFError, prompt_for_input, "What is your favorite color?")
 
     def test_cli(self):
         """Test the command line interface."""
@@ -639,7 +708,7 @@ def main(*args, **kw):
         sys.argv = [sys.argv[0]] + list(args)
         sys.stdin = input_buffer
         sys.stdout = output_buffer
-        humanfriendly.cli.main()
+        cli.main()
     except SystemExit as e:
         returncode = e.code or 1
     finally:
@@ -657,6 +726,34 @@ def normalize_timestamp(value, ndigits=1):
     multitasking, processor scheduling, etc.
     """
     return '%.2f' % round(float(value), ndigits=ndigits)
+
+
+class PatchedAttribute(object):
+
+    """Context manager that temporary replaces an object attribute."""
+
+    def __init__(self, obj, name, value):
+        """
+        Initialize a :class:`PatchedAttribute` object.
+
+        :param obj: The object to patch.
+        :param name: An attribute name.
+        :param value: The value to set.
+        """
+        self.obj = obj
+        self.name = name
+        self.value = value
+        self.saved_value = None
+
+    def __enter__(self):
+        """Replace (patch) the attribute."""
+        self.saved_value = getattr(self.obj, self.name)
+        setattr(self.obj, self.name, self.value)
+        return self.value
+
+    def __exit__(self, exc_type=None, exc_value=None, traceback=None):
+        """Restore the attribute to its original value."""
+        setattr(self.obj, self.name, self.saved_value)
 
 
 if __name__ == '__main__':

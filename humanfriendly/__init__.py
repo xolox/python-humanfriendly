@@ -7,7 +7,7 @@
 """The main module of the `humanfriendly` package."""
 
 # Semi-standard module versioning.
-__version__ = '1.37'
+__version__ = '1.38'
 
 # Standard library modules.
 import multiprocessing
@@ -32,14 +32,16 @@ from humanfriendly.text import (  # NOQA
     pluralize, tokenize, trim_empty_lines,
 )
 
+# In humanfriendly 1.38 the prompt_for_choice() function was moved out into a
+# separate module because several variants of interactive prompts were added.
+from humanfriendly.prompts import prompt_for_choice  # NOQA
+
 # Compatibility with Python 2 and 3.
 try:
     # Python 2.
-    interactive_prompt = raw_input
     string_types = basestring
 except NameError:
     # Python 3.
-    interactive_prompt = input
     string_types = str
 
 # Spinners are redrawn at most this many seconds.
@@ -520,64 +522,6 @@ def parse_path(pathname):
     :returns: An absolute pathname (a string).
     """
     return os.path.abspath(os.path.expanduser(os.path.expandvars(pathname)))
-
-
-def prompt_for_choice(choices, default=None):
-    """
-    Prompt the user to select a choice from a list of options.
-
-    :param choices: A list of strings with available options.
-    :param default: The default choice if the user simply presses Enter
-                    (expected to be a string, defaults to ``None``).
-    :returns: The string corresponding to the user's choice.
-    """
-    # By default the raw_input() prompt is very unfriendly, for example the
-    # `Home' key enters `^[OH' and the `End' key enters `^[OF'. By simply
-    # importing the `readline' module the prompt becomes much friendlier.
-    import readline  # NOQA
-    # Make sure we can use 'choices' more than once (i.e. not a generator).
-    choices = list(choices)
-    # Present the available choices in a user friendly way.
-    for i, choice in enumerate(choices, start=1):
-        text = u" %i. %s" % (i, choice)
-        if choice == default:
-            text += " (default choice)"
-        print(text)
-    # Loop until a valid choice is made.
-    prompt = "Enter your choice as a number or unique substring (Ctrl-C aborts): "
-    while True:
-        input = interactive_prompt(prompt).strip()
-        # Make sure the user entered something.
-        if not input:
-            if default is not None:
-                return default
-            continue
-        # Check for a valid number.
-        if input.isdigit():
-            index = int(input) - 1
-            if 0 <= index < len(choices):
-                return choices[index]
-        # Check for substring matches.
-        matches = []
-        for choice in choices:
-            lower_input = input.lower()
-            lower_choice = choice.lower()
-            if lower_input == lower_choice:
-                # If we have an 'exact' match we return it immediately.
-                return choice
-            elif lower_input in lower_choice:
-                # Otherwise we gather substring matches.
-                matches.append(choice)
-        # If a single choice was matched we return it, otherwise we give the
-        # user a hint about what went wrong.
-        if len(matches) == 1:
-            return matches[0]
-        elif matches:
-            print("Error: The string '%s' matches more than one choice (%s)." % (input, concatenate(matches)))
-        elif input.isdigit():
-            print("Error: The number %i is not a valid choice." % int(input))
-        else:
-            print("Error: The string '%s' doesn't match any choices." % input)
 
 
 class Timer(object):
