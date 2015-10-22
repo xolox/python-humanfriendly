@@ -20,16 +20,9 @@ import logging
 import sys
 
 # Modules included in our package.
+from humanfriendly.compat import interactive_prompt
 from humanfriendly.terminal import HIGHLIGHT_COLOR, ansi_wrap, ansi_strip, connected_to_terminal, warning
 from humanfriendly.text import compact, format, concatenate
-
-# Compatibility with Python 2 and 3.
-try:
-    # Python 2.
-    interactive_prompt = raw_input
-except NameError:
-    # Python 3.
-    interactive_prompt = input
 
 MAX_ATTEMPTS = 10
 """The number of times an interactive prompt is shown on invalid input (an integer)."""

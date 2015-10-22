@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: July 28, 2015
+# Last Change: October 22, 2015
 # URL: https://humanfriendly.readthedocs.org
 
 """
@@ -34,6 +34,7 @@ import collections
 import re
 
 # Modules included in our package.
+from humanfriendly.compat import coerce_string
 from humanfriendly.terminal import (
     ansi_strip,
     ansi_width,
@@ -42,14 +43,6 @@ from humanfriendly.terminal import (
     find_terminal_size,
     HIGHLIGHT_COLOR,
 )
-
-# Compatibility with Python 2 and 3.
-try:
-    # Python 2.
-    unicode_type = unicode
-except NameError:
-    # Python 3.
-    unicode_type = str
 
 # Compiled regular expression pattern to recognize table columns containing
 # numeric data (integer and/or floating point numbers). Used to right-align the
@@ -276,7 +269,7 @@ def format_robust_table(data, column_names):
 
 
 def normalize_columns(row):
-    return [unicode_type(c) for c in row]
+    return [coerce_string(c) for c in row]
 
 
 def highlight_column_name(name):

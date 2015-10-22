@@ -22,6 +22,7 @@ import unittest
 import humanfriendly
 from humanfriendly import cli, prompts
 from humanfriendly import compact, dedent
+from humanfriendly.compat import StringIO
 from humanfriendly.prompts import (
     TooManyInvalidReplies,
     prompt_for_confirmation,
@@ -53,12 +54,6 @@ from humanfriendly.usage import (
 
 # Test dependencies.
 from capturer import CaptureOutput
-
-# Compatibility with Python 2 and 3.
-try:
-    from StringIO import StringIO
-except ImportError:
-    from io import StringIO
 
 
 class HumanFriendlyTestCase(unittest.TestCase):

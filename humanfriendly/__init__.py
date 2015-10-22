@@ -7,7 +7,7 @@
 """The main module of the `humanfriendly` package."""
 
 # Semi-standard module versioning.
-__version__ = '1.38'
+__version__ = '1.39'
 
 # Standard library modules.
 import multiprocessing
@@ -37,12 +37,7 @@ from humanfriendly.text import (  # NOQA
 from humanfriendly.prompts import prompt_for_choice  # NOQA
 
 # Compatibility with Python 2 and 3.
-try:
-    # Python 2.
-    string_types = basestring
-except NameError:
-    # Python 3.
-    string_types = str
+from humanfriendly.compat import is_string
 
 # Spinners are redrawn at most this many seconds.
 minimum_spinner_interval = 0.2
@@ -95,7 +90,7 @@ def coerce_boolean(value):
     :raises: :py:exc:`exceptions.ValueError` when the value is a string but
              cannot be coerced with certainty.
     """
-    if isinstance(value, string_types):
+    if is_string(value):
         normalized = value.strip().lower()
         if normalized in ('1', 'yes', 'true', 'on'):
             return True
@@ -166,7 +161,7 @@ def parse_size(size):
         if len(tokens) == 1:
             return int(tokens[0])
         # Otherwise we expect to find two tokens: A number and a unit.
-        if len(tokens) == 2 and isinstance(tokens[1], string_types):
+        if len(tokens) == 2 and is_string(tokens[1]):
             normalized_unit = tokens[1].lower()
             # Try to match the first letter of the unit.
             for unit in disk_size_units:
@@ -235,7 +230,7 @@ def parse_length(length):
         if len(tokens) == 1:
             return int(tokens[0])
         # Otherwise we expect to find two tokens: A number and a unit.
-        if len(tokens) == 2 and isinstance(tokens[1], string_types):
+        if len(tokens) == 2 and is_string(tokens[1]):
             normalized_unit = tokens[1].lower()
             # Try to match the first letter of the unit.
             for unit in length_size_units:
@@ -397,7 +392,7 @@ def parse_timespan(timespan):
         if len(tokens) == 1:
             return float(tokens[0])
         # Otherwise we expect to find two tokens: A number and a unit.
-        if len(tokens) == 2 and isinstance(tokens[1], string_types):
+        if len(tokens) == 2 and is_string(tokens[1]):
             normalized_unit = tokens[1].lower()
             for unit in time_units:
                 if normalized_unit in (unit['singular'], unit['plural'], unit['abbreviation']):

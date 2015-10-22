@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: July 28, 2015
+# Last Change: October 22, 2015
 # URL: https://humanfriendly.readthedocs.org
 
 """
@@ -48,13 +48,8 @@ import functools
 import logging
 import re
 
-# Python 2 / 3 compatibility.
-try:
-    from StringIO import StringIO
-except ImportError:
-    from io import StringIO
-
 # Modules included in our package.
+from humanfriendly.compat import StringIO
 from humanfriendly.text import dedent, join_lines, split_paragraphs, trim_empty_lines
 
 # Compiled regular expression used to tokenize usage messages.
