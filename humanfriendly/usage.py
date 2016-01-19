@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: October 22, 2015
+# Last Change: January 19, 2016
 # URL: https://humanfriendly.readthedocs.org
 
 """
@@ -32,25 +32,28 @@ details.
 .. _reStructuredText: https://en.wikipedia.org/wiki/ReStructuredText
 """
 
-# Public functions that require documentation (PEP-257).
-__all__ = (
-    'find_meta_variables',
-    'format_usage',
-    'import_module',
-    'inject_usage',
-    'parse_usage',
-    'render_usage',
-)
-
 # Standard library modules.
 import csv
 import functools
 import logging
 import re
 
+# Standard library module or external dependency (see setup.py).
+from importlib import import_module
+
 # Modules included in our package.
 from humanfriendly.compat import StringIO
 from humanfriendly.text import dedent, join_lines, split_paragraphs, trim_empty_lines
+
+# Public functions that require documentation (PEP-257).
+__all__ = (
+    'find_meta_variables',
+    'format_usage',
+    'import_module',  # previously exported (backwards compatibility)
+    'inject_usage',
+    'parse_usage',
+    'render_usage',
+)
 
 # Compiled regular expression used to tokenize usage messages.
 USAGE_PATTERN = re.compile(r'''
@@ -263,27 +266,6 @@ def inject_usage(module_name):
     import cog
     usage_text = import_module(module_name).__doc__
     cog.out("\n" + render_usage(usage_text) + "\n\n")
-
-
-def import_module(name):
-    """
-    Simplified version of :func:`importlib.import_module()` (which isn't available in Python 2.6).
-
-    :param name: The of the module to import (a string).
-    :returns: The imported module.
-
-    Uses :func:`__import__()` to import the given module name and zero or more
-    :func:`getattr()` calls to get from the top level module to the nested
-    module (if the given module name contains dots).
-
-    Used by :func:`inject_usage()` to import nested modules in order to extract
-    their usage message.
-    """
-    module = __import__(name)
-    identifiers = name.split('.')[1:]
-    while identifiers:
-        module = getattr(module, identifiers.pop(0))
-    return module
 
 
 def render_paragraph(paragraph, meta_variables):

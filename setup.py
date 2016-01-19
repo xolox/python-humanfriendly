@@ -30,6 +30,11 @@ readme_file = os.path.join(source_directory, 'README.rst')
 with codecs.open(readme_file, 'r', 'utf-8') as handle:
     readme_text = handle.read()
 
+# Conditional importlib dependency for Python 2.6.
+install_requires = []
+if sys.version_info[:2] <= (2, 6) or sys.version_info[:2] == (3, 0):
+    install_requires.append('importlib')
+
 setup(
     name='humanfriendly',
     version=version_string,
@@ -39,6 +44,7 @@ setup(
     author='Peter Odding',
     author_email='peter@peterodding.com',
     packages=find_packages(),
+    install_requires=install_requires,
     entry_points=dict(console_scripts=[
         'humanfriendly = humanfriendly.cli:main'
     ]),

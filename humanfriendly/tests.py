@@ -4,7 +4,7 @@
 # Tests for the `humanfriendly' package.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: October 23, 2015
+# Last Change: January 17, 2016
 # URL: https://humanfriendly.readthedocs.org
 
 """Test suite for the `humanfriendly` package."""
@@ -49,7 +49,6 @@ from humanfriendly.terminal import (
 from humanfriendly.usage import (
     find_meta_variables,
     format_usage,
-    import_module,
     render_usage,
 )
 
@@ -692,13 +691,6 @@ class HumanFriendlyTestCase(unittest.TestCase):
 
                 Don't change anything.
         """) for token in ('`-n`', '`--dry-run`'))
-
-    def test_import_module(self):
-        """Test :func:`humanfriendly.usage.import_module()`."""
-        import humanfriendly
-        assert humanfriendly is import_module('humanfriendly')
-        from humanfriendly import cli
-        assert cli is import_module('humanfriendly.cli')
 
 
 def main(*args, **kw):
