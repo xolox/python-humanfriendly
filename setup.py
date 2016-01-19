@@ -3,43 +3,44 @@
 """Setup script for the `humanfriendly` package."""
 
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: January 17, 2016
+# Last Change: January 19, 2016
 # URL: https://humanfriendly.readthedocs.org
 
 # Standard library modules.
 import codecs
 import os
+import re
 import sys
 
 # De-facto standard solution for Python packaging.
 from setuptools import find_packages, setup
 
-# Find the directory where the source distribution was unpacked.
-source_directory = os.path.dirname(os.path.abspath(__file__))
 
-# Add the directory with the source distribution to the search path.
-sys.path.append(source_directory)
+def get_contents(filename):
+    """Get the contents of a file relative to the source distribution directory."""
+    directory = os.path.dirname(os.path.abspath(__file__))
+    pathname = os.path.join(directory, filename)
+    with codecs.open(pathname, 'r', 'utf-8') as handle:
+        return handle.read()
 
-# Import the module to find the version number (this is safe because we don't
-# have any external dependencies).
-from humanfriendly import __version__ as version_string  # noqa
 
-# Fill in the long description (for the benefit of PyPI)
-# with the contents of README.rst (rendered by GitHub).
-readme_file = os.path.join(source_directory, 'README.rst')
-with codecs.open(readme_file, 'r', 'utf-8') as handle:
-    readme_text = handle.read()
+def get_version(filename):
+    """Extract the version number from a Python module."""
+    contents = get_contents(filename)
+    metadata = dict(re.findall('__([a-z]+)__ = [\'"]([^\'"]+)', contents))
+    return metadata['version']
 
-# Conditional importlib dependency for Python 2.6.
+
+# Conditional importlib dependency for Python 2.6 and 3.0.
 install_requires = []
 if sys.version_info[:2] <= (2, 6) or sys.version_info[:2] == (3, 0):
     install_requires.append('importlib')
 
 setup(
     name='humanfriendly',
-    version=version_string,
+    version=get_version('humanfriendly/__init__.py'),
     description="Human friendly output for text interfaces using Python",
-    long_description=readme_text,
+    long_description=get_contents('README.rst'),
     url='https://humanfriendly.readthedocs.org',
     author='Peter Odding',
     author_email='peter@peterodding.com',
