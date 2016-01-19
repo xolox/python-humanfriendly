@@ -3,7 +3,7 @@
 """Setup script for the `humanfriendly` package."""
 
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: October 22, 2015
+# Last Change: January 17, 2016
 # URL: https://humanfriendly.readthedocs.org
 
 # Standard library modules.
@@ -22,7 +22,7 @@ sys.path.append(source_directory)
 
 # Import the module to find the version number (this is safe because we don't
 # have any external dependencies).
-from humanfriendly import __version__ as version_string
+from humanfriendly import __version__ as version_string  # noqa
 
 # Fill in the long description (for the benefit of PyPI)
 # with the contents of README.rst (rendered by GitHub).

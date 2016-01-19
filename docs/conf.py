@@ -31,7 +31,7 @@ copyright = u'2016, Peter Odding'
 # built documents.
 
 # Find the package version and make it the release.
-from humanfriendly import __version__ as humanfriendly_version
+from humanfriendly import __version__ as humanfriendly_version  # noqa
 
 # The short X.Y version.
 version = '.'.join(humanfriendly_version.split('.')[:2])
