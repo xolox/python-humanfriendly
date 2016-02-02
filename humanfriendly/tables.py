@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: October 23, 2015
+# Last Change: January 29, 2016
 # URL: https://humanfriendly.readthedocs.org
 
 """
@@ -23,12 +23,6 @@ Some generic notes about the table formatting functions in this module:
   highlight deviations from the norm in an overview of calculated values).
 """
 
-__all__ = (
-    'format_pretty_table',
-    'format_robust_table',
-    'format_smart_table',
-)
-
 # Standard library modules.
 import collections
 import re
@@ -42,6 +36,12 @@ from humanfriendly.terminal import (
     terminal_supports_colors,
     find_terminal_size,
     HIGHLIGHT_COLOR,
+)
+
+__all__ = (
+    'format_pretty_table',
+    'format_robust_table',
+    'format_smart_table',
 )
 
 # Compiled regular expression pattern to recognize table columns containing

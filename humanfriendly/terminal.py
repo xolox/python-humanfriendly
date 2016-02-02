@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: October 23, 2015
+# Last Change: January 29, 2016
 # URL: https://humanfriendly.readthedocs.org
 
 """
@@ -258,9 +258,9 @@ def terminal_supports_colors(stream=None):
     `django.core.management.color.supports_color()
     <https://github.com/django/django/blob/master/django/core/management/color.py>`_.
     """
-    return (sys.platform != 'Pocket PC'
-            and (sys.platform != 'win32' or 'ANSICON' in os.environ)
-            and connected_to_terminal(stream))
+    return (sys.platform != 'Pocket PC' and
+            (sys.platform != 'win32' or 'ANSICON' in os.environ) and
+            connected_to_terminal(stream))
 
 
 def find_terminal_size():
