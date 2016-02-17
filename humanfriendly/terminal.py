@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: January 29, 2016
+# Last Change: February 17, 2016
 # URL: https://humanfriendly.readthedocs.org
 
 """
@@ -85,11 +85,11 @@ def message(*args, **kw):
     """
     Show an informational message on the terminal.
 
-    :param args: Any position arguments are passed on to :func:`format()`.
-    :param kw: Any keyword arguments are passed on to :func:`format()`.
+    :param args: Any position arguments are passed on to :func:`~humanfriendly.text.format()`.
+    :param kw: Any keyword arguments are passed on to :func:`~humanfriendly.text.format()`.
 
-    Renders the message using :func:`format()` and writes the resulting
-    string to :data:`sys.stderr` (followed by a newline).
+    Renders the message using :func:`~humanfriendly.text.format()` and writes
+    the resulting string to :data:`sys.stderr` (followed by a newline).
     """
     sys.stderr.write(format(*args, **kw) + '\n')
 
@@ -98,13 +98,14 @@ def warning(*args, **kw):
     """
     Show a warning message on the terminal.
 
-    :param args: Any position arguments are passed on to :func:`format()`.
-    :param kw: Any keyword arguments are passed on to :func:`format()`.
+    :param args: Any position arguments are passed on to :func:`~humanfriendly.text.format()`.
+    :param kw: Any keyword arguments are passed on to :func:`~humanfriendly.text.format()`.
 
-    Renders the message using :func:`format()` and writes the resulting string
-    to :data:`sys.stderr` (followed by a newline). If :data:`sys.stderr` is
-    connected to a terminal :func:`ansi_wrap()` is used to color the message in
-    a red font (to make the warning stand out from surrounding text).
+    Renders the message using :func:`~humanfriendly.text.format()` and writes
+    the resulting string to :data:`sys.stderr` (followed by a newline). If
+    :data:`sys.stderr` is connected to a terminal :func:`ansi_wrap()` is used
+    to color the message in a red font (to make the warning stand out from
+    surrounding text).
     """
     text = format(*args, **kw)
     if terminal_supports_colors(sys.stderr):

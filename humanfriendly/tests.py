@@ -4,7 +4,7 @@
 # Tests for the `humanfriendly' package.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: January 17, 2016
+# Last Change: February 17, 2016
 # URL: https://humanfriendly.readthedocs.org
 
 """Test suite for the `humanfriendly` package."""
@@ -21,13 +21,18 @@ import unittest
 # Modules included in our package.
 import humanfriendly
 from humanfriendly import cli, prompts
-from humanfriendly import compact, dedent
+from humanfriendly import compact, dedent, trim_empty_lines
 from humanfriendly.compat import StringIO
 from humanfriendly.prompts import (
     TooManyInvalidReplies,
     prompt_for_confirmation,
     prompt_for_choice,
     prompt_for_input,
+)
+from humanfriendly.sphinx import (
+    setup,
+    special_methods_callback,
+    usage_message_callback,
 )
 from humanfriendly.tables import (
     format_pretty_table,
@@ -691,6 +696,64 @@ class HumanFriendlyTestCase(unittest.TestCase):
 
                 Don't change anything.
         """) for token in ('`-n`', '`--dry-run`'))
+
+    def test_sphinx_customizations(self):
+        """Tests for the :mod:`humanfriendly.sphinx` module."""
+        class FakeApp(object):
+
+            def __init__(self):
+                self.callbacks = {}
+
+            def __documented_special_method__(self):
+                """This "unofficial" special method is documented."""
+
+            def __undocumented_special_method__(self):
+                pass  # Intentionally not documented :-).
+
+            def connect(self, event, callback):
+                self.callbacks.setdefault(event, []).append(callback)
+
+            def bogus_usage(self):
+                """Usage: This is not supposed to be reformatted!"""
+
+        # Test event callback registration.
+        fake_app = FakeApp()
+        setup(fake_app)
+        assert special_methods_callback in fake_app.callbacks['autodoc-skip-member']
+        assert usage_message_callback in fake_app.callbacks['autodoc-process-docstring']
+        # Test that `special methods' which are documented aren't skipped.
+        assert special_methods_callback(
+            app=None, what=None, name=None,
+            obj=FakeApp.__documented_special_method__,
+            skip=True, options=None,
+        ) is False
+        # Test that `special methods' which are undocumented are skipped.
+        assert special_methods_callback(
+            app=None, what=None, name=None,
+            obj=FakeApp.__undocumented_special_method__,
+            skip=True, options=None,
+        ) is True
+        # Test formatting of usage messages. obj/lines
+        from humanfriendly import cli, sphinx
+        # We expect the docstring in the `cli' module to be reformatted
+        # (because it contains a usage message in the expected format).
+        assert self.docstring_is_reformatted(cli)
+        # We don't expect the docstring in the `sphinx' module to be
+        # reformatted (because it doesn't contain a usage message).
+        assert not self.docstring_is_reformatted(sphinx)
+        # We don't expect the docstring of the following *method* to be
+        # reformatted because only *module* docstrings should be reformatted.
+        assert not self.docstring_is_reformatted(fake_app.bogus_usage)
+
+    def docstring_is_reformatted(self, entity):
+        """Check whether :func:`.usage_message_callback()` reformats a module's docstring."""
+        lines = trim_empty_lines(entity.__doc__).splitlines()
+        saved_lines = list(lines)
+        usage_message_callback(
+            app=None, what=None, name=None,
+            obj=entity, options=None, lines=lines,
+        )
+        return lines != saved_lines
 
 
 def main(*args, **kw):

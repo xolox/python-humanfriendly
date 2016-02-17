@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: January 19, 2016
+# Last Change: February 2, 2016
 # URL: https://humanfriendly.readthedocs.org
 
 """
@@ -45,7 +45,7 @@ from importlib import import_module
 from humanfriendly.compat import StringIO
 from humanfriendly.text import dedent, join_lines, split_paragraphs, trim_empty_lines
 
-# Public functions that require documentation (PEP-257).
+# Public identifiers that require documentation (PEP-257).
 __all__ = (
     'find_meta_variables',
     'format_usage',
@@ -53,7 +53,11 @@ __all__ = (
     'inject_usage',
     'parse_usage',
     'render_usage',
+    'USAGE_MARKER',
 )
+
+USAGE_MARKER = "Usage:"
+"""The string that starts the first line of a usage message."""
 
 # Compiled regular expression used to tokenize usage messages.
 USAGE_PATTERN = re.compile(r'''
@@ -105,7 +109,7 @@ def format_usage(usage_text):
     formatted_lines = []
     meta_variables = find_meta_variables(usage_text)
     for line in usage_text.strip().splitlines(True):
-        if line.startswith('Usage:'):
+        if line.startswith(USAGE_MARKER):
             # Highlight the "Usage: ..." line in bold font and color.
             formatted_lines.append(ansi_wrap(line, color=HIGHLIGHT_COLOR))
         else:
@@ -271,7 +275,7 @@ def inject_usage(module_name):
 def render_paragraph(paragraph, meta_variables):
     # Reformat the "Usage:" line to highlight "Usage:" in bold and show the
     # remainder of the line as pre-formatted text.
-    if paragraph.startswith('Usage:'):
+    if paragraph.startswith(USAGE_MARKER):
         tokens = paragraph.split()
         return "**%s** `%s`" % (tokens[0], ' '.join(tokens[1:]))
     # Reformat the "Supported options:" line to highlight it in bold.

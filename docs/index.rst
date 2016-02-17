@@ -36,6 +36,12 @@ The :mod:`humanfriendly` module
 .. automodule:: humanfriendly
    :members:
 
+The :mod:`humanfriendly.cli` module
+-----------------------------------
+
+.. automodule:: humanfriendly.cli
+   :members:
+
 The :mod:`humanfriendly.compat` module
 --------------------------------------
 
@@ -46,6 +52,12 @@ The :mod:`humanfriendly.prompts` module
 ---------------------------------------
 
 .. automodule:: humanfriendly.prompts
+   :members:
+
+The :mod:`humanfriendly.sphinx` module
+--------------------------------------
+
+.. automodule:: humanfriendly.sphinx
    :members:
 
 The :mod:`humanfriendly.text` module
