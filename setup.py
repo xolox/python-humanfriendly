@@ -3,7 +3,7 @@
 """Setup script for the `humanfriendly` package."""
 
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: January 19, 2016
+# Last Change: February 17, 2016
 # URL: https://humanfriendly.readthedocs.org
 
 # Standard library modules.
@@ -67,6 +67,7 @@ setup(
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
         'Topic :: Communications',
         'Topic :: Scientific/Engineering :: Human Machine Interfaces',
         'Topic :: Software Development',
