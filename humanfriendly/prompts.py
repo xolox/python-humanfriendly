@@ -3,7 +3,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: October 23, 2015
+# Last Change: February 18, 2016
 # URL: https://humanfriendly.readthedocs.org
 
 """
@@ -188,7 +188,7 @@ def prompt_for_choice(choices, default=None, padding=True):
             lower_choice = choice.lower()
             if lower_reply == lower_choice:
                 # If we have an 'exact' match we return it immediately.
-                logger.debug("Option (%r) selected by reply (exact match).", choice, reply)
+                logger.debug("Option (%r) selected by reply (exact match).", choice)
                 return choice
             elif lower_reply in lower_choice and len(lower_reply) > 0:
                 # Otherwise we gather substring matches.
