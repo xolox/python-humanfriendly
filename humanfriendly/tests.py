@@ -4,7 +4,7 @@
 # Tests for the `humanfriendly' package.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: February 17, 2016
+# Last Change: February 18, 2016
 # URL: https://humanfriendly.readthedocs.org
 
 """Test suite for the `humanfriendly` package."""
@@ -698,23 +698,26 @@ class HumanFriendlyTestCase(unittest.TestCase):
         """) for token in ('`-n`', '`--dry-run`'))
 
     def test_sphinx_customizations(self):
-        """Tests for the :mod:`humanfriendly.sphinx` module."""
+        """Test the :mod:`humanfriendly.sphinx` module."""
         class FakeApp(object):
 
             def __init__(self):
                 self.callbacks = {}
 
             def __documented_special_method__(self):
-                """This "unofficial" special method is documented."""
+                """Documented unofficial special method."""
+                pass
 
             def __undocumented_special_method__(self):
-                pass  # Intentionally not documented :-).
+                # Intentionally not documented :-).
+                pass
 
             def connect(self, event, callback):
                 self.callbacks.setdefault(event, []).append(callback)
 
             def bogus_usage(self):
                 """Usage: This is not supposed to be reformatted!"""
+                pass
 
         # Test event callback registration.
         fake_app = FakeApp()
