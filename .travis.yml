@@ -10,6 +10,7 @@ install:
   - pip install --requirement=requirements-flake8.txt
   - pip install 'coverage >= 4.0a5'
   - pip install 'coveralls >= 1.0a2'
+  - python -c 'import setuptools; print("Setuptools version:", setuptools.__version__)'
   - LC_ALL=C pip install .
 script:
   - make check
