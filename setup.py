@@ -31,10 +31,31 @@ def get_version(filename):
     return metadata['version']
 
 
-# Conditional importlib dependency for Python 2.6 and 3.0.
+def have_environment_marker_support():
+    """
+    Check whether setuptools has support for PEP-426 environment marker support.
+
+    Based on the ``setup.py`` script of the ``pytest`` package:
+    https://bitbucket.org/pytest-dev/pytest/src/default/setup.py
+    """
+    try:
+        from pkg_resources import parse_version
+        from setuptools import __version__
+        return parse_version(__version__) >= parse_version('0.7.2')
+    except Exception:
+        return False
+
+# Conditional importlib dependency for Python 2.6 and 3.0 when creating a source distribution.
 install_requires = []
-if sys.version_info[:2] <= (2, 6) or sys.version_info[:2] == (3, 0):
-    install_requires.append('importlib')
+if 'bdist_wheel' not in sys.argv:
+    if sys.version_info[:2] <= (2, 6) or sys.version_info[:2] == (3, 0):
+        install_requires.append('importlib')
+
+# Conditional importlib dependency for Python 2.6 and 3.0 when creating a wheel distribution.
+extras_require = {}
+if have_environment_marker_support():
+    extras_require[':python_version <= "2.6" or python_version == "3.0"'] = ['importlib']
+
 
 setup(
     name='humanfriendly',
@@ -46,6 +67,7 @@ setup(
     author_email='peter@peterodding.com',
     packages=find_packages(),
     install_requires=install_requires,
+    extras_require=extras_require,
     entry_points=dict(console_scripts=[
         'humanfriendly = humanfriendly.cli:main'
     ]),
