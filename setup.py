@@ -3,7 +3,7 @@
 """Setup script for the `humanfriendly` package."""
 
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: February 17, 2016
+# Last Change: February 20, 2016
 # URL: https://humanfriendly.readthedocs.org
 
 # Standard library modules.
@@ -57,6 +57,7 @@ setup(
     classifiers=[
         'Development Status :: 6 - Mature',
         'Environment :: Console',
+        'Framework :: Sphinx :: Extension',
         'Intended Audience :: Developers',
         'Intended Audience :: System Administrators',
         'License :: OSI Approved :: MIT License',
