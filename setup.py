@@ -54,7 +54,7 @@ if 'bdist_wheel' not in sys.argv:
 # Conditional importlib dependency for Python 2.6 and 3.0 when creating a wheel distribution.
 extras_require = {}
 if have_environment_marker_support():
-    extras_require[':python_version <= "2.6" or python_version == "3.0"'] = ['importlib']
+    extras_require[':python_version == "2.6" or python_version == "3.0"'] = ['importlib']
 
 
 setup(
