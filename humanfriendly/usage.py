@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: February 2, 2016
+# Last Change: March 15, 2016
 # URL: https://humanfriendly.readthedocs.org
 
 """
@@ -80,7 +80,7 @@ USAGE_PATTERN = re.compile(r'''
 ''', re.VERBOSE)
 
 # Compiled regular expression to recognize lines that define options.
-OPTION_PATTERN = re.compile('(^\s+-{1,2}\w.*$)', re.MULTILINE)
+OPTION_PATTERN = re.compile('(^\s{0,2}-{1,2}\w.*$)', re.MULTILINE)
 
 # Initialize a logger for this module.
 logger = logging.getLogger(__name__)
