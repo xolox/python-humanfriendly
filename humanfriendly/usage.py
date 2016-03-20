@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: March 15, 2016
+# Last Change: March 20, 2016
 # URL: https://humanfriendly.readthedocs.org
 
 """
@@ -43,7 +43,7 @@ from importlib import import_module
 
 # Modules included in our package.
 from humanfriendly.compat import StringIO
-from humanfriendly.text import dedent, join_lines, split_paragraphs, trim_empty_lines
+from humanfriendly.text import dedent, join_lines, split, split_paragraphs, trim_empty_lines
 
 # Public identifiers that require documentation (PEP-257).
 __all__ = (
@@ -58,6 +58,9 @@ __all__ = (
 
 USAGE_MARKER = "Usage:"
 """The string that starts the first line of a usage message."""
+
+START_OF_OPTIONS_MARKER = "Supported options:"
+"""The string that marks the start of the documented command line options."""
 
 # Compiled regular expression used to tokenize usage messages.
 USAGE_PATTERN = re.compile(r'''
@@ -79,8 +82,8 @@ USAGE_PATTERN = re.compile(r'''
     )
 ''', re.VERBOSE)
 
-# Compiled regular expression to recognize lines that define options.
-OPTION_PATTERN = re.compile('(^\s{0,2}-{1,2}\w.*$)', re.MULTILINE)
+# Compiled regular expression used to recognize options.
+OPTION_PATTERN = re.compile(r'^(-\w|--\w+(-\w+)*(=\S+)?)$')
 
 # Initialize a logger for this module.
 logger = logging.getLogger(__name__)
@@ -167,8 +170,9 @@ def parse_usage(text):
     - The usage message starts with a line ``Usage: ...`` that shows a symbolic
       representation of the way the program is to be invoked.
 
-    - After some free form text a line ``Supported options:`` precedes the
-      documentation of the supported command line options.
+    - After some free form text a line ``Supported options:`` (surrounded by
+      empty lines) precedes the documentation of the supported command line
+      options.
 
     - The command line options are documented as follows::
 
@@ -191,16 +195,37 @@ def parse_usage(text):
       Feel free to request more detailed documentation if you're interested in
       using the :mod:`humanfriendly.usage` module outside of the little ecosystem
       of Python packages that I have been building over the past years.
-
     """
-    # Split the raw usage message on lines that introduce a new command line option.
-    chunks = [dedent(c) for c in re.split(OPTION_PATTERN, text) if c and not c.isspace()]
-    # Split the introduction (the text before any options) into one or more paragraphs.
-    introduction = [join_lines(p) for p in split_paragraphs(chunks.pop(0))]
-    # Should someone need to easily debug the parsing performed here.
+    introduction = []
+    documented_options = []
+    # Split the raw usage message into paragraphs.
+    paragraphs = split_paragraphs(text)
+    # Get the paragraphs that are part of the introduction.
+    while paragraphs:
+        # Check whether we've found the end of the introduction.
+        end_of_intro = (paragraphs[0] == START_OF_OPTIONS_MARKER)
+        # Append the current paragraph to the introduction.
+        introduction.append(join_lines(paragraphs.pop(0)))
+        # Stop after we've processed the complete introduction.
+        if end_of_intro:
+            break
     logger.debug("Parsed introduction: %s", introduction)
-    logger.debug("Parsed options: %s", chunks)
-    return introduction, chunks
+    # Parse the paragraphs that document command line options.
+    while paragraphs:
+        documented_options.append(dedent(paragraphs.pop(0)))
+        description = []
+        while paragraphs:
+            # Check if the next paragraph starts the documentation of another
+            # command line option.
+            if all(OPTION_PATTERN.match(t) for t in split(paragraphs[0])):
+                break
+            else:
+                description.append(paragraphs.pop(0))
+        # Join the description's paragraphs back together so we can remove
+        # common leading indentation.
+        documented_options.append(dedent('\n\n'.join(description)))
+    logger.debug("Parsed options: %s", documented_options)
+    return introduction, documented_options
 
 
 def render_usage(text):

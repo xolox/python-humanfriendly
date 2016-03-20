@@ -4,7 +4,7 @@
 # Tests for the `humanfriendly' package.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: February 18, 2016
+# Last Change: March 20, 2016
 # URL: https://humanfriendly.readthedocs.org
 
 """Test suite for the `humanfriendly` package."""
@@ -54,6 +54,7 @@ from humanfriendly.terminal import (
 from humanfriendly.usage import (
     find_meta_variables,
     format_usage,
+    parse_usage,
     render_usage,
 )
 
@@ -652,6 +653,64 @@ class HumanFriendlyTestCase(unittest.TestCase):
             A final example: --format-timespan=SECONDS
             This line doesn't contain a META variable.
         """)) == sorted(['VALUE', 'BYTES', 'SECONDS'])
+
+    def test_parse_usage_simple(self):
+        """Test :func:`humanfriendly.usage.parse_usage()` (a simple case)."""
+        introduction, options = self.preprocess_parse_result("""
+            Usage: my-fancy-app [OPTIONS]
+
+            Boring description.
+
+            Supported options:
+
+              -h, --help
+
+                Show this message and exit.
+        """)
+        # The following fragments are (expected to be) part of the introduction.
+        assert "Usage: my-fancy-app [OPTIONS]" in introduction
+        assert "Boring description." in introduction
+        assert "Supported options:" in introduction
+        # The following fragments are (expected to be) part of the documented options.
+        assert "-h, --help" in options
+        assert "Show this message and exit." in options
+
+    def test_parse_usage_tricky(self):
+        """Test :func:`humanfriendly.usage.parse_usage()` (a tricky case)."""
+        introduction, options = self.preprocess_parse_result("""
+            Usage: my-fancy-app [OPTIONS]
+
+            Here's the introduction to my-fancy-app. Some of the lines in the
+            introduction start with a command line option just to confuse the
+            parsing algorithm :-)
+
+            For example
+            --an-awesome-option
+            is still part of the introduction.
+
+            Supported options:
+
+              -a, --an-awesome-option
+
+                Explanation why this is an awesome option.
+
+              -b, --a-boring-option
+
+                Explanation why this is a boring option.
+        """)
+        # The following fragments are (expected to be) part of the introduction.
+        assert "Usage: my-fancy-app [OPTIONS]" in introduction
+        assert any('still part of the introduction' in p for p in introduction)
+        assert "Supported options:" in introduction
+        # The following fragments are (expected to be) part of the documented options.
+        assert "-a, --an-awesome-option" in options
+        assert "Explanation why this is an awesome option." in options
+        assert "-b, --a-boring-option" in options
+        assert "Explanation why this is a boring option." in options
+
+    def preprocess_parse_result(self, text):
+        """Ignore leading/trailing whitespace in usage parsing tests."""
+        return tuple([p.strip() for p in r] for r in parse_usage(dedent(text)))
 
     def test_format_usage(self):
         """Test :func:`humanfriendly.usage.format_usage()`."""
