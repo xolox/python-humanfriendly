@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: October 22, 2015
+# Last Change: April 21, 2016
 # URL: https://humanfriendly.readthedocs.org
 
 """
@@ -240,7 +240,7 @@ def join_lines(text):
     break :func:`join_lines()` (in that case you can use :func:`dedent()`
     before calling :func:`join_lines()`).
     """
-    return re.sub(r'(\S)\n(\S)', r'\1 \2', text).strip()
+    return re.sub(r'(\S)\n(\S)', r'\1 \2', text)
 
 
 def pluralize(count, singular, plural=None):

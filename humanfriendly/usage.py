@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: March 20, 2016
+# Last Change: April 21, 2016
 # URL: https://humanfriendly.readthedocs.org
 
 """
@@ -307,7 +307,7 @@ def render_paragraph(paragraph, meta_variables):
     if paragraph == 'Supported options:':
         return "**%s**" % paragraph
     # Reformat shell transcripts into code blocks.
-    if re.match(r'^\$\s+\S', paragraph):
+    if re.match(r'^\s*\$\s+\S', paragraph):
         lines = ['   %s' % line for line in paragraph.splitlines()]
         lines.insert(0, '.. code-block:: sh')
         lines.insert(1, '')
