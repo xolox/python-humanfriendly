@@ -4,7 +4,7 @@
 # Tests for the `humanfriendly' package.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: March 20, 2016
+# Last Change: April 21, 2016
 # URL: https://humanfriendly.readthedocs.org
 
 """Test suite for the `humanfriendly` package."""
@@ -748,13 +748,13 @@ class HumanFriendlyTestCase(unittest.TestCase):
               $ echo test
               test
         """))
-        assert all(token in render_usage("""
+        assert all(token in render_usage(dedent("""
             Supported options:
 
               -n, --dry-run
 
                 Don't change anything.
-        """) for token in ('`-n`', '`--dry-run`'))
+        """)) for token in ('`-n`', '`--dry-run`'))
 
     def test_sphinx_customizations(self):
         """Test the :mod:`humanfriendly.sphinx` module."""

@@ -308,17 +308,29 @@ def render_paragraph(paragraph, meta_variables):
         return "**%s**" % paragraph
     # Reformat shell transcripts into code blocks.
     if re.match(r'^\s*\$\s+\S', paragraph):
-        lines = ['   %s' % line for line in paragraph.splitlines()]
+        # Split the paragraph into lines.
+        lines = paragraph.splitlines()
+        # Check if the paragraph is already indented.
+        if not paragraph[0].isspace():
+            # If the paragraph isn't already indented we'll indent it now.
+            lines = ['  %s' % line for line in lines]
         lines.insert(0, '.. code-block:: sh')
         lines.insert(1, '')
         return "\n".join(lines)
-    # Change `quoting' so it doesn't trip up DocUtils.
-    paragraph = re.sub("`(.+?)'", r'"\1"', paragraph)
-    # Escape asterisks.
-    paragraph = paragraph.replace('*', r'\*')
-    # Reformat inline tokens.
-    return replace_special_tokens(paragraph, meta_variables,
-                                  lambda token: '``%s``' % token)
+    # The following reformatting applies only to paragraphs which are not
+    # indented. Yes this is a hack - for now we assume that indented paragraphs
+    # are code blocks, even though this assumption can be wrong.
+    if not paragraph[0].isspace():
+        # Change UNIX style `quoting' so it doesn't trip up DocUtils.
+        paragraph = re.sub("`(.+?)'", r'"\1"', paragraph)
+        # Escape asterisks.
+        paragraph = paragraph.replace('*', r'\*')
+        # Reformat inline tokens.
+        paragraph = replace_special_tokens(
+            paragraph, meta_variables,
+            lambda token: '``%s``' % token,
+        )
+    return paragraph
 
 
 def replace_special_tokens(text, meta_variables, replace_fn):
