@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: April 21, 2016
+# Last Change: June 29, 2016
 # URL: https://humanfriendly.readthedocs.org
 
 """The main module of the `humanfriendly` package."""
@@ -58,6 +58,14 @@ disk_size_units = (dict(prefix='b', divider=1, singular='byte', plural='bytes'),
                    dict(prefix='t', divider=1024**4, singular='TB', plural='TB'),
                    dict(prefix='p', divider=1024**5, singular='PB', plural='PB'))
 
+# Common disk size units based on IEEE 1541.
+disk_size_units_ieee = (dict(prefix='b', divider=1, singular='byte', plural='bytes'),
+                        dict(prefix='k', divider=1000**1, singular='KB', plural='KB'),
+                        dict(prefix='m', divider=1000**2, singular='MB', plural='MB'),
+                        dict(prefix='g', divider=1000**3, singular='GB', plural='GB'),
+                        dict(prefix='t', divider=1000**4, singular='TB', plural='TB'),
+                        dict(prefix='p', divider=1000**5, singular='PB', plural='PB'))
+
 # Common length size units, used for formatting and parsing.
 length_size_units = (dict(prefix='nm', divider=1e-09, singular='nm', plural='nm'),
                      dict(prefix='mm', divider=1e-03, singular='mm', plural='mm'),
@@ -103,7 +111,7 @@ def coerce_boolean(value):
         return bool(value)
 
 
-def format_size(num_bytes, keep_width=False):
+def format_size(num_bytes, keep_width=False, correct=False):
     """
     Format a byte count as a human readable file size.
 
@@ -127,15 +135,20 @@ def format_size(num_bytes, keep_width=False):
     '1 MB'
     >>> format_size(1024 ** 3 * 4)
     '4 GB'
+    >>> format_size(1000 ** 3 * 4, correct=True)
+    '4 GB'
     """
-    for unit in reversed(disk_size_units):
+    units = disk_size_units
+    if correct:
+        units = disk_size_units_ieee
+    for unit in reversed(units):
         if num_bytes >= unit['divider']:
             number = round_number(float(num_bytes) / unit['divider'], keep_width=keep_width)
             return pluralize(number, unit['singular'], unit['plural'])
     return pluralize(num_bytes, 'byte')
 
 
-def parse_size(size):
+def parse_size(size, correct=False):
     """
     Parse a human readable data size and return the number of bytes.
 
@@ -154,6 +167,8 @@ def parse_size(size):
     5120
     >>> parse_size('1.5 GB')
     1610612736
+    >>> parse_size('1.5 GB', correct=True)
+    1500000000
     """
     tokens = tokenize(size)
     if tokens and isinstance(tokens[0], numbers.Number):
@@ -164,7 +179,10 @@ def parse_size(size):
         if len(tokens) == 2 and is_string(tokens[1]):
             normalized_unit = tokens[1].lower()
             # Try to match the first letter of the unit.
-            for unit in disk_size_units:
+            units = disk_size_units
+            if correct:
+                units = disk_size_units_ieee
+            for unit in units:
                 if normalized_unit.startswith(unit['prefix']):
                     return int(tokens[0] * unit['divider'])
     # We failed to parse the size specification.
