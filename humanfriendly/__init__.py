@@ -69,10 +69,10 @@ length_size_units = (dict(prefix='nm', divider=1e-09, singular='nm', plural='nm'
 time_units = (dict(divider=1e-3, singular='millisecond', plural='milliseconds', abbreviation='ms'),
               dict(divider=1, singular='second', plural='seconds', abbreviation='s'),
               dict(divider=60, singular='minute', plural='minutes', abbreviation='m'),
-              dict(divider=60*60, singular='hour', plural='hours', abbreviation='h'),
-              dict(divider=60*60*24, singular='day', plural='days', abbreviation='d'),
-              dict(divider=60*60*24*7, singular='week', plural='weeks', abbreviation='w'),
-              dict(divider=60*60*24*7*52, singular='year', plural='years', abbreviation='y'))
+              dict(divider=60 * 60, singular='hour', plural='hours', abbreviation='h'),
+              dict(divider=60 * 60 * 24, singular='day', plural='days', abbreviation='d'),
+              dict(divider=60 * 60 * 24 * 7, singular='week', plural='weeks', abbreviation='w'),
+              dict(divider=60 * 60 * 24 * 7 * 52, singular='year', plural='years', abbreviation='y'))
 
 
 def coerce_boolean(value):
@@ -737,7 +737,7 @@ class Spinner(object):
                 if not label:
                     raise Exception("No label set for spinner!")
                 elif self.total and progress:
-                    label = "%s: %.2f%%" % (label, progress/(self.total/100.0))
+                    label = "%s: %.2f%%" % (label, progress / (self.total / 100.0))
                 elif self.timer and self.timer.elapsed_time > 2:
                     label = "%s (%s)" % (label, self.timer.rounded)
                 self.stream.write("%s %s %s ..\r" % (erase_line_code, state, label))

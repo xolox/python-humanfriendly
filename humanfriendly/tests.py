@@ -4,7 +4,7 @@
 # Tests for the `humanfriendly' package.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: August 8, 2016
+# Last Change: September 28, 2016
 # URL: https://humanfriendly.readthedocs.org
 
 """Test suite for the `humanfriendly` package."""
@@ -140,7 +140,7 @@ class HumanFriendlyTestCase(unittest.TestCase):
         self.assertEqual('1 year', humanfriendly.format_timespan(year))
         self.assertEqual('2 years', humanfriendly.format_timespan(year * 2))
         self.assertEqual('6 years, 5 weeks, 4 days, 3 hours, 2 minutes and 500 milliseconds',
-                         humanfriendly.format_timespan(year*6 + week*5 + day*4 + hour*3 + minute*2 + 0.5,
+                         humanfriendly.format_timespan(year * 6 + week * 5 + day * 4 + hour * 3 + minute * 2 + 0.5,
                                                        detailed=True))
         self.assertEqual(
             '1 year, 2 weeks and 3 days',
@@ -156,14 +156,14 @@ class HumanFriendlyTestCase(unittest.TestCase):
         self.assertEqual(0.5, humanfriendly.parse_timespan('0.5 seconds'))
         self.assertEqual(5, humanfriendly.parse_timespan('5s'))
         self.assertEqual(5, humanfriendly.parse_timespan('5 seconds'))
-        self.assertEqual(60*2, humanfriendly.parse_timespan('2m'))
-        self.assertEqual(60*2, humanfriendly.parse_timespan('2 minutes'))
-        self.assertEqual(60*60*3, humanfriendly.parse_timespan('3 h'))
-        self.assertEqual(60*60*3, humanfriendly.parse_timespan('3 hours'))
-        self.assertEqual(60*60*24*4, humanfriendly.parse_timespan('4d'))
-        self.assertEqual(60*60*24*4, humanfriendly.parse_timespan('4 days'))
-        self.assertEqual(60*60*24*7*5, humanfriendly.parse_timespan('5 w'))
-        self.assertEqual(60*60*24*7*5, humanfriendly.parse_timespan('5 weeks'))
+        self.assertEqual(60 * 2, humanfriendly.parse_timespan('2m'))
+        self.assertEqual(60 * 2, humanfriendly.parse_timespan('2 minutes'))
+        self.assertEqual(60 * 60 * 3, humanfriendly.parse_timespan('3 h'))
+        self.assertEqual(60 * 60 * 3, humanfriendly.parse_timespan('3 hours'))
+        self.assertEqual(60 * 60 * 24 * 4, humanfriendly.parse_timespan('4d'))
+        self.assertEqual(60 * 60 * 24 * 4, humanfriendly.parse_timespan('4 days'))
+        self.assertEqual(60 * 60 * 24 * 7 * 5, humanfriendly.parse_timespan('5 w'))
+        self.assertEqual(60 * 60 * 24 * 7 * 5, humanfriendly.parse_timespan('5 weeks'))
         self.assertRaises(humanfriendly.InvalidTimespan, humanfriendly.parse_timespan, '1z')
 
     def test_parse_date(self):
@@ -370,13 +370,13 @@ class HumanFriendlyTestCase(unittest.TestCase):
         for seconds, text in ((1, '1 second'),
                               (2, '2 seconds'),
                               (60, '1 minute'),
-                              (60*2, '2 minutes'),
-                              (60*60, '1 hour'),
-                              (60*60*2, '2 hours'),
-                              (60*60*24, '1 day'),
-                              (60*60*24*2, '2 days'),
-                              (60*60*24*7, '1 week'),
-                              (60*60*24*7*2, '2 weeks')):
+                              (60 * 2, '2 minutes'),
+                              (60 * 60, '1 hour'),
+                              (60 * 60 * 2, '2 hours'),
+                              (60 * 60 * 24, '1 day'),
+                              (60 * 60 * 24 * 2, '2 days'),
+                              (60 * 60 * 24 * 7, '1 week'),
+                              (60 * 60 * 24 * 7 * 2, '2 weeks')):
             t = humanfriendly.Timer(time.time() - seconds)
             self.assertEqual(humanfriendly.round_number(t.elapsed_time, keep_width=True), '%i.00' % seconds)
             self.assertEqual(str(t), text)
@@ -525,7 +525,7 @@ class HumanFriendlyTestCase(unittest.TestCase):
         returncode, output = main('--format-number=1234567')
         assert output.strip() == '1,234,567'
         # Test `humanfriendly --format-size'.
-        random_byte_count = random.randint(1024, 1024*1024)
+        random_byte_count = random.randint(1024, 1024 * 1024)
         returncode, output = main('--format-size=%i' % random_byte_count)
         assert output.strip() == humanfriendly.format_size(random_byte_count)
         # Test `humanfriendly --format-table'.

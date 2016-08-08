@@ -1,0 +1,4 @@
+# Test suite requirements.
+capturer >= 2.1
+coloredlogs >= 2.0
+pytest
