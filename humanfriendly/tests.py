@@ -4,7 +4,7 @@
 # Tests for the `humanfriendly' package.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: April 21, 2016
+# Last Change: August 8, 2016
 # URL: https://humanfriendly.readthedocs.org
 
 """Test suite for the `humanfriendly` package."""
@@ -14,6 +14,7 @@ import logging
 import math
 import os
 import random
+import string
 import sys
 import time
 import unittest
@@ -49,6 +50,7 @@ from humanfriendly.terminal import (
     ansi_wrap,
     connected_to_terminal,
     find_terminal_size,
+    show_pager,
     terminal_supports_colors,
 )
 from humanfriendly.usage import (
@@ -626,6 +628,28 @@ class HumanFriendlyTestCase(unittest.TestCase):
         """Test :func:`humanfriendly.terminal.connected_to_terminal()`."""
         self.check_terminal_capabilities(connected_to_terminal)
 
+    def test_show_pager(self):
+        """Test :func:`humanfriendly.terminal.show_pager()`."""
+        original_pager = os.environ.get('PAGER', None)
+        try:
+            # We specifically avoid `less' because it would become awkward to
+            # run the test suite in an interactive terminal :-).
+            os.environ['PAGER'] = 'cat'
+            # Generate a significant amount of random text spread over multiple
+            # lines that we expect to be reported literally on the terminal.
+            random_text = "\n".join(random_string(25) for i in range(50))
+            # Run the pager command and validate the output.
+            with CaptureOutput() as capturer:
+                show_pager(random_text)
+                assert random_text in capturer.get_text()
+        finally:
+            if original_pager is not None:
+                # Restore the original $PAGER value.
+                os.environ['PAGER'] = original_pager
+            else:
+                # Clear the custom $PAGER value.
+                os.environ.pop('PAGER')
+
     def test_terminal_supports_colors(self):
         """Test :func:`humanfriendly.terminal.terminal_supports_colors()`."""
         self.check_terminal_capabilities(terminal_supports_colors)
@@ -848,6 +872,11 @@ def normalize_timestamp(value, ndigits=1):
     multitasking, processor scheduling, etc.
     """
     return '%.2f' % round(float(value), ndigits=ndigits)
+
+
+def random_string(length=25):
+    """Generate a random string."""
+    return ''.join(random.choice(string.ascii_letters) for i in range(length))
 
 
 class PatchedAttribute(object):
