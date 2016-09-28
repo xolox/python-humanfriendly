@@ -190,6 +190,10 @@ class HumanFriendlyTestCase(unittest.TestCase):
         self.assertEqual('1 GB', humanfriendly.format_size(1024 ** 3))
         self.assertEqual('1 TB', humanfriendly.format_size(1024 ** 4))
         self.assertEqual('1 PB', humanfriendly.format_size(1024 ** 5))
+        self.assertEqual('1 byte', humanfriendly.format_size(1, correct=True))
+        self.assertEqual('45 KB', humanfriendly.format_size(1000 * 45, correct=True))
+        self.assertEqual('1 GB', humanfriendly.format_size(1000 ** 3, correct=True))
+        self.assertEqual('2.9 TB', humanfriendly.format_size(1000 ** 4 * 2.9, correct=True))
 
     def test_parse_size(self):
         """Test :func:`humanfriendly.parse_size()`."""
@@ -203,6 +207,8 @@ class HumanFriendlyTestCase(unittest.TestCase):
         self.assertEqual(1024 ** 3 * 1.5, humanfriendly.parse_size('1.5 GB'))
         self.assertRaises(humanfriendly.InvalidSize, humanfriendly.parse_size, '1z')
         self.assertRaises(humanfriendly.InvalidSize, humanfriendly.parse_size, 'a')
+        self.assertEqual(1000, humanfriendly.parse_size('1 KB', correct=True))
+        self.assertEqual(1000 ** 2 * 69, humanfriendly.parse_size('69 MB', correct=True))
 
     def test_format_length(self):
         """Test :func:`humanfriendly.format_length()`."""
