@@ -91,6 +91,35 @@ Human friendly input/output (text formatting) on the command line based on the P
 
 .. [[[end]]]
 
+Note on units used
+------------------
+
+This package uses the traditional units based on powers of two. These units are
+still used in Microsoft Windows' graphical user interface and in other
+software.
+
++--------+----------------+
+| Unit   | Value in bytes |
++--------+----------------+
+| ``KB`` |          1024  |
++--------+----------------+
+| ``MB`` |       1048576  |
++--------+----------------+
+| ``GB`` |    1073741824  |
++--------+----------------+
+| ``TB`` | 1099511627776  |
++--------+----------------+
+| etc    |                |
++--------+----------------+
+
+The standard IEEE 1541, used by many hardware and software vendors today,
+contradicts this definition, using power of 10 units instead for ``kB``,
+``MB``, ``GB`` and so on. These definitions are often referred to as SI
+formatting, due to their similarity with the metric system. Thankfully, IEEE
+1541 also unambigously defines ``KiB``, ``MiB`` (etc) to the values based on
+powers of 2. This module does not yet support these units.
+
+
 Contact
 -------
 

@@ -121,7 +121,8 @@ def format_size(num_bytes, keep_width=False, correct=False):
                        ``False`` if they can be stripped.
     :returns: The corresponding human readable file size (a string).
 
-    This function supports ranges from kilobytes to terabytes.
+    This function supports ranges from kilobytes to terabytes. It only supports
+    the definitions that are based on powers of 2.
 
     Some examples:
 
@@ -156,6 +157,8 @@ def parse_size(size, correct=False):
     :param size: The human readable file size to parse (a string).
     :returns: The corresponding size in bytes (an integer).
     :raises: :exc:`InvalidSize` when the input can't be parsed.
+
+    This function only supports the definitions that are based on powers of 2.
 
     Some examples:
 
