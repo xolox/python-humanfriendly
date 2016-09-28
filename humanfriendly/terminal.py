@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: February 17, 2016
+# Last Change: September 28, 2016
 # URL: https://humanfriendly.readthedocs.org
 
 """
@@ -36,6 +36,7 @@ except ImportError:
 # Modules included in our package. We import find_meta_variables() here to
 # preserve backwards compatibility with older versions of humanfriendly where
 # that function was defined in this module.
+from humanfriendly.compat import is_unicode
 from humanfriendly.text import concatenate, format
 from humanfriendly.usage import find_meta_variables, format_usage  # NOQA
 
@@ -367,11 +368,13 @@ def usage(usage_text):
     show_pager(usage_text)
 
 
-def show_pager(formatted_text):
+def show_pager(formatted_text, encoding='UTF-8'):
     """
     Print a large text to the terminal using a pager.
 
     :param formatted_text: The text to print to the terminal (a string).
+    :param encoding: The name of the text encoding used to encode the formatted
+                     text if the formatted text is a Unicode string (a string).
 
     The use of a pager helps to avoid the wall of text effect where the user
     has to scroll up to see where the output began (not very user friendly).
@@ -389,6 +392,8 @@ def show_pager(formatted_text):
             pager_command = ['less', '--RAW-CONTROL-CHARS']
         else:
             pager_command = [os.environ.get('PAGER', 'less')]
+        if is_unicode(formatted_text):
+            formatted_text = formatted_text.encode(encoding)
         pager = subprocess.Popen(pager_command, stdin=subprocess.PIPE)
         pager.communicate(input=formatted_text)
     else:

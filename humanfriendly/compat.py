@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: October 22, 2015
+# Last Change: September 28, 2016
 # URL: https://humanfriendly.readthedocs.org
 
 """
@@ -57,9 +57,19 @@ def coerce_string(value):
 
 def is_string(value):
     """
-    Check whether a value is a :func:`python2:basestring` (in Python 2) or :class:`python2:str` (in Python 3).
+    Check if a value is a :func:`python2:basestring` (in Python 2) or :class:`python2:str` (in Python 3) object.
 
     :param value: The value to check.
     :returns: :data:`True` if the value is a string, :data:`False` otherwise.
     """
     return isinstance(value, basestring)
+
+
+def is_unicode(value):
+    """
+    Check if a value is a :func:`python2:unicode` (in Python 2) or :class:`python2:str` (in Python 3) object.
+
+    :param value: The value to check.
+    :returns: :data:`True` if the value is a Unicode string, :data:`False` otherwise.
+    """
+    return isinstance(value, unicode)
