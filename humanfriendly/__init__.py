@@ -344,11 +344,11 @@ def format_timespan(num_seconds, detailed=False, max_units=3):
     else:
         # Slow path.
         result = []
-        num_seconds = decimal.Decimal(num_seconds)
+        num_seconds = decimal.Decimal(str(num_seconds))
         relevant_units = list(reversed(time_units[0 if detailed else 1:]))
         for unit in relevant_units:
             # Extract the unit count from the remaining time.
-            divider = decimal.Decimal(unit['divider'])
+            divider = decimal.Decimal(str(unit['divider']))
             count = num_seconds / divider
             num_seconds %= divider
             # Round the unit count appropriately.
