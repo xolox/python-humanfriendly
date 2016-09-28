@@ -7,6 +7,7 @@
 """The main module of the `humanfriendly` package."""
 
 # Standard library modules.
+import decimal
 import multiprocessing
 import numbers
 import os
@@ -309,7 +310,7 @@ def round_number(count, keep_width=False):
     return text
 
 
-def format_timespan(num_seconds, detailed=False):
+def format_timespan(num_seconds, detailed=False, max_units=3):
     """
     Format a timespan in seconds as a human readable string.
 
@@ -317,6 +318,8 @@ def format_timespan(num_seconds, detailed=False):
     :param detailed: If :data:`True` milliseconds are represented separately
                      instead of being represented as fractional seconds
                      (defaults to :data:`False`).
+    :param max_units: The maximum number of units to show in the formatted time
+                      span (an integer, defaults to three).
     :returns: The formatted timespan as a string.
 
     Some examples:
@@ -341,18 +344,30 @@ def format_timespan(num_seconds, detailed=False):
     else:
         # Slow path.
         result = []
-        for unit in reversed(time_units):
-            if num_seconds >= unit['divider']:
-                count = int(num_seconds / unit['divider'])
-                num_seconds %= unit['divider']
+        num_seconds = decimal.Decimal(num_seconds)
+        relevant_units = list(reversed(time_units[0 if detailed else 1:]))
+        for unit in relevant_units:
+            # Extract the unit count from the remaining time.
+            divider = decimal.Decimal(unit['divider'])
+            count = num_seconds / divider
+            num_seconds %= divider
+            # Round the unit count appropriately.
+            if unit != relevant_units[-1]:
+                # Integer rounding for all but the smallest unit.
+                count = int(count)
+            else:
+                # Floating point rounding for the smallest unit.
+                count = round_number(count)
+            # Only include relevant units in the result.
+            if count not in (0, '0'):
                 result.append(pluralize(count, unit['singular'], unit['plural']))
         if len(result) == 1:
             # A single count/unit combination.
             return result[0]
         else:
             if not detailed:
-                # Remove insignificant data from the formatted timespan.
-                result = result[:3]
+                # Remove `insignificant' data from the formatted timespan.
+                result = result[:max_units]
             # Format the timespan in a readable way.
             return concatenate(result)
 
