@@ -15,7 +15,6 @@ script:
   - make check
   - make test
 after_success:
-  - coverage combine
   - coveralls
 branches:
   except:
