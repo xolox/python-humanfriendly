@@ -121,30 +121,38 @@ class HumanFriendlyTestCase(unittest.TestCase):
         day = hour * 24
         week = day * 7
         year = week * 52
-        self.assertEqual('1 millisecond', humanfriendly.format_timespan(0.001, detailed=True))
-        self.assertEqual('500 milliseconds', humanfriendly.format_timespan(0.5, detailed=True))
-        self.assertEqual('0.5 seconds', humanfriendly.format_timespan(0.5, detailed=False))
-        self.assertEqual('0 seconds', humanfriendly.format_timespan(0))
-        self.assertEqual('0.54 seconds', humanfriendly.format_timespan(0.54321))
-        self.assertEqual('1 second', humanfriendly.format_timespan(1))
-        self.assertEqual('3.14 seconds', humanfriendly.format_timespan(math.pi))
-        self.assertEqual('1 minute', humanfriendly.format_timespan(minute))
-        self.assertEqual('1 minute and 20 seconds', humanfriendly.format_timespan(80))
-        self.assertEqual('2 minutes', humanfriendly.format_timespan(minute * 2))
-        self.assertEqual('1 hour', humanfriendly.format_timespan(hour))
-        self.assertEqual('2 hours', humanfriendly.format_timespan(hour * 2))
-        self.assertEqual('1 day', humanfriendly.format_timespan(day))
-        self.assertEqual('2 days', humanfriendly.format_timespan(day * 2))
-        self.assertEqual('1 week', humanfriendly.format_timespan(week))
-        self.assertEqual('2 weeks', humanfriendly.format_timespan(week * 2))
-        self.assertEqual('1 year', humanfriendly.format_timespan(year))
-        self.assertEqual('2 years', humanfriendly.format_timespan(year * 2))
-        self.assertEqual('6 years, 5 weeks, 4 days, 3 hours, 2 minutes and 500 milliseconds',
-                         humanfriendly.format_timespan(year * 6 + week * 5 + day * 4 + hour * 3 + minute * 2 + 0.5,
-                                                       detailed=True))
-        self.assertEqual(
-            '1 year, 2 weeks and 3 days',
-            humanfriendly.format_timespan(year + week * 2 + day * 3 + hour * 12))
+        assert '1 millisecond' == humanfriendly.format_timespan(0.001, detailed=True)
+        assert '500 milliseconds' == humanfriendly.format_timespan(0.5, detailed=True)
+        assert '0.5 seconds' == humanfriendly.format_timespan(0.5, detailed=False)
+        assert '0 seconds' == humanfriendly.format_timespan(0)
+        assert '0.54 seconds' == humanfriendly.format_timespan(0.54321)
+        assert '1 second' == humanfriendly.format_timespan(1)
+        assert '3.14 seconds' == humanfriendly.format_timespan(math.pi)
+        assert '1 minute' == humanfriendly.format_timespan(minute)
+        assert '1 minute and 20 seconds' == humanfriendly.format_timespan(80)
+        assert '2 minutes' == humanfriendly.format_timespan(minute * 2)
+        assert '1 hour' == humanfriendly.format_timespan(hour)
+        assert '2 hours' == humanfriendly.format_timespan(hour * 2)
+        assert '1 day' == humanfriendly.format_timespan(day)
+        assert '2 days' == humanfriendly.format_timespan(day * 2)
+        assert '1 week' == humanfriendly.format_timespan(week)
+        assert '2 weeks' == humanfriendly.format_timespan(week * 2)
+        assert '1 year' == humanfriendly.format_timespan(year)
+        assert '2 years' == humanfriendly.format_timespan(year * 2)
+        assert '6 years, 5 weeks, 4 days, 3 hours, 2 minutes and 500 milliseconds' == \
+            humanfriendly.format_timespan(year * 6 + week * 5 + day * 4 + hour * 3 + minute * 2 + 0.5, detailed=True)
+        assert '1 year, 2 weeks and 3 days' == \
+            humanfriendly.format_timespan(year + week * 2 + day * 3 + hour * 12)
+        # Make sure milliseconds are never shown separately when detailed=False.
+        # https://github.com/xolox/python-humanfriendly/issues/10
+        assert '1 minute, 1 second and 100 milliseconds' == humanfriendly.format_timespan(61.10, detailed=True)
+        assert '1 minute and 1.1 second' == humanfriendly.format_timespan(61.10, detailed=False)
+        # Test for loss of precision as reported in issue 11:
+        # https://github.com/xolox/python-humanfriendly/issues/11
+        assert '1 minute and 0.3 seconds' == humanfriendly.format_timespan(60.300)
+        assert '5 minutes and 0.3 seconds' == humanfriendly.format_timespan(300.300)
+        assert '1 second and 15 milliseconds' == humanfriendly.format_timespan(1.015, detailed=True)
+        assert '10 seconds and 15 milliseconds' == humanfriendly.format_timespan(10.015, detailed=True)
 
     def test_parse_timespan(self):
         """Test :func:`humanfriendly.parse_timespan()`."""
