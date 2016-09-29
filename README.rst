@@ -39,9 +39,11 @@ It's very simple to start using the `humanfriendly` package::
    Enter a readable file size: 16G
    >>> num_bytes = humanfriendly.parse_size(user_input)
    >>> print num_bytes
-   17179869184
+   16000000000
    >>> print "You entered:", humanfriendly.format_size(num_bytes)
    You entered: 16 GB
+   >>> print "You entered:", humanfriendly.format_size(num_bytes, binary=True)
+   You entered: 14.9 GiB
 
 Command line
 ------------
@@ -117,7 +119,7 @@ the new default became decimal multiples of bytes (powers of ten):
 +------+---------------+---------------+
 
 The option to use binary multiples of bytes remains by passing the keyword
-argument `decimal=True` to the `format_size()`_ and `parse_size()`_ functions.
+argument `binary=True` to the `format_size()`_ and `parse_size()`_ functions.
 
 Contact
 -------
