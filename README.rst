@@ -26,6 +26,9 @@ text interfaces more user friendly. Some example features:
 The `humanfriendly` package is currently tested on Python 2.6, 2.7, 3.4, 3.5
 and PyPy.
 
+.. contents::
+   :local:
+
 Getting started
 ---------------
 
@@ -91,34 +94,30 @@ Human friendly input/output (text formatting) on the command line based on the P
 
 .. [[[end]]]
 
-Note on units used
-------------------
+A note about size units
+-----------------------
 
-This package uses the traditional units based on powers of two. These units are
-still used in Microsoft Windows' graphical user interface and in other
-software.
+When I originally published the `humanfriendly` package I went with binary
+multiples of bytes (powers of two). It was pointed out several times that this
+was a poor choice (see issue `#4`_ and pull requests `#8`_ and `#9`_) and thus
+the new default became decimal multiples of bytes (powers of ten):
 
-+--------+----------------+
-| Unit   | Value in bytes |
-+--------+----------------+
-| ``KB`` |          1024  |
-+--------+----------------+
-| ``MB`` |       1048576  |
-+--------+----------------+
-| ``GB`` |    1073741824  |
-+--------+----------------+
-| ``TB`` | 1099511627776  |
-+--------+----------------+
-| etc    |                |
-+--------+----------------+
++------+---------------+---------------+
+| Unit | Binary value  | Decimal value |
++------+---------------+---------------+
+| KB   |          1024 |          1000 +
++------+---------------+---------------+
+| MB   |       1048576 |       1000000 |
++------+---------------+---------------+
+| GB   |    1073741824 |    1000000000 |
++------+---------------+---------------+
+| TB   | 1099511627776 | 1000000000000 |
++------+---------------+---------------+
+| etc  |               |               |
++------+---------------+---------------+
 
-The standard IEEE 1541, used by many hardware and software vendors today,
-contradicts this definition, using power of 10 units instead for ``kB``,
-``MB``, ``GB`` and so on. These definitions are often referred to as SI
-formatting, due to their similarity with the metric system. Thankfully, IEEE
-1541 also unambigously defines ``KiB``, ``MiB`` (etc) to the values based on
-powers of 2. This module does not yet support these units.
-
+The option to use binary multiples of bytes remains by passing the keyword
+argument `decimal=True` to the `format_size()`_ and `parse_size()`_ functions.
 
 Contact
 -------
@@ -136,8 +135,13 @@ This software is licensed under the `MIT license`_.
 © 2016 Peter Odding.
 
 .. External references:
+.. _#4: https://github.com/xolox/python-humanfriendly/issues/4
+.. _#8: https://github.com/xolox/python-humanfriendly/pull/8
+.. _#9: https://github.com/xolox/python-humanfriendly/pull/9
+.. _format_size(): https://humanfriendly.readthedocs.io/en/latest/#humanfriendly.format_size
 .. _GitHub: https://github.com/xolox/python-humanfriendly
 .. _MIT license: http://en.wikipedia.org/wiki/MIT_License
+.. _parse_size(): https://humanfriendly.readthedocs.io/en/latest/#humanfriendly.parse_size
 .. _peter@peterodding.com: peter@peterodding.com
 .. _PyPI: https://pypi.python.org/pypi/humanfriendly
 .. _Read the Docs: https://humanfriendly.readthedocs.org

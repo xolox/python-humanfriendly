@@ -1,12 +1,13 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: September 28, 2016
+# Last Change: September 29, 2016
 # URL: https://humanfriendly.readthedocs.org
 
 """The main module of the `humanfriendly` package."""
 
 # Standard library modules.
+import collections
 import decimal
 import multiprocessing
 import numbers
@@ -38,7 +39,7 @@ from humanfriendly.prompts import prompt_for_choice  # NOQA
 from humanfriendly.compat import is_string
 
 # Semi-standard module versioning.
-__version__ = '1.44.9'
+__version__ = '2.0a1'
 
 # Spinners are redrawn at most this many seconds.
 minimum_spinner_interval = 0.2
@@ -51,21 +52,17 @@ erase_line_code = '\r\x1b[K'
 hide_cursor_code = '\x1b[?25l'
 show_cursor_code = '\x1b[?25h'
 
-# Common disk size units, used for formatting and parsing.
-disk_size_units = (dict(prefix='b', divider=1, singular='byte', plural='bytes'),
-                   dict(prefix='k', divider=1024**1, singular='KB', plural='KB'),
-                   dict(prefix='m', divider=1024**2, singular='MB', plural='MB'),
-                   dict(prefix='g', divider=1024**3, singular='GB', plural='GB'),
-                   dict(prefix='t', divider=1024**4, singular='TB', plural='TB'),
-                   dict(prefix='p', divider=1024**5, singular='PB', plural='PB'))
+SizeUnit = collections.namedtuple('SizeUnit', 'divider, symbol, name')
+CombinedUnit = collections.namedtuple('CombinedUnit', 'decimal, binary')
 
-# Common disk size units based on IEEE 1541.
-disk_size_units_ieee = (dict(prefix='b', divider=1, singular='byte', plural='bytes'),
-                        dict(prefix='k', divider=1000**1, singular='KB', plural='KB'),
-                        dict(prefix='m', divider=1000**2, singular='MB', plural='MB'),
-                        dict(prefix='g', divider=1000**3, singular='GB', plural='GB'),
-                        dict(prefix='t', divider=1000**4, singular='TB', plural='TB'),
-                        dict(prefix='p', divider=1000**5, singular='PB', plural='PB'))
+# Common disk size units in binary (base-2) and decimal (base-10) multiples.
+disk_size_units = (
+    CombinedUnit(SizeUnit(1000**1, 'KB', 'kilobyte'), SizeUnit(1024**1, 'KiB', 'kibibyte')),
+    CombinedUnit(SizeUnit(1000**2, 'MB', 'megabyte'), SizeUnit(1024**2, 'MiB', 'mebibyte')),
+    CombinedUnit(SizeUnit(1000**3, 'GB', 'gigabyte'), SizeUnit(1024**3, 'GiB', 'gibibyte')),
+    CombinedUnit(SizeUnit(1000**4, 'TB', 'terabyte'), SizeUnit(1024**4, 'TiB', 'tebibyte')),
+    CombinedUnit(SizeUnit(1000**5, 'PB', 'petabyte'), SizeUnit(1024**5, 'PiB', 'pebibyte')),
+)
 
 # Common length size units, used for formatting and parsing.
 length_size_units = (dict(prefix='nm', divider=1e-09, singular='nm', plural='nm'),
@@ -112,19 +109,19 @@ def coerce_boolean(value):
         return bool(value)
 
 
-def format_size(num_bytes, keep_width=False, correct=False):
+def format_size(num_bytes, keep_width=False, binary=False):
     """
     Format a byte count as a human readable file size.
 
     :param num_bytes: The size to format in bytes (an integer).
-    :param keep_width: ``True`` if trailing zeros should not be stripped,
-                       ``False`` if they can be stripped.
+    :param keep_width: :data:`True` if trailing zeros should not be stripped,
+                       :data:`False` if they can be stripped.
+    :param binary: :data:`True` to use binary multiples of bytes (base-2),
+                   :data:`False` to use decimal multiples of bytes (base-10).
     :returns: The corresponding human readable file size (a string).
 
-    This function supports ranges from kilobytes to terabytes. It only supports
-    the definitions that are based on powers of 2.
-
-    Some examples:
+    This function knows how to format sizes in bytes, kilobytes, megabytes,
+    gigabytes, terabytes and petabytes. Some examples:
 
     >>> from humanfriendly import format_size
     >>> format_size(0)
@@ -133,62 +130,79 @@ def format_size(num_bytes, keep_width=False, correct=False):
     '1 byte'
     >>> format_size(5)
     '5 bytes'
-    >>> format_size(1024 ** 2)
-    '1 MB'
-    >>> format_size(1024 ** 3 * 4)
-    '4 GB'
-    >>> format_size(1000 ** 3 * 4, correct=True)
+    > format_size(1000)
+    '1 KB'
+    > format_size(1024, binary=True)
+    '1 KiB'
+    >>> format_size(1000 ** 3 * 4)
     '4 GB'
     """
-    units = disk_size_units
-    if correct:
-        units = disk_size_units_ieee
-    for unit in reversed(units):
-        if num_bytes >= unit['divider']:
-            number = round_number(float(num_bytes) / unit['divider'], keep_width=keep_width)
-            return pluralize(number, unit['singular'], unit['plural'])
+    for unit in reversed(disk_size_units):
+        if num_bytes >= unit.binary.divider and binary:
+            number = round_number(float(num_bytes) / unit.binary.divider, keep_width=keep_width)
+            return pluralize(number, unit.binary.symbol, unit.binary.symbol)
+        elif num_bytes >= unit.decimal.divider and not binary:
+            number = round_number(float(num_bytes) / unit.decimal.divider, keep_width=keep_width)
+            return pluralize(number, unit.decimal.symbol, unit.decimal.symbol)
     return pluralize(num_bytes, 'byte')
 
 
-def parse_size(size, correct=False):
+def parse_size(size, binary=False):
     """
     Parse a human readable data size and return the number of bytes.
 
     :param size: The human readable file size to parse (a string).
+    :param binary: :data:`True` to use binary multiples of bytes (base-2) for
+                   ambiguous unit symbols and names, :data:`False` to use
+                   decimal multiples of bytes (base-10).
     :returns: The corresponding size in bytes (an integer).
     :raises: :exc:`InvalidSize` when the input can't be parsed.
 
-    This function only supports the definitions that are based on powers of 2.
-
-    Some examples:
+    This function knows how to parse sizes in bytes, kilobytes, megabytes,
+    gigabytes, terabytes and petabytes. Some examples:
 
     >>> from humanfriendly import parse_size
     >>> parse_size('42')
     42
+    >>> parse_size('13b')
+    13
+    >>> parse_size('5 bytes')
+    5
     >>> parse_size('1 KB')
+    1000
+    >>> parse_size('1 kilobyte')
+    1000
+    >>> parse_size('1 KiB')
     1024
-    >>> parse_size('5 kilobyte')
-    5120
+    >>> parse_size('1 KB', binary=True)
+    1024
     >>> parse_size('1.5 GB')
-    1610612736
-    >>> parse_size('1.5 GB', correct=True)
     1500000000
+    >>> parse_size('1.5 GB', binary=True)
+    1610612736
     """
     tokens = tokenize(size)
     if tokens and isinstance(tokens[0], numbers.Number):
-        # If the input contains only a number, it's assumed to be the number of bytes.
-        if len(tokens) == 1:
+        # Get the normalized unit (if any) from the tokenized input.
+        normalized_unit = tokens[1].lower() if len(tokens) == 2 and is_string(tokens[1]) else ''
+        # If the input contains only a number, it's assumed to be the number of
+        # bytes. The second token can also explicitly reference the unit bytes.
+        if len(tokens) == 1 or normalized_unit.startswith('b'):
             return int(tokens[0])
-        # Otherwise we expect to find two tokens: A number and a unit.
-        if len(tokens) == 2 and is_string(tokens[1]):
-            normalized_unit = tokens[1].lower()
-            # Try to match the first letter of the unit.
-            units = disk_size_units
-            if correct:
-                units = disk_size_units_ieee
-            for unit in units:
-                if normalized_unit.startswith(unit['prefix']):
-                    return int(tokens[0] * unit['divider'])
+        # Otherwise we expect two tokens: A number and a unit.
+        if normalized_unit:
+            for unit in disk_size_units:
+                # First we check for unambiguous symbols (KiB, MiB, GiB, etc)
+                # and names (kibibyte, mebibyte, gibibyte, etc) because their
+                # handling is always the same.
+                if normalized_unit in (unit.binary.symbol.lower(), unit.binary.name.lower()):
+                    return int(tokens[0] * unit.binary.divider)
+                # Now we will deal with ambiguous prefixes (K, M, G, etc),
+                # symbols (KB, MB, GB, etc) and names (kilobyte, megabyte,
+                # gigabyte, etc) according to the caller's preference.
+                if (normalized_unit in (unit.decimal.symbol.lower(), unit.decimal.name.lower()) or
+                        normalized_unit.startswith(unit.decimal.symbol[0].lower())):
+                    return int(tokens[0] * (unit.binary.divider if binary else unit.decimal.divider))
     # We failed to parse the size specification.
     msg = "Failed to parse size! (input %r was tokenized as %r)"
     raise InvalidSize(msg % (size, tokens))

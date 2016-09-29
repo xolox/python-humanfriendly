@@ -4,7 +4,7 @@
 # Tests for the `humanfriendly' package.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: September 28, 2016
+# Last Change: September 29, 2016
 # URL: https://humanfriendly.readthedocs.org
 
 """Test suite for the `humanfriendly` package."""
@@ -185,30 +185,34 @@ class HumanFriendlyTestCase(unittest.TestCase):
         self.assertEqual('0 bytes', humanfriendly.format_size(0))
         self.assertEqual('1 byte', humanfriendly.format_size(1))
         self.assertEqual('42 bytes', humanfriendly.format_size(42))
-        self.assertEqual('1 KB', humanfriendly.format_size(1024 ** 1))
-        self.assertEqual('1 MB', humanfriendly.format_size(1024 ** 2))
-        self.assertEqual('1 GB', humanfriendly.format_size(1024 ** 3))
-        self.assertEqual('1 TB', humanfriendly.format_size(1024 ** 4))
-        self.assertEqual('1 PB', humanfriendly.format_size(1024 ** 5))
-        self.assertEqual('1 byte', humanfriendly.format_size(1, correct=True))
-        self.assertEqual('45 KB', humanfriendly.format_size(1000 * 45, correct=True))
-        self.assertEqual('1 GB', humanfriendly.format_size(1000 ** 3, correct=True))
-        self.assertEqual('2.9 TB', humanfriendly.format_size(1000 ** 4 * 2.9, correct=True))
+        self.assertEqual('1 KB', humanfriendly.format_size(1000 ** 1))
+        self.assertEqual('1 MB', humanfriendly.format_size(1000 ** 2))
+        self.assertEqual('1 GB', humanfriendly.format_size(1000 ** 3))
+        self.assertEqual('1 TB', humanfriendly.format_size(1000 ** 4))
+        self.assertEqual('1 PB', humanfriendly.format_size(1000 ** 5))
+        self.assertEqual('1 KiB', humanfriendly.format_size(1024 ** 1, binary=True))
+        self.assertEqual('1 MiB', humanfriendly.format_size(1024 ** 2, binary=True))
+        self.assertEqual('1 GiB', humanfriendly.format_size(1024 ** 3, binary=True))
+        self.assertEqual('1 TiB', humanfriendly.format_size(1024 ** 4, binary=True))
+        self.assertEqual('1 PiB', humanfriendly.format_size(1024 ** 5, binary=True))
+        self.assertEqual('45 KB', humanfriendly.format_size(1000 * 45))
+        self.assertEqual('2.9 TB', humanfriendly.format_size(1000 ** 4 * 2.9))
 
     def test_parse_size(self):
         """Test :func:`humanfriendly.parse_size()`."""
         self.assertEqual(0, humanfriendly.parse_size('0B'))
         self.assertEqual(42, humanfriendly.parse_size('42'))
         self.assertEqual(42, humanfriendly.parse_size('42B'))
-        self.assertEqual(1024, humanfriendly.parse_size('1k'))
-        self.assertEqual(1024, humanfriendly.parse_size('1 KB'))
-        self.assertEqual(1024, humanfriendly.parse_size('1 kilobyte'))
-        self.assertEqual(1024 ** 3, humanfriendly.parse_size('1 GB'))
-        self.assertEqual(1024 ** 3 * 1.5, humanfriendly.parse_size('1.5 GB'))
+        self.assertEqual(1000, humanfriendly.parse_size('1k'))
+        self.assertEqual(1024, humanfriendly.parse_size('1k', binary=True))
+        self.assertEqual(1000, humanfriendly.parse_size('1 KB'))
+        self.assertEqual(1000, humanfriendly.parse_size('1 kilobyte'))
+        self.assertEqual(1024, humanfriendly.parse_size('1 kilobyte', binary=True))
+        self.assertEqual(1000 ** 2 * 69, humanfriendly.parse_size('69 MB'))
+        self.assertEqual(1000 ** 3, humanfriendly.parse_size('1 GB'))
+        self.assertEqual(1000 ** 3 * 1.5, humanfriendly.parse_size('1.5 GB'))
         self.assertRaises(humanfriendly.InvalidSize, humanfriendly.parse_size, '1z')
         self.assertRaises(humanfriendly.InvalidSize, humanfriendly.parse_size, 'a')
-        self.assertEqual(1000, humanfriendly.parse_size('1 KB', correct=True))
-        self.assertEqual(1000 ** 2 * 69, humanfriendly.parse_size('69 MB', correct=True))
 
     def test_format_length(self):
         """Test :func:`humanfriendly.format_length()`."""
