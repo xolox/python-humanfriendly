@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: September 28, 2016
+# Last Change: October 9, 2016
 # URL: https://humanfriendly.readthedocs.org
 
 """
@@ -65,6 +65,15 @@ ANSI_TEXT_STYLES = dict(bold=1, faint=2, underline=4, inverse=7, strike_through=
 A dictionary with (name, number) pairs of text styles (effects). Used by
 :func:`ansi_style()` to generate ANSI escape sequences that change text
 styles. Only widely supported text styles are included here.
+"""
+
+CLEAN_OUTPUT_PATTERN = re.compile(u'(\r|\n|\b|%s)' % re.escape(ANSI_ERASE_LINE))
+"""
+A compiled regular expression used to separate significant characters from other text.
+
+This pattern is used by :func:`clean_terminal_output()` to split terminal
+output into regular text versus backspace, carriage return and line feed
+characters and ANSI 'erase line' escape sequences.
 """
 
 DEFAULT_LINES = 25
@@ -227,6 +236,81 @@ def readline_strip(expr):
     :returns: The stripped text.
     """
     return expr.replace('\001', '').replace('\002', '')
+
+
+def clean_terminal_output(text):
+    """
+    Clean up the terminal output of a command.
+
+    :param text: The raw text with special characters (a Unicode string).
+    :returns: A list of Unicode strings (one for each line).
+
+    This function emulates the effect of backspace (0x08), carriage return
+    (0x0D) and line feed (0x0A) characters and the ANSI 'erase line' escape
+    sequence on interactive terminals. It's intended to clean up command output
+    that was originally meant to be rendered on an interactive terminal and
+    that has been captured using e.g. the script_ program [#]_ or the
+    :mod:`pty` module [#]_.
+
+    .. [#] My coloredlogs_ package supports the ``coloredlogs --to-html``
+           command which uses script_ to fool a subprocess into thinking that
+           it's connected to an interactive terminal (in order to get it to
+           emit ANSI escape sequences).
+
+    .. [#] My capturer_ package uses the :mod:`pty` module to fool the current
+           process and subprocesses into thinking they are connected to an
+           interactive terminal (in order to get them to emit ANSI escape
+           sequences).
+
+    **Some caveats about the use of this function:**
+
+    - Strictly speaking the effect of carriage returns cannot be emulated
+      outside of an actual terminal due to the interaction between overlapping
+      output, terminal widths and line wrapping. The goal of this function is
+      to sanitize noise in terminal output while preserving useful output.
+      Think of it as a useful and pragmatic but possibly lossy conversion.
+
+    - The algorithm isn't smart enough to properly handle a pair of ANSI escape
+      sequences that open before a carriage return and close after the last
+      carriage return in a linefeed delimited string; the resulting string will
+      contain only the closing end of the ANSI escape sequence pair. Tracking
+      this kind of complexity requires a state machine and proper parsing.
+
+    .. _capturer: https://pypi.python.org/pypi/capturer
+    .. _coloredlogs: https://pypi.python.org/pypi/coloredlogs
+    .. _script: http://man7.org/linux/man-pages/man1/script.1.html
+    """
+    cleaned_lines = []
+    current_line = ''
+    current_position = 0
+    for token in CLEAN_OUTPUT_PATTERN.split(text):
+        if token == '\r':
+            # Seek back to the start of the current line.
+            current_position = 0
+        elif token == '\b':
+            # Seek back one character in the current line.
+            current_position = max(0, current_position - 1)
+        else:
+            if token == '\n':
+                # Capture the current line.
+                cleaned_lines.append(current_line)
+            if token in ('\n', ANSI_ERASE_LINE):
+                # Clear the current line.
+                current_line = ''
+                current_position = 0
+            elif token:
+                # Merge regular output into the current line.
+                new_position = current_position + len(token)
+                prefix = current_line[:current_position]
+                suffix = current_line[new_position:]
+                current_line = prefix + token + suffix
+                current_position = new_position
+    # Capture the last line (if any).
+    cleaned_lines.append(current_line)
+    # Remove any empty trailing lines.
+    while cleaned_lines and not cleaned_lines[-1]:
+        cleaned_lines.pop(-1)
+    return cleaned_lines
 
 
 def connected_to_terminal(stream=None):
