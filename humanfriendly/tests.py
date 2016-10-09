@@ -4,7 +4,7 @@
 # Tests for the `humanfriendly' package.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: September 29, 2016
+# Last Change: October 9, 2016
 # URL: https://humanfriendly.readthedocs.org
 
 """Test suite for the `humanfriendly` package."""
@@ -48,6 +48,7 @@ from humanfriendly.terminal import (
     ansi_style,
     ansi_width,
     ansi_wrap,
+    clean_terminal_output,
     connected_to_terminal,
     find_terminal_size,
     show_pager,
@@ -599,6 +600,21 @@ class HumanFriendlyTestCase(unittest.TestCase):
         assert ansi_wrap(text, bold=True).startswith(ANSI_CSI)
         # Make sure ansi_wrap() ends the text by resetting the ANSI styles.
         assert ansi_wrap(text, bold=True).endswith(ANSI_RESET)
+
+    def test_clean_output(self):
+        """Test :func:`humanfriendly.terminal.clean_terminal_output()`."""
+        # Simple output should pass through unharmed (single line).
+        assert clean_terminal_output('foo') == ['foo']
+        # Simple output should pass through unharmed (multiple lines).
+        assert clean_terminal_output('foo\nbar') == ['foo', 'bar']
+        # Carriage returns and preceding substrings are removed.
+        assert clean_terminal_output('foo\rbar\nbaz') == ['bar', 'baz']
+        # Carriage returns move the cursor to the start of the line without erasing text.
+        assert clean_terminal_output('aaa\rab') == ['aba']
+        # Backspace moves the cursor one position back without erasing text.
+        assert clean_terminal_output('aaa\b\bb') == ['aba']
+        # Trailing empty lines should be stripped.
+        assert clean_terminal_output('foo\nbar\nbaz\n\n\n') == ['foo', 'bar', 'baz']
 
     def test_find_terminal_size(self):
         """Test :func:`humanfriendly.terminal.find_terminal_size()`."""
