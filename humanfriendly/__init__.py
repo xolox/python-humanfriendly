@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: October 9, 2016
+# Last Change: November 30, 2016
 # URL: https://humanfriendly.readthedocs.org
 
 """The main module of the `humanfriendly` package."""
@@ -510,7 +510,7 @@ def parse_date(datestring):
     .. _Unix time: http://en.wikipedia.org/wiki/Unix_time
     """
     try:
-        tokens = list(map(str.strip, datestring.split()))
+        tokens = [t.strip() for t in datestring.split()]
         if len(tokens) >= 2:
             date_parts = list(map(int, tokens[0].split('-'))) + [1, 1]
             time_parts = list(map(int, tokens[1].split(':'))) + [0, 0, 0]
