@@ -4,7 +4,7 @@
 # Tests for the `humanfriendly' package.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: October 9, 2016
+# Last Change: November 30, 2016
 # URL: https://humanfriendly.readthedocs.org
 
 """Test suite for the `humanfriendly` package."""
@@ -179,6 +179,7 @@ class HumanFriendlyTestCase(unittest.TestCase):
         """Test :func:`humanfriendly.parse_date()`."""
         self.assertEqual((2013, 6, 17, 0, 0, 0), humanfriendly.parse_date('2013-06-17'))
         self.assertEqual((2013, 6, 17, 2, 47, 42), humanfriendly.parse_date('2013-06-17 02:47:42'))
+        self.assertEqual((2016, 11, 30, 0, 47, 17), humanfriendly.parse_date(u'2016-11-30 00:47:17'))
         self.assertRaises(humanfriendly.InvalidDate, humanfriendly.parse_date, '2013-06-XY')
 
     def test_format_size(self):
