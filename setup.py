@@ -3,7 +3,7 @@
 """Setup script for the `humanfriendly` package."""
 
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: August 4, 2016
+# Last Change: November 30, 2016
 # URL: https://humanfriendly.readthedocs.org
 
 # Standard library modules.
@@ -47,6 +47,7 @@ def have_environment_marker_support():
         return parse_version(__version__) >= parse_version('0.7.2')
     except Exception:
         return False
+
 
 # Conditional importlib dependency for Python 2.6 and 3.0 when creating a source distribution.
 install_requires = []
