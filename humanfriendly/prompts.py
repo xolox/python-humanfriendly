@@ -3,7 +3,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: February 18, 2016
+# Last Change: November 30, 2016
 # URL: https://humanfriendly.readthedocs.org
 
 """
@@ -21,7 +21,14 @@ import sys
 
 # Modules included in our package.
 from humanfriendly.compat import interactive_prompt
-from humanfriendly.terminal import HIGHLIGHT_COLOR, ansi_wrap, ansi_strip, terminal_supports_colors, warning
+from humanfriendly.terminal import (
+    HIGHLIGHT_COLOR,
+    ansi_strip,
+    ansi_wrap,
+    connected_to_terminal,
+    terminal_supports_colors,
+    warning,
+)
 from humanfriendly.text import compact, format, concatenate
 
 MAX_ATTEMPTS = 10
@@ -69,14 +76,10 @@ def prompt_for_confirmation(question, default=None, padding=True):
      Are you sure? [y/n]
     """
     # Generate the text for the prompt.
-    prompt_text = question
-    if terminal_supports_colors():
-        prompt_text = ansi_wrap(prompt_text, bold=True, readline_hints=True)
+    prompt_text = prepare_prompt_text(question, bold=True)
     # Append the valid replies (and default reply) to the prompt text.
     hint = "[Y/n]" if default else "[y/N]" if default is not None else "[y/n]"
-    if terminal_supports_colors():
-        hint = ansi_wrap(hint, color=HIGHLIGHT_COLOR, readline_hints=True)
-    prompt_text += " %s " % hint
+    prompt_text += " %s " % prepare_prompt_text(hint, color=HIGHLIGHT_COLOR)
     # Loop until a valid response is given.
     logger.debug("Requesting interactive confirmation from terminal: %r", ansi_strip(prompt_text).rstrip())
     for attempt in retry_limit():
@@ -166,8 +169,7 @@ def prompt_for_choice(choices, default=None, padding=True):
         # Instructions for the user.
         "Enter your choice as a number or unique substring (Control-C aborts): ",
     ])
-    if terminal_supports_colors():
-        prompt_text = ansi_wrap(prompt_text, bold=True, readline_hints=True)
+    prompt_text = prepare_prompt_text(prompt_text, bold=True)
     # Loop until a valid choice is made.
     logger.debug("Requesting interactive choice on terminal (options are %s) ..",
                  concatenate(map(repr, choices)))
@@ -289,6 +291,23 @@ def prompt_for_input(question, default=None, padding=True, strip=True):
         return default
     else:
         return reply.strip()
+
+
+def prepare_prompt_text(prompt_text, **options):
+    """
+    Wrap a text to be rendered as an interactive prompt in ANSI escape sequences.
+
+    :param prompt_text: The text to render on the prompt (a string).
+    :param options: Any keyword arguments are passed on to :func:`.ansi_wrap()`.
+    :returns: The resulting prompt text (a string).
+
+    ANSI escape sequences are only used when the standard output stream is
+    connected to a terminal. When the standard input stream is connected to a
+    terminal any escape sequences are wrapped in "readline hints".
+    """
+    return (ansi_wrap(prompt_text, readline_hints=connected_to_terminal(sys.stdin), **options)
+            if terminal_supports_colors(sys.stdout)
+            else prompt_text)
 
 
 def prepare_friendly_prompts():
