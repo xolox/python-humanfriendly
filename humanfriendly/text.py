@@ -254,7 +254,7 @@ def pluralize(count, singular, plural=None):
 
     :param count: The count (a number).
     :param singular: The singular form of the word (a string).
-    :param plural: The plural form of the word (a string or ``None``).
+    :param plural: The plural form of the word (a string or :data:`None`).
     :returns: The count and singular/plural word concatenated (a string).
     """
     if not plural:

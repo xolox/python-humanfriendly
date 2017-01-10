@@ -87,8 +87,8 @@ def coerce_boolean(value):
 
     :param value: Any Python value. If the value is a string:
 
-                  - The strings '1', 'yes', 'true' and 'on' are coerced to ``True``.
-                  - The strings '0', 'no', 'false' and 'off' are coerced to ``False``.
+                  - The strings '1', 'yes', 'true' and 'on' are coerced to :data:`True`.
+                  - The strings '0', 'no', 'false' and 'off' are coerced to :data:`False`.
                   - Other strings raise an exception.
 
                   Other Python values are coerced using :py:func:`bool()`.
@@ -213,8 +213,8 @@ def format_length(num_metres, keep_width=False):
     Format a metre count as a human readable length.
 
     :param num_metres: The length to format in metres (float / integer).
-    :param keep_width: ``True`` if trailing zeros should not be stripped,
-                       ``False`` if they can be stripped.
+    :param keep_width: :data:`True` if trailing zeros should not be stripped,
+                       :data:`False` if they can be stripped.
     :returns: The corresponding human readable length (a string).
 
     This function supports ranges from nanometres to kilometres.
@@ -319,8 +319,8 @@ def round_number(count, keep_width=False):
     Round a floating point number to two decimal places in a human friendly format.
 
     :param count: The number to format.
-    :param keep_width: ``True`` if trailing zeros should not be stripped,
-                       ``False`` if they can be stripped.
+    :param keep_width: :data:`True` if trailing zeros should not be stripped,
+                       :data:`False` if they can be stripped.
     :returns: The formatted number as a string. If no decimal places are
               required to represent the number, they will be omitted.
 
@@ -580,7 +580,7 @@ class Timer(object):
         Remember the time when the :py:class:`Timer` was created.
 
         :param start_time: The start time (a float, defaults to the current time).
-        :param resumable: Create a resumable timer (defaults to ``False``).
+        :param resumable: Create a resumable timer (defaults to :data:`False`).
         """
         self.resumable = resumable
         if self.resumable:
@@ -723,17 +723,17 @@ class Spinner(object):
         """
         Initialize a spinner.
 
-        :param label: The label for the spinner (a string, defaults to ``None``).
+        :param label: The label for the spinner (a string, defaults to :data:`None`).
         :param total: The expected number of steps (an integer).
         :param stream: The output stream to show the spinner on (defaults to
                        :py:data:`sys.stderr`).
-        :param interactive: If this is ``False`` then the spinner doesn't write
+        :param interactive: If this is :data:`False` then the spinner doesn't write
                             to the output stream at all. It defaults to the
                             return value of ``stream.isatty()``.
         :param timer: A :py:class:`Timer` object (optional). If this is given
                       the spinner will show the elapsed time according to the
                       timer.
-        :param hide_cursor: If ``True`` (the default) the text cursor is hidden
+        :param hide_cursor: If :data:`True` (the default) the text cursor is hidden
                             as long as the spinner is active.
         """
         self.label = label
@@ -858,7 +858,7 @@ class AutomaticSpinner(object):
         Initialize an automatic spinner.
 
         :param label: The label for the spinner (a string).
-        :param show_time: If this is ``True`` (the default) then the spinner
+        :param show_time: If this is :data:`True` (the default) then the spinner
                           shows elapsed time.
         """
         self.label = label
