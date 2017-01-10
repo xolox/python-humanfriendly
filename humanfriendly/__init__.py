@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: November 30, 2016
+# Last Change: January 10, 2017
 # URL: https://humanfriendly.readthedocs.org
 
 """The main module of the `humanfriendly` package."""
@@ -592,14 +592,20 @@ class Timer(object):
     def __enter__(self):
         """
         Start or resume counting elapsed time.
+
+        :returns: The :class:`Timer` object.
+        :raises: :exc:`~exceptions.ValueError` when the timer isn't resumable.
         """
         if not self.resumable:
             raise ValueError("Timer is not resumable!")
         self.start_time = time.time()
+        return self
 
     def __exit__(self, exc_type=None, exc_value=None, traceback=None):
         """
         Stop counting elapsed time.
+
+        :raises: :exc:`~exceptions.ValueError` when the timer isn't resumable.
         """
         if not self.resumable:
             raise ValueError("Timer is not resumable!")
@@ -822,11 +828,15 @@ class Spinner(object):
             self.stream.write(erase_line_code)
 
     def __enter__(self):
-        """Enable the use of spinners as context managers."""
+        """
+        Enable the use of spinners as context managers.
+
+        :returns: The :class:`Spinner` object.
+        """
         return self
 
     def __exit__(self, exc_type=None, exc_value=None, traceback=None):
-        """Enable the use of spinners as context managers."""
+        """Clear the spinner when leaving the context."""
         self.clear()
 
 
