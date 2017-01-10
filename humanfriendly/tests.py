@@ -4,7 +4,7 @@
 # Tests for the `humanfriendly' package.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: November 30, 2016
+# Last Change: January 10, 2017
 # URL: https://humanfriendly.readthedocs.org
 
 """Test suite for the `humanfriendly` package."""
@@ -419,6 +419,9 @@ class HumanFriendlyTestCase(unittest.TestCase):
             resumable_timer.elapsed_time,
             keep_width=True,
         )), '2.00')
+        # Make sure Timer.__enter__() returns the timer object.
+        with humanfriendly.Timer(resumable=True) as timer:
+            assert timer is not None
 
     def test_spinner(self):
         """Test :func:`humanfriendly.Spinner`."""
