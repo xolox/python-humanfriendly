@@ -1,10 +1,23 @@
 #!/usr/bin/env python
 
-"""Setup script for the `humanfriendly` package."""
-
+# Setup script for the `humanfriendly' package.
+#
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: November 30, 2016
+# Last Change: January 16, 2017
 # URL: https://humanfriendly.readthedocs.io
+
+"""
+Setup script for the `humanfriendly` package.
+
+**python setup.py install**
+  Install from the working directory into the current Python environment.
+
+**python setup.py sdist**
+  Build a source distribution archive.
+
+**python setup.py bdist_wheel**
+  Build a wheel distribution archive.
+"""
 
 # Standard library modules.
 import codecs
@@ -18,7 +31,7 @@ from setuptools import find_packages, setup
 
 def get_contents(*args):
     """Get the contents of a file relative to the source distribution directory."""
-    with codecs.open(get_absolute_path(*args), 'r', 'utf-8') as handle:
+    with codecs.open(get_absolute_path(*args), 'r', 'UTF-8') as handle:
         return handle.read()
 
 
@@ -27,6 +40,23 @@ def get_version(*args):
     contents = get_contents(*args)
     metadata = dict(re.findall('__([a-z]+)__ = [\'"]([^\'"]+)', contents))
     return metadata['version']
+
+
+def get_install_requires():
+    """Add conditional dependencies for Python 2 (when creating source distributions)."""
+    install_requires = []
+    if sys.version_info[:2] <= (2, 6) or sys.version_info[:2] == (3, 0):
+        install_requires.append('importlib')
+    return install_requires
+
+
+def get_extras_require():
+    """Add conditional dependencies for Python 2 (when creating wheel distributions)."""
+    extras_require = {}
+    if have_environment_marker_support():
+        expression = ':python_version == "2.6" or python_version == "3.0"'
+        extras_require[expression] = ['importlib']
+    return extras_require
 
 
 def get_absolute_path(*args):
@@ -49,32 +79,20 @@ def have_environment_marker_support():
         return False
 
 
-# Conditional importlib dependency for Python 2.6 and 3.0 when creating a source distribution.
-install_requires = []
-if 'bdist_wheel' not in sys.argv:
-    if sys.version_info[:2] <= (2, 6) or sys.version_info[:2] == (3, 0):
-        install_requires.append('importlib')
-
-# Conditional importlib dependency for Python 2.6 and 3.0 when creating a wheel distribution.
-extras_require = {}
-if have_environment_marker_support():
-    extras_require[':python_version == "2.6" or python_version == "3.0"'] = ['importlib']
-
-
 setup(
     name='humanfriendly',
     version=get_version('humanfriendly', '__init__.py'),
     description="Human friendly output for text interfaces using Python",
     long_description=get_contents('README.rst'),
     url='https://humanfriendly.readthedocs.io',
-    author='Peter Odding',
+    author="Peter Odding",
     author_email='peter@peterodding.com',
     packages=find_packages(),
-    install_requires=install_requires,
-    extras_require=extras_require,
     entry_points=dict(console_scripts=[
-        'humanfriendly = humanfriendly.cli:main'
+        'humanfriendly = humanfriendly.cli:main',
     ]),
+    install_requires=get_install_requires(),
+    extras_require=get_extras_require(),
     test_suite='humanfriendly.tests',
     tests_require=[
         'capturer >= 2.1',
