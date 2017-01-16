@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: April 21, 2016
+# Last Change: January 17, 2017
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -43,7 +43,7 @@ from importlib import import_module
 
 # Modules included in our package.
 from humanfriendly.compat import StringIO
-from humanfriendly.text import dedent, join_lines, split, split_paragraphs, trim_empty_lines
+from humanfriendly.text import dedent, join_lines, split_paragraphs, trim_empty_lines
 
 # Public identifiers that require documentation (PEP-257).
 __all__ = (
@@ -216,8 +216,11 @@ def parse_usage(text):
         description = []
         while paragraphs:
             # Check if the next paragraph starts the documentation of another
-            # command line option.
-            if all(OPTION_PATTERN.match(t) for t in split(paragraphs[0])):
+            # command line option. We split on a comma followed by a space so
+            # that our parsing doesn't trip up when the label used for an
+            # option's value contains commas.
+            tokens = [t.strip() for t in re.split(r',\s', paragraphs[0]) if t and not t.isspace()]
+            if all(OPTION_PATTERN.match(t) for t in tokens):
                 break
             else:
                 description.append(paragraphs.pop(0))
