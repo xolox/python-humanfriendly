@@ -4,7 +4,7 @@
 # Tests for the `humanfriendly' package.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: January 10, 2017
+# Last Change: January 17, 2017
 # URL: https://humanfriendly.readthedocs.io
 
 """Test suite for the `humanfriendly` package."""
@@ -769,6 +769,33 @@ class HumanFriendlyTestCase(unittest.TestCase):
         assert "Explanation why this is an awesome option." in options
         assert "-b, --a-boring-option" in options
         assert "Explanation why this is a boring option." in options
+
+    def test_parse_usage_commas(self):
+        """Test :func:`humanfriendly.usage.parse_usage()` against option labels containing commas."""
+        introduction, options = self.preprocess_parse_result("""
+            Usage: my-fancy-app [OPTIONS]
+
+            Some introduction goes here.
+
+            Supported options:
+
+              -f, --first-option
+
+                Explanation of first option.
+
+              -s, --second-option=WITH,COMMA
+
+                This should be a separate option's description.
+        """)
+        # The following fragments are (expected to be) part of the introduction.
+        assert "Usage: my-fancy-app [OPTIONS]" in introduction
+        assert "Some introduction goes here." in introduction
+        assert "Supported options:" in introduction
+        # The following fragments are (expected to be) part of the documented options.
+        assert "-f, --first-option" in options
+        assert "Explanation of first option." in options
+        assert "-s, --second-option=WITH,COMMA" in options
+        assert "This should be a separate option's description." in options
 
     def preprocess_parse_result(self, text):
         """Ignore leading/trailing whitespace in usage parsing tests."""
