@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: January 10, 2017
+# Last Change: January 16, 2017
 # URL: https://humanfriendly.readthedocs.io
 
 """The main module of the `humanfriendly` package."""
@@ -36,7 +36,7 @@ from humanfriendly.text import (  # NOQA
 from humanfriendly.prompts import prompt_for_choice  # NOQA
 
 # Compatibility with Python 2 and 3.
-from humanfriendly.compat import is_string
+from humanfriendly.compat import is_string, monotonic
 
 # Semi-standard module versioning.
 __version__ = '2.2.1'
@@ -581,13 +581,23 @@ class Timer(object):
 
         :param start_time: The start time (a float, defaults to the current time).
         :param resumable: Create a resumable timer (defaults to :data:`False`).
+
+        When `start_time` is given :class:`Timer` uses :func:`time.time()` as a
+        clock source, otherwise it uses :func:`humanfriendly.compat.monotonic()`.
         """
-        self.resumable = resumable
-        if self.resumable:
+        if resumable:
+            self.monotonic = True
+            self.resumable = True
             self.start_time = 0.0
             self.total_time = 0.0
+        elif start_time:
+            self.monotonic = False
+            self.resumable = False
+            self.start_time = start_time
         else:
-            self.start_time = start_time or time.time()
+            self.monotonic = True
+            self.resumable = False
+            self.start_time = monotonic()
 
     def __enter__(self):
         """
@@ -598,7 +608,7 @@ class Timer(object):
         """
         if not self.resumable:
             raise ValueError("Timer is not resumable!")
-        self.start_time = time.time()
+        self.start_time = monotonic()
         return self
 
     def __exit__(self, exc_type=None, exc_value=None, traceback=None):
@@ -609,8 +619,9 @@ class Timer(object):
         """
         if not self.resumable:
             raise ValueError("Timer is not resumable!")
-        self.total_time += time.time() - self.start_time
-        self.start_time = 0
+        if self.start_time:
+            self.total_time += monotonic() - self.start_time
+            self.start_time = 0.0
 
     @property
     def elapsed_time(self):
@@ -621,7 +632,8 @@ class Timer(object):
         if self.resumable:
             elapsed_time += self.total_time
         if self.start_time:
-            elapsed_time += time.time() - self.start_time
+            current_time = monotonic() if self.monotonic else time.time()
+            elapsed_time += current_time - self.start_time
         return elapsed_time
 
     @property

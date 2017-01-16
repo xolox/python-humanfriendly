@@ -47,15 +47,30 @@ def get_install_requires():
     install_requires = []
     if sys.version_info[:2] <= (2, 6) or sys.version_info[:2] == (3, 0):
         install_requires.append('importlib')
-    return install_requires
+    if sys.version_info[:2] < (3, 3):
+        install_requires.append('monotonic')
+    return sorted(install_requires)
 
 
 def get_extras_require():
     """Add conditional dependencies for Python 2 (when creating wheel distributions)."""
     extras_require = {}
     if have_environment_marker_support():
-        expression = ':python_version == "2.6" or python_version == "3.0"'
+        # Conditional `importlib' dependency.
+        expression = ':%s' % ' or '.join([
+            'python_version == "2.6"',
+            'python_version == "3.0"',
+        ])
         extras_require[expression] = ['importlib']
+        # Conditional `monotonic' dependency.
+        expression = ':%s' % ' or '.join([
+            'python_version == "2.6"',
+            'python_version == "2.7"',
+            'python_version == "3.0"',
+            'python_version == "3.1"',
+            'python_version == "3.2"',
+        ])
+        extras_require[expression] = ['monotonic']
     return extras_require
 
 
