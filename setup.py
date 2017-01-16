@@ -3,7 +3,7 @@
 # Setup script for the `humanfriendly' package.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: January 16, 2017
+# Last Change: January 17, 2017
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -45,10 +45,11 @@ def get_version(*args):
 def get_install_requires():
     """Add conditional dependencies for Python 2 (when creating source distributions)."""
     install_requires = []
-    if sys.version_info[:2] <= (2, 6) or sys.version_info[:2] == (3, 0):
-        install_requires.append('importlib')
-    if sys.version_info[:2] < (3, 3):
-        install_requires.append('monotonic')
+    if 'bdist_wheel' not in sys.argv:
+        if sys.version_info[:2] <= (2, 6) or sys.version_info[:2] == (3, 0):
+            install_requires.append('importlib')
+        if sys.version_info[:2] < (3, 3):
+            install_requires.append('monotonic')
     return sorted(install_requires)
 
 
