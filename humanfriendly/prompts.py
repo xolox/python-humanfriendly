@@ -4,7 +4,7 @@
 #
 # Author: Peter Odding <peter@peterodding.com>
 # Last Change: November 30, 2016
-# URL: https://humanfriendly.readthedocs.org
+# URL: https://humanfriendly.readthedocs.io
 
 """
 Interactive terminal prompts.

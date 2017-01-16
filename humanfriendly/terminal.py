@@ -2,7 +2,7 @@
 #
 # Author: Peter Odding <peter@peterodding.com>
 # Last Change: October 9, 2016
-# URL: https://humanfriendly.readthedocs.org
+# URL: https://humanfriendly.readthedocs.io
 
 """
 Interaction with UNIX terminals.

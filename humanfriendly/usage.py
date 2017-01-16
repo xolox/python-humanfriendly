@@ -2,7 +2,7 @@
 #
 # Author: Peter Odding <peter@peterodding.com>
 # Last Change: April 21, 2016
-# URL: https://humanfriendly.readthedocs.org
+# URL: https://humanfriendly.readthedocs.io
 
 """
 Parsing and reformatting of usage messages.

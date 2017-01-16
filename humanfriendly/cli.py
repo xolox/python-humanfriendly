@@ -2,7 +2,7 @@
 #
 # Author: Peter Odding <peter@peterodding.com>
 # Last Change: May 27, 2015
-# URL: https://humanfriendly.readthedocs.org
+# URL: https://humanfriendly.readthedocs.io
 
 """
 Usage: humanfriendly [OPTIONS]

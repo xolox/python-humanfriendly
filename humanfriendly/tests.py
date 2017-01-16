@@ -5,7 +5,7 @@
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
 # Last Change: January 10, 2017
-# URL: https://humanfriendly.readthedocs.org
+# URL: https://humanfriendly.readthedocs.io
 
 """Test suite for the `humanfriendly` package."""
 

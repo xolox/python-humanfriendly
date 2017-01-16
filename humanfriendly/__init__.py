@@ -2,7 +2,7 @@
 #
 # Author: Peter Odding <peter@peterodding.com>
 # Last Change: January 10, 2017
-# URL: https://humanfriendly.readthedocs.org
+# URL: https://humanfriendly.readthedocs.io
 
 """The main module of the `humanfriendly` package."""
 
@@ -506,7 +506,7 @@ def parse_date(datestring):
     >>> print(format_timespan(seconds_since_then))
     1 year, 43 weeks and 1 day
 
-    .. _dateutil: https://dateutil.readthedocs.org/en/latest/parser.html
+    .. _dateutil: https://dateutil.readthedocs.io/en/latest/parser.html
     .. _Unix time: http://en.wikipedia.org/wiki/Unix_time
     """
     try:

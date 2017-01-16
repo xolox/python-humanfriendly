@@ -4,7 +4,7 @@
 
 # Author: Peter Odding <peter@peterodding.com>
 # Last Change: November 30, 2016
-# URL: https://humanfriendly.readthedocs.org
+# URL: https://humanfriendly.readthedocs.io
 
 # Standard library modules.
 import codecs
@@ -66,7 +66,7 @@ setup(
     version=get_version('humanfriendly', '__init__.py'),
     description="Human friendly output for text interfaces using Python",
     long_description=get_contents('README.rst'),
-    url='https://humanfriendly.readthedocs.org',
+    url='https://humanfriendly.readthedocs.io',
     author='Peter Odding',
     author_email='peter@peterodding.com',
     packages=find_packages(),
