@@ -157,7 +157,7 @@ def ansi_style(**kw):
                enabled.
     :returns: The ANSI escape sequences to enable the requested text styles or
               an empty string if no styles were requested.
-    :raises: :py:exc:`~exceptions.ValueError` when an invalid color name is given.
+    :raises: :exc:`~exceptions.ValueError` when an invalid color name is given.
     """
     # Start with sequences that change text styles.
     sequences = [str(ANSI_TEXT_STYLES[k]) for k, v in kw.items() if k in ANSI_TEXT_STYLES and v]
@@ -372,7 +372,7 @@ def find_terminal_size():
               cached values!
 
               Response: As a library I don't consider it the role of the
-              :py:mod:`humanfriendly.terminal` module to install a process wide
+              :mod:`humanfriendly.terminal` module to install a process wide
               signal handler ...
 
     .. _Pre-emptive snarky comment: http://blogs.msdn.com/b/oldnewthing/archive/2008/01/30/7315957.aspx

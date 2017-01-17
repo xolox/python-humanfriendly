@@ -91,9 +91,9 @@ def coerce_boolean(value):
                   - The strings '0', 'no', 'false' and 'off' are coerced to :data:`False`.
                   - Other strings raise an exception.
 
-                  Other Python values are coerced using :py:func:`bool()`.
+                  Other Python values are coerced using :func:`bool()`.
     :returns: A proper boolean value.
-    :raises: :py:exc:`exceptions.ValueError` when the value is a string but
+    :raises: :exc:`exceptions.ValueError` when the value is a string but
              cannot be coerced with certainty.
     """
     if is_string(value):
@@ -488,15 +488,15 @@ def parse_date(datestring):
     >>> mktime(parse_date('2013-06-17 02:47:42') + (-1, -1, -1))
     1371430062.0
 
-    And here's how you convert it to a :py:class:`datetime.datetime` object:
+    And here's how you convert it to a :class:`datetime.datetime` object:
 
     >>> from humanfriendly import parse_date
     >>> from datetime import datetime
     >>> datetime(*parse_date('2013-06-17 02:47:42'))
     datetime.datetime(2013, 6, 17, 2, 47, 42)
 
-    Here's an example that combines :py:func:`format_timespan()` and
-    :py:func:`parse_date()` to calculate a human friendly timespan since a
+    Here's an example that combines :func:`format_timespan()` and
+    :func:`parse_date()` to calculate a human friendly timespan since a
     given date:
 
     >>> from humanfriendly import format_timespan, parse_date
@@ -559,9 +559,9 @@ def parse_path(pathname):
     """
     Convert a human friendly pathname to an absolute pathname.
 
-    Expands leading tildes using :py:func:`os.path.expanduser()` and
-    environment variables using :py:func:`os.path.expandvars()` and makes the
-    resulting pathname absolute using :py:func:`os.path.abspath()`.
+    Expands leading tildes using :func:`os.path.expanduser()` and
+    environment variables using :func:`os.path.expandvars()` and makes the
+    resulting pathname absolute using :func:`os.path.abspath()`.
 
     :param pathname: A human friendly pathname (a string).
     :returns: An absolute pathname (a string).
@@ -577,7 +577,7 @@ class Timer(object):
 
     def __init__(self, start_time=None, resumable=False):
         """
-        Remember the time when the :py:class:`Timer` was created.
+        Remember the time when the :class:`Timer` was created.
 
         :param start_time: The start time (a float, defaults to the current time).
         :param resumable: Create a resumable timer (defaults to :data:`False`).
@@ -727,8 +727,8 @@ class Spinner(object):
                 progress += random.random() * 5
 
     If you want to provide user feedback during a long running operation but
-    it's not practical to periodically call the :py:func:`~Spinner.step()`
-    method consider using :py:class:`AutomaticSpinner` instead.
+    it's not practical to periodically call the :func:`~Spinner.step()`
+    method consider using :class:`AutomaticSpinner` instead.
 
     As you may already have noticed in the examples above, :class:`Spinner`
     objects can be used as context managers to automatically call
@@ -744,11 +744,11 @@ class Spinner(object):
         :param label: The label for the spinner (a string, defaults to :data:`None`).
         :param total: The expected number of steps (an integer).
         :param stream: The output stream to show the spinner on (defaults to
-                       :py:data:`sys.stderr`).
+                       :data:`sys.stderr`).
         :param interactive: If this is :data:`False` then the spinner doesn't write
                             to the output stream at all. It defaults to the
                             return value of ``stream.isatty()``.
-        :param timer: A :py:class:`Timer` object (optional). If this is given
+        :param timer: A :class:`Timer` object (optional). If this is given
                       the spinner will show the elapsed time according to the
                       timer.
         :param hide_cursor: If :data:`True` (the default) the text cursor is hidden
@@ -857,20 +857,20 @@ class AutomaticSpinner(object):
     """
     Show a spinner on the terminal that automatically starts animating.
 
-    This class shows a spinner on the terminal (just like :py:class:`Spinner`
+    This class shows a spinner on the terminal (just like :class:`Spinner`
     does) that automatically starts animating. This class should be used as a
-    context manager using the :py:keyword:`with` statement. The animation
+    context manager using the :keyword:`with` statement. The animation
     continues for as long as the context is active.
 
-    :py:class:`AutomaticSpinner` provides an alternative to :py:class:`Spinner`
+    :class:`AutomaticSpinner` provides an alternative to :class:`Spinner`
     for situations where it is not practical for the caller to periodically
-    call :py:func:`~Spinner.step()` to advance the animation, e.g. because
+    call :func:`~Spinner.step()` to advance the animation, e.g. because
     you're performing a blocking call and don't fancy implementing threading or
     subprocess handling just to provide some user feedback.
 
-    This works using the :py:mod:`multiprocessing` module by spawning a
+    This works using the :mod:`multiprocessing` module by spawning a
     subprocess to render the spinner while the main process is busy doing
-    something more useful. By using the :py:keyword:`with` statement you're
+    something more useful. By using the :keyword:`with` statement you're
     guaranteed that the subprocess is properly terminated at the appropriate
     time.
     """
