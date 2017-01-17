@@ -43,7 +43,7 @@ def get_version(*args):
 
 
 def get_install_requires():
-    """Add conditional dependencies for Python 2 (when creating source distributions)."""
+    """Get the conditional dependencies for source distributions."""
     install_requires = []
     if 'bdist_wheel' not in sys.argv:
         if sys.version_info[:2] <= (2, 6) or sys.version_info[:2] == (3, 0):
@@ -54,7 +54,7 @@ def get_install_requires():
 
 
 def get_extras_require():
-    """Add conditional dependencies for Python 2 (when creating wheel distributions)."""
+    """Get the conditional dependencies for wheel distributions."""
     extras_require = {}
     if have_environment_marker_support():
         # Conditional `importlib' dependency.
