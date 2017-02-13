@@ -471,10 +471,10 @@ def show_pager(formatted_text, encoding='UTF-8'):
     that's used to invoke the pager.
     """
     if connected_to_terminal():
-        if is_unicode(formatted_text):
-            formatted_text = formatted_text.encode(encoding)
         command_line = get_pager_command(formatted_text)
         pager = subprocess.Popen(command_line, stdin=subprocess.PIPE)
+        if is_unicode(formatted_text):
+            formatted_text = formatted_text.encode(encoding)
         pager.communicate(input=formatted_text)
     else:
         print(formatted_text)
