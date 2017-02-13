@@ -4,7 +4,7 @@
 # Tests for the `humanfriendly' package.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: January 17, 2017
+# Last Change: February 13, 2017
 # URL: https://humanfriendly.readthedocs.io
 
 """Test suite for the `humanfriendly` package."""
@@ -51,6 +51,7 @@ from humanfriendly.terminal import (
     clean_terminal_output,
     connected_to_terminal,
     find_terminal_size,
+    get_pager_command,
     show_pager,
     terminal_supports_colors,
 )
@@ -687,6 +688,34 @@ class HumanFriendlyTestCase(unittest.TestCase):
             else:
                 # Clear the custom $PAGER value.
                 os.environ.pop('PAGER')
+
+    def test_get_pager_command(self):
+        """Test :func:`humanfriendly.terminal.get_pager_command()`."""
+        # Make sure --RAW-CONTROL-CHARS isn't used when it's not needed.
+        assert '--RAW-CONTROL-CHARS' not in get_pager_command("Usage message")
+        # Make sure --RAW-CONTROL-CHARS is used when it's needed.
+        assert '--RAW-CONTROL-CHARS' in get_pager_command(ansi_wrap("Usage message", bold=True))
+        # Make sure that less-specific options are only used when valid.
+        options_specific_to_less = ['--no-init', '--quit-if-one-screen']
+        for pager in 'cat', 'less':
+            original_pager = os.environ.get('PAGER', None)
+            try:
+                # Set $PAGER to `cat' or `less'.
+                os.environ['PAGER'] = pager
+                # Get the pager command line.
+                command_line = get_pager_command()
+                # Check for less-specific options.
+                if pager == 'less':
+                    assert all(opt in command_line for opt in options_specific_to_less)
+                else:
+                    assert not any(opt in command_line for opt in options_specific_to_less)
+            finally:
+                if original_pager is not None:
+                    # Restore the original $PAGER value.
+                    os.environ['PAGER'] = original_pager
+                else:
+                    # Clear the custom $PAGER value.
+                    os.environ.pop('PAGER')
 
     def test_terminal_supports_colors(self):
         """Test :func:`humanfriendly.terminal.terminal_supports_colors()`."""

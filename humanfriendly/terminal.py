@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: October 9, 2016
+# Last Change: February 14, 2017
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -95,7 +95,7 @@ def message(*args, **kw):
     """
     Show an informational message on the terminal.
 
-    :param args: Any position arguments are passed on to :func:`~humanfriendly.text.format()`.
+    :param args: Any positional arguments are passed on to :func:`~humanfriendly.text.format()`.
     :param kw: Any keyword arguments are passed on to :func:`~humanfriendly.text.format()`.
 
     Renders the message using :func:`~humanfriendly.text.format()` and writes
@@ -108,7 +108,7 @@ def warning(*args, **kw):
     """
     Show a warning message on the terminal.
 
-    :param args: Any position arguments are passed on to :func:`~humanfriendly.text.format()`.
+    :param args: Any positional arguments are passed on to :func:`~humanfriendly.text.format()`.
     :param kw: Any keyword arguments are passed on to :func:`~humanfriendly.text.format()`.
 
     Renders the message using :func:`~humanfriendly.text.format()` and writes
@@ -460,25 +460,62 @@ def show_pager(formatted_text, encoding='UTF-8'):
     :param encoding: The name of the text encoding used to encode the formatted
                      text if the formatted text is a Unicode string (a string).
 
+    When :func:`connected_to_terminal()` returns :data:`True` a pager is used
+    to show the text on the terminal, otherwise the text is printed directly
+    without invoking a pager.
+
     The use of a pager helps to avoid the wall of text effect where the user
     has to scroll up to see where the output began (not very user friendly).
 
-    If :data:`sys.stdout` is not connected to a terminal (see
-    :func:`connected_to_terminal()`) then the text is printed directly without
-    invoking a pager.
-
-    If the given text contains ANSI escape sequences the command ``less
-    --RAW-CONTROL-CHARS`` is used, otherwise ``$PAGER`` is used (if ``$PAGER``
-    isn't set the command ``less`` is used).
+    Refer to :func:`get_pager_command()` for details about the command line
+    that's used to invoke the pager.
     """
-    if connected_to_terminal(sys.stdout):
-        if ANSI_CSI in formatted_text:
-            pager_command = ['less', '--RAW-CONTROL-CHARS']
-        else:
-            pager_command = [os.environ.get('PAGER', 'less')]
+    if connected_to_terminal():
         if is_unicode(formatted_text):
             formatted_text = formatted_text.encode(encoding)
-        pager = subprocess.Popen(pager_command, stdin=subprocess.PIPE)
+        command_line = get_pager_command(formatted_text)
+        pager = subprocess.Popen(command_line, stdin=subprocess.PIPE)
         pager.communicate(input=formatted_text)
     else:
         print(formatted_text)
+
+
+def get_pager_command(text=None):
+    """
+    Get the command to show a text on the terminal using a pager.
+
+    :param text: The text to print to the terminal (a string).
+    :returns: A list of strings with the pager command and arguments.
+
+    The use of a pager helps to avoid the wall of text effect where the user
+    has to scroll up to see where the output began (not very user friendly).
+
+    If the given text contains ANSI escape sequences the command ``less
+    --RAW-CONTROL-CHARS`` is used, otherwise the environment variable
+    ``$PAGER`` is used (if ``$PAGER`` isn't set less_ is used).
+
+    When the selected pager is less_, the following options are used to make
+    the experience more user friendly:
+
+    - ``--quit-if-one-screen`` causes less_ to automatically exit if the entire
+      text can be displayed on the first screen. This makes the use of a pager
+      transparent for smaller texts (because the operator doesn't have to quit
+      the pager).
+
+    - ``--no-init`` prevents less_ from clearing the screen when it exits. This
+      ensures that the operator gets a chance to review the text (for example a
+      usage message) after quitting the pager, while composing the next command.
+
+    .. _less: http://man7.org/linux/man-pages/man1/less.1.html
+    """
+    # Compose the pager command.
+    if text and ANSI_CSI in text:
+        command_line = ['less', '--RAW-CONTROL-CHARS']
+    else:
+        command_line = [os.environ.get('PAGER', 'less')]
+    # Pass some additional options to `less' (to make it more
+    # user friendly) without breaking support for other pagers.
+    if os.path.basename(command_line[0]) == 'less':
+        command_line.append('--no-init')
+        command_line.append('--quit-if-one-screen')
+    return command_line
