@@ -72,13 +72,13 @@ length_size_units = (dict(prefix='nm', divider=1e-09, singular='nm', plural='nm'
                      dict(prefix='km', divider=1000, singular='km', plural='km'))
 
 # Common time units, used for formatting of time spans.
-time_units = (dict(divider=1e-3, singular='millisecond', plural='milliseconds', abbreviation='ms'),
-              dict(divider=1, singular='second', plural='seconds', abbreviation='s'),
-              dict(divider=60, singular='minute', plural='minutes', abbreviation='m'),
-              dict(divider=60 * 60, singular='hour', plural='hours', abbreviation='h'),
-              dict(divider=60 * 60 * 24, singular='day', plural='days', abbreviation='d'),
-              dict(divider=60 * 60 * 24 * 7, singular='week', plural='weeks', abbreviation='w'),
-              dict(divider=60 * 60 * 24 * 7 * 52, singular='year', plural='years', abbreviation='y'))
+time_units = (dict(divider=1e-3, singular='millisecond', plural='milliseconds', abbreviations=['ms']),
+              dict(divider=1, singular='second', plural='seconds', abbreviations=['s']),
+              dict(divider=60, singular='minute', plural='minutes', abbreviations=['m', 'mins', 'min']),
+              dict(divider=60 * 60, singular='hour', plural='hours', abbreviations=['h']),
+              dict(divider=60 * 60 * 24, singular='day', plural='days', abbreviations=['d']),
+              dict(divider=60 * 60 * 24 * 7, singular='week', plural='weeks', abbreviations=['w']),
+              dict(divider=60 * 60 * 24 * 7 * 52, singular='year', plural='years', abbreviations=['y']))
 
 
 def coerce_boolean(value):
@@ -445,7 +445,7 @@ def parse_timespan(timespan):
         if len(tokens) == 2 and is_string(tokens[1]):
             normalized_unit = tokens[1].lower()
             for unit in time_units:
-                if normalized_unit in (unit['singular'], unit['plural'], unit['abbreviation']):
+                if normalized_unit in ([unit['singular'], unit['plural']] + unit['abbreviations']):
                     return float(tokens[0]) * unit['divider']
     # We failed to parse the timespan specification.
     msg = "Failed to parse timespan! (input %r was tokenized as %r)"
