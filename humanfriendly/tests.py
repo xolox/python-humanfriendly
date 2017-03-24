@@ -168,6 +168,8 @@ class HumanFriendlyTestCase(unittest.TestCase):
         self.assertEqual(5, humanfriendly.parse_timespan('5 seconds'))
         self.assertEqual(60 * 2, humanfriendly.parse_timespan('2m'))
         self.assertEqual(60 * 2, humanfriendly.parse_timespan('2 minutes'))
+        self.assertEqual(60 * 3, humanfriendly.parse_timespan('3 min'))
+        self.assertEqual(60 * 3, humanfriendly.parse_timespan('3 mins'))
         self.assertEqual(60 * 60 * 3, humanfriendly.parse_timespan('3 h'))
         self.assertEqual(60 * 60 * 3, humanfriendly.parse_timespan('3 hours'))
         self.assertEqual(60 * 60 * 24 * 4, humanfriendly.parse_timespan('4d'))
