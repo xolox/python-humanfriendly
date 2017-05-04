@@ -3,7 +3,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: mei 4, 2017
+# Last Change: May 4, 2017
 # URL: https://humanfriendly.readthedocs.io
 
 """
