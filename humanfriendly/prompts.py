@@ -3,7 +3,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: November 30, 2016
+# Last Change: mei 4, 2017
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -330,10 +330,13 @@ def prepare_friendly_prompts():
 
 def retry_limit():
     """
-    Generator for interactive prompts that repeat on invalid input.
+    Allow the user to provide valid input up to :data:`MAX_ATTEMPTS` times.
 
     :raises: :exc:`TooManyInvalidReplies` when an interactive prompt
              receives repeated invalid input (:data:`MAX_ATTEMPTS`).
+
+    This function returns a generator for interactive prompts that want to
+    repeat on invalid input without getting stuck in infinite loops.
     """
     for i in range(MAX_ATTEMPTS):
         yield i + 1

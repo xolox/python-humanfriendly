@@ -665,9 +665,21 @@ class HumanFriendlyTestCase(unittest.TestCase):
             sys.stdout = saved_stdout
             sys.stderr = saved_stderr
 
-    def test_connected_to_terminal(self):
-        """Test :func:`humanfriendly.terminal.connected_to_terminal()`."""
-        self.check_terminal_capabilities(connected_to_terminal)
+    def test_terminal_capabilities(self):
+        """Test the functions that check for terminal capabilities."""
+        for test_stream in connected_to_terminal, terminal_supports_colors:
+            # This test suite should be able to run interactively as well as
+            # non-interactively, so we can't expect or demand that standard streams
+            # will always be connected to a terminal. Fortunately Capturer enables
+            # us to fake it :-).
+            for stream in sys.stdout, sys.stderr:
+                with CaptureOutput():
+                    assert test_stream(stream)
+            # Test something that we know can never be a terminal.
+            with open(os.devnull) as handle:
+                assert not test_stream(handle)
+            # Verify that objects without isatty() don't raise an exception.
+            assert not test_stream(object())
 
     def test_show_pager(self):
         """Test :func:`humanfriendly.terminal.show_pager()`."""
@@ -718,25 +730,6 @@ class HumanFriendlyTestCase(unittest.TestCase):
                 else:
                     # Clear the custom $PAGER value.
                     os.environ.pop('PAGER')
-
-    def test_terminal_supports_colors(self):
-        """Test :func:`humanfriendly.terminal.terminal_supports_colors()`."""
-        self.check_terminal_capabilities(terminal_supports_colors)
-
-    def check_terminal_capabilities(self, test_stream):
-        """Helper for :func:`test_connected_to_terminal()` and func:`test_terminal_supports_colors()`."""
-        # This test suite should be able to run interactively as well as
-        # non-interactively, so we can't expect or demand that standard streams
-        # will always be connected to a terminal. Fortunately Capturer enables
-        # us to fake it :-).
-        for stream in sys.stdout, sys.stderr:
-            with CaptureOutput():
-                assert test_stream(stream)
-        # Test something that we know can never be a terminal.
-        with open(os.devnull) as handle:
-            assert not test_stream(handle)
-        # Verify that objects without isatty() don't raise an exception.
-        assert not test_stream(object())
 
     def test_find_meta_variables(self):
         """Test :func:`humanfriendly.usage.find_meta_variables()`."""
@@ -939,7 +932,7 @@ class HumanFriendlyTestCase(unittest.TestCase):
 
 
 def main(*args, **kw):
-    """Utility function to test the command line interface without invoking a subprocess."""
+    """Test the command line interface without invoking a subprocess."""
     returncode = 0
     input_buffer = StringIO(kw.get('input', ''))
     output_buffer = StringIO()
@@ -962,7 +955,7 @@ def main(*args, **kw):
 
 def normalize_timestamp(value, ndigits=1):
     """
-    Utility function to round timestamps to the given number of digits.
+    Round timestamps to the given number of digits.
 
     This helps to make the test suite less sensitive to timing issues caused by
     multitasking, processor scheduling, etc.
