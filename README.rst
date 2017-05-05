@@ -57,7 +57,8 @@ Command line
 
 **Usage:** `humanfriendly [OPTIONS]`
 
-Human friendly input/output (text formatting) on the command line based on the Python package with the same name.
+Human friendly input/output (text formatting) on the command
+line based on the Python package with the same name.
 
 **Supported options:**
 
@@ -88,8 +89,7 @@ Human friendly input/output (text formatting) on the command line based on the P
    number of bytes to standard output."
    ``--parse-length=VALUE``,"Parse a human readable length (given as the string ``VALUE``) and print the
    number of metres to standard output."
-   "``-h``, ``--help``","Show this message and exit.
-   "
+   "``-h``, ``--help``",Show this message and exit.
 
 .. [[[end]]]
 

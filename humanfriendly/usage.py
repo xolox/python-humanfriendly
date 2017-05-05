@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: January 17, 2017
+# Last Change: May 6, 2017
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -205,7 +205,7 @@ def parse_usage(text):
         # Check whether we've found the end of the introduction.
         end_of_intro = (paragraphs[0] == START_OF_OPTIONS_MARKER)
         # Append the current paragraph to the introduction.
-        introduction.append(join_lines(paragraphs.pop(0)))
+        introduction.append(paragraphs.pop(0))
         # Stop after we've processed the complete introduction.
         if end_of_intro:
             break
@@ -255,7 +255,7 @@ def render_usage(text):
             description = options.pop(0)
             csv_writer.writerow([
                 render_paragraph(variants, meta_variables),
-                '\n\n'.join(render_paragraph(p, meta_variables) for p in split_paragraphs(description)),
+                ('\n\n'.join(render_paragraph(p, meta_variables) for p in split_paragraphs(description))).rstrip(),
             ])
         csv_lines = csv_buffer.getvalue().splitlines()
         output.append('\n'.join('   %s' % l for l in csv_lines))
