@@ -43,7 +43,7 @@ from importlib import import_module
 
 # Modules included in our package.
 from humanfriendly.compat import StringIO
-from humanfriendly.text import dedent, join_lines, split_paragraphs, trim_empty_lines
+from humanfriendly.text import dedent, split_paragraphs, trim_empty_lines
 
 # Public identifiers that require documentation (PEP-257).
 __all__ = (
