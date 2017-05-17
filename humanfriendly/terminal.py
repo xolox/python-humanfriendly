@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: February 14, 2017
+# Last Change: May 18, 2017
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -17,6 +17,7 @@ escape sequences work.
 """
 
 # Standard library modules.
+import codecs
 import os
 import re
 import subprocess
@@ -36,7 +37,7 @@ except ImportError:
 # Modules included in our package. We import find_meta_variables() here to
 # preserve backwards compatibility with older versions of humanfriendly where
 # that function was defined in this module.
-from humanfriendly.compat import is_unicode
+from humanfriendly.compat import coerce_string, is_unicode
 from humanfriendly.text import concatenate, format
 from humanfriendly.usage import find_meta_variables, format_usage  # NOQA
 
@@ -82,6 +83,9 @@ DEFAULT_LINES = 25
 DEFAULT_COLUMNS = 80
 """The default number of columns in a terminal (an integer)."""
 
+DEFAULT_ENCODING = 'UTF-8'
+"""The output encoding for Unicode strings."""
+
 HIGHLIGHT_COLOR = os.environ.get('HUMANFRIENDLY_HIGHLIGHT_COLOR', 'green')
 """
 The color used to highlight important tokens in formatted text (e.g. the usage
@@ -91,36 +95,78 @@ message of the ``humanfriendly`` program). If the environment variable
 """
 
 
-def message(*args, **kw):
+def output(text, *args, **kw):
     """
-    Show an informational message on the terminal.
+    Print a formatted message to the standard output stream.
 
-    :param args: Any positional arguments are passed on to :func:`~humanfriendly.text.format()`.
-    :param kw: Any keyword arguments are passed on to :func:`~humanfriendly.text.format()`.
+    For details about argument handling please refer to
+    :func:`~humanfriendly.text.format()`.
 
     Renders the message using :func:`~humanfriendly.text.format()` and writes
-    the resulting string to :data:`sys.stderr` (followed by a newline).
+    the resulting string (followed by a newline) to :data:`sys.stdout` using
+    :func:`auto_encode()`.
     """
-    sys.stderr.write(format(*args, **kw) + '\n')
+    auto_encode(sys.stdout, coerce_string(text) + '\n', *args, **kw)
 
 
-def warning(*args, **kw):
+def message(text, *args, **kw):
+    """
+    Print a formatted message to the standard error stream.
+
+    For details about argument handling please refer to
+    :func:`~humanfriendly.text.format()`.
+
+    Renders the message using :func:`~humanfriendly.text.format()` and writes
+    the resulting string (followed by a newline) to :data:`sys.stderr` using
+    :func:`auto_encode()`.
+    """
+    auto_encode(sys.stderr, coerce_string(text) + '\n', *args, **kw)
+
+
+def warning(text, *args, **kw):
     """
     Show a warning message on the terminal.
 
-    :param args: Any positional arguments are passed on to :func:`~humanfriendly.text.format()`.
-    :param kw: Any keyword arguments are passed on to :func:`~humanfriendly.text.format()`.
+    For details about argument handling please refer to
+    :func:`~humanfriendly.text.format()`.
 
     Renders the message using :func:`~humanfriendly.text.format()` and writes
-    the resulting string to :data:`sys.stderr` (followed by a newline). If
-    :data:`sys.stderr` is connected to a terminal :func:`ansi_wrap()` is used
-    to color the message in a red font (to make the warning stand out from
-    surrounding text).
+    the resulting string (followed by a newline) to :data:`sys.stderr` using
+    :func:`auto_encode()`.
+
+    If :data:`sys.stderr` is connected to a terminal that supports colors,
+    :func:`ansi_wrap()` is used to color the message in a red font (to make
+    the warning stand out from surrounding text).
     """
-    text = format(*args, **kw)
+    text = coerce_string(text)
     if terminal_supports_colors(sys.stderr):
         text = ansi_wrap(text, color='red')
-    sys.stderr.write(text + '\n')
+    auto_encode(sys.stderr, text + '\n', *args, **kw)
+
+
+def auto_encode(stream, text, *args, **kw):
+    """
+    Reliably write Unicode strings to the terminal.
+
+    :param stream: The file-like object to write to (a value like
+                   :data:`sys.stdout` or :data:`sys.stderr`).
+    :param text: The text to write to the stream (a string).
+    :param args: Refer to :func:`~humanfriendly.text.format()`.
+    :param kw: Refer to :func:`~humanfriendly.text.format()`.
+
+    Renders the text using :func:`~humanfriendly.text.format()` and writes it
+    to the given stream. If an :exc:`~exceptions.UnicodeEncodeError` is
+    encountered in doing so, the text is encoded using :data:`DEFAULT_ENCODING`
+    and the write is retried. The reasoning behind this rather blunt approach
+    is that it's preferable to get output on the command line in the wrong
+    encoding then to have the Python program blow up with a
+    :exc:`~exceptions.UnicodeEncodeError` exception.
+    """
+    text = format(text, *args, **kw)
+    try:
+        stream.write(text)
+    except UnicodeEncodeError:
+        stream.write(codecs.encode(text, DEFAULT_ENCODING))
 
 
 def ansi_strip(text, readline_hints=True):
@@ -452,13 +498,14 @@ def usage(usage_text):
     show_pager(usage_text)
 
 
-def show_pager(formatted_text, encoding='UTF-8'):
+def show_pager(formatted_text, encoding=DEFAULT_ENCODING):
     """
     Print a large text to the terminal using a pager.
 
     :param formatted_text: The text to print to the terminal (a string).
     :param encoding: The name of the text encoding used to encode the formatted
-                     text if the formatted text is a Unicode string (a string).
+                     text if the formatted text is a Unicode string (a string,
+                     defaults to :data:`DEFAULT_ENCODING`).
 
     When :func:`connected_to_terminal()` returns :data:`True` a pager is used
     to show the text on the terminal, otherwise the text is printed directly
@@ -477,7 +524,7 @@ def show_pager(formatted_text, encoding='UTF-8'):
             formatted_text = formatted_text.encode(encoding)
         pager.communicate(input=formatted_text)
     else:
-        print(formatted_text)
+        output(formatted_text)
 
 
 def get_pager_command(text=None):

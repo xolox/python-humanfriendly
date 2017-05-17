@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: May 27, 2015
+# Last Change: May 18, 2017
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -85,7 +85,7 @@ from humanfriendly import (
     Spinner,
     Timer,
 )
-from humanfriendly.terminal import usage
+from humanfriendly.terminal import output, usage, warning
 
 
 def main():
@@ -96,8 +96,8 @@ def main():
             'format-table', 'format-timespan=', 'parse-length=',
             'parse-size=', 'run-command', 'help',
         ])
-    except getopt.GetoptError as e:
-        sys.stderr.write("Error: %s\n" % e)
+    except Exception as e:
+        warning("Error: %s", e)
         sys.exit(1)
     actions = []
     delimiter = None
@@ -150,19 +150,19 @@ def run_command(command_line):
 def print_formatted_length(value):
     """Print a human readable length."""
     if '.' in value:
-        print(format_length(float(value)))
+        output(format_length(float(value)))
     else:
-        print(format_length(int(value)))
+        output(format_length(int(value)))
 
 
 def print_formatted_number(value):
     """Print large numbers in a human readable format."""
-    print(format_number(float(value)))
+    output(format_number(float(value)))
 
 
 def print_formatted_size(value):
     """Print a human readable size."""
-    print(format_size(int(value)))
+    output(format_size(int(value)))
 
 
 def print_formatted_table(delimiter):
@@ -171,19 +171,19 @@ def print_formatted_table(delimiter):
     for line in sys.stdin:
         line = line.rstrip()
         data.append(line.split(delimiter))
-    print(format_table(data))
+    output(format_table(data))
 
 
 def print_formatted_timespan(value):
     """Print a human readable timespan."""
-    print(format_timespan(float(value)))
+    output(format_timespan(float(value)))
 
 
 def print_parsed_length(value):
     """Parse a human readable length and print the number of metres."""
-    print(parse_length(value))
+    output(parse_length(value))
 
 
 def print_parsed_size(value):
     """Parse a human readable data size and print the number of bytes."""
-    print(parse_size(value))
+    output(parse_size(value))
