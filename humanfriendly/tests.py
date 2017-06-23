@@ -4,7 +4,7 @@
 # Tests for the `humanfriendly' package.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: May 4, 2017
+# Last Change: June 24, 2017
 # URL: https://humanfriendly.readthedocs.io
 
 """Test suite for the `humanfriendly` package."""
@@ -14,7 +14,6 @@ import logging
 import math
 import os
 import random
-import string
 import sys
 import time
 import unittest
@@ -55,6 +54,7 @@ from humanfriendly.terminal import (
     show_pager,
     terminal_supports_colors,
 )
+from humanfriendly.text import random_string
 from humanfriendly.usage import (
     find_meta_variables,
     format_usage,
@@ -961,11 +961,6 @@ def normalize_timestamp(value, ndigits=1):
     multitasking, processor scheduling, etc.
     """
     return '%.2f' % round(float(value), ndigits=ndigits)
-
-
-def random_string(length=25):
-    """Generate a random string."""
-    return ''.join(random.choice(string.ascii_letters) for i in range(length))
 
 
 class PatchedAttribute(object):

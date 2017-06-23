@@ -21,7 +21,10 @@ The :mod:`~humanfriendly.text` module contains simple functions to manipulate te
 
 # Standard library modules.
 import math
+import numbers
+import random
 import re
+import string
 import textwrap
 
 # Public identifiers that require documentation.
@@ -33,6 +36,7 @@ __all__ = (
     'is_empty_line',
     'join_lines',
     'pluralize',
+    'random_string',
     'split',
     'split_paragraphs',
     'tokenize',
@@ -245,6 +249,26 @@ def pluralize(count, singular, plural=None):
     if not plural:
         plural = singular + 's'
     return '%s %s' % (count, singular if math.floor(float(count)) == 1 else plural)
+
+
+def random_string(length=(25, 100), characters=string.ascii_letters):
+    """random_string(length=(25, 100), characters=string.ascii_letters)
+    Generate a random string.
+
+    :param length: The length of the string to be generated (a number or a
+                   tuple with two numbers). If this is a tuple then a random
+                   number between the two numbers given in the tuple is used.
+    :param characters: The characters to be used (a string, defaults
+                       to :data:`string.ascii_letters`).
+    :returns: A random string.
+
+    The :func:`random_string()` function is very useful in test suites; by the
+    time I included it in :mod:`humanfriendly.text` I had already included
+    variants of this function in seven different test suites :-).
+    """
+    if not isinstance(length, numbers.Number):
+        length = random.randint(length[0], length[1])
+    return ''.join(random.choice(characters) for _ in range(length))
 
 
 def split(text, delimiter=','):
