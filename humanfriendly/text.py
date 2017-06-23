@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: April 21, 2016
+# Last Change: June 23, 2017
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -25,6 +25,37 @@ import re
 import textwrap
 
 
+def compact(text, *args, **kw):
+    '''
+    Compact whitespace in a string.
+
+    Trims leading and trailing whitespace, replaces runs of whitespace
+    characters with a single space and interpolates any arguments using
+    :func:`format()`.
+
+    :param text: The text to compact (a string).
+    :param args: Any positional arguments are interpolated using :func:`format()`.
+    :param kw: Any keyword arguments are interpolated using :func:`format()`.
+    :returns: The compacted text (a string).
+
+    Here's an example of how I like to use the :func:`compact()` function, this
+    is an example from a random unrelated project I'm working on at the moment::
+
+        raise PortDiscoveryError(compact("""
+            Failed to discover port(s) that Apache is listening on!
+            Maybe I'm parsing the wrong configuration file? ({filename})
+        """, filename=self.ports_config))
+
+    The combination of :func:`compact()` and Python's multi line strings allows
+    me to write long text fragments with interpolated variables that are easy
+    to write, easy to read and work well with Python's whitespace
+    sensitivity.
+    '''
+    non_whitespace_tokens = text.split()
+    compacted_text = ' '.join(non_whitespace_tokens)
+    return format(compacted_text, *args, **kw)
+
+
 def concatenate(items):
     """
     Concatenate a list of items in a human friendly way.
@@ -43,6 +74,32 @@ def concatenate(items):
         return items[0]
     else:
         return ''
+
+
+def dedent(text, *args, **kw):
+    """
+    Dedent a string (remove common leading whitespace from all lines).
+
+    Removes common leading whitespace from all lines in the string using
+    :func:`textwrap.dedent()`, removes leading and trailing empty lines using
+    :func:`trim_empty_lines()` and interpolates any arguments using
+    :func:`format()`.
+
+    :param text: The text to dedent (a string).
+    :param args: Any positional arguments are interpolated using :func:`format()`.
+    :param kw: Any keyword arguments are interpolated using :func:`format()`.
+    :returns: The dedented text (a string).
+
+    The :func:`compact()` function's documentation contains an example of how I
+    like to use the :func:`compact()` and :func:`dedent()` functions. The main
+    difference is that I use :func:`compact()` for text that will be presented
+    to the user (where whitespace is not so significant) and :func:`dedent()`
+    for data file and code generation tasks (where newlines and indentation are
+    very significant).
+    """
+    dedented_text = textwrap.dedent(text)
+    trimmed_text = trim_empty_lines(dedented_text)
+    return format(trimmed_text, *args, **kw)
 
 
 def format(text, *args, **kw):
@@ -129,78 +186,6 @@ def format(text, *args, **kw):
     return text
 
 
-def compact(text, *args, **kw):
-    '''
-    Compact whitespace in a string.
-
-    Trims leading and trailing whitespace, replaces runs of whitespace
-    characters with a single space and interpolates any arguments using
-    :func:`format()`.
-
-    :param text: The text to compact (a string).
-    :param args: Any positional arguments are interpolated using :func:`format()`.
-    :param kw: Any keyword arguments are interpolated using :func:`format()`.
-    :returns: The compacted text (a string).
-
-    Here's an example of how I like to use the :func:`compact()` function, this
-    is an example from a random unrelated project I'm working on at the moment::
-
-        raise PortDiscoveryError(compact("""
-            Failed to discover port(s) that Apache is listening on!
-            Maybe I'm parsing the wrong configuration file? ({filename})
-        """, filename=self.ports_config))
-
-    The combination of :func:`compact()` and Python's multi line strings allows
-    me to write long text fragments with interpolated variables that are easy
-    to write, easy to read and work well with Python's whitespace
-    sensitivity.
-    '''
-    non_whitespace_tokens = text.split()
-    compacted_text = ' '.join(non_whitespace_tokens)
-    return format(compacted_text, *args, **kw)
-
-
-def dedent(text, *args, **kw):
-    """
-    Dedent a string (remove common leading whitespace from all lines).
-
-    Removes common leading whitespace from all lines in the string using
-    :func:`textwrap.dedent()`, removes leading and trailing empty lines using
-    :func:`trim_empty_lines()` and interpolates any arguments using
-    :func:`format()`.
-
-    :param text: The text to dedent (a string).
-    :param args: Any positional arguments are interpolated using :func:`format()`.
-    :param kw: Any keyword arguments are interpolated using :func:`format()`.
-    :returns: The dedented text (a string).
-
-    The :func:`compact()` function's documentation contains an example of how I
-    like to use the :func:`compact()` and :func:`dedent()` functions. The main
-    difference is that I use :func:`compact()` for text that will be presented
-    to the user (where whitespace is not so significant) and :func:`dedent()`
-    for data file and code generation tasks (where newlines and indentation are
-    very significant).
-    """
-    dedented_text = textwrap.dedent(text)
-    trimmed_text = trim_empty_lines(dedented_text)
-    return format(trimmed_text, *args, **kw)
-
-
-def trim_empty_lines(text):
-    """
-    Trim leading and trailing empty lines from the given text.
-
-    :param text: The text to trim (a string).
-    :returns: The trimmed text (a string).
-    """
-    lines = text.splitlines(True)
-    while lines and is_empty_line(lines[0]):
-        lines.pop(0)
-    while lines and is_empty_line(lines[-1]):
-        lines.pop(-1)
-    return ''.join(lines)
-
-
 def is_empty_line(text):
     """
     Check if a text is empty or contains only whitespace.
@@ -210,21 +195,6 @@ def is_empty_line(text):
               :data:`False` otherwise.
     """
     return len(text) == 0 or text.isspace()
-
-
-def split_paragraphs(text):
-    """
-    Split a string into paragraphs (one or more lines delimited by an empty line).
-
-    :param text: The text to split into paragraphs (a string).
-    :returns: A list of strings.
-    """
-    paragraphs = []
-    for chunk in text.split('\n\n'):
-        chunk = trim_empty_lines(chunk)
-        if chunk and not chunk.isspace():
-            paragraphs.append(chunk)
-    return paragraphs
 
 
 def join_lines(text):
@@ -298,6 +268,21 @@ def split(text, delimiter=','):
     return [token.strip() for token in text.split(delimiter) if token and not token.isspace()]
 
 
+def split_paragraphs(text):
+    """
+    Split a string into paragraphs (one or more lines delimited by an empty line).
+
+    :param text: The text to split into paragraphs (a string).
+    :returns: A list of strings.
+    """
+    paragraphs = []
+    for chunk in text.split('\n\n'):
+        chunk = trim_empty_lines(chunk)
+        if chunk and not chunk.isspace():
+            paragraphs.append(chunk)
+    return paragraphs
+
+
 def tokenize(text):
     """
     Tokenize a text into numbers and strings.
@@ -331,3 +316,18 @@ def tokenize(text):
         elif token:
             tokenized_input.append(token)
     return tokenized_input
+
+
+def trim_empty_lines(text):
+    """
+    Trim leading and trailing empty lines from the given text.
+
+    :param text: The text to trim (a string).
+    :returns: The trimmed text (a string).
+    """
+    lines = text.splitlines(True)
+    while lines and is_empty_line(lines[0]):
+        lines.pop(0)
+    while lines and is_empty_line(lines[-1]):
+        lines.pop(-1)
+    return ''.join(lines)
