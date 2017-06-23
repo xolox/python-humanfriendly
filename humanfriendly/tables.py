@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: January 29, 2016
+# Last Change: June 24, 2017
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -38,6 +38,7 @@ from humanfriendly.terminal import (
     HIGHLIGHT_COLOR,
 )
 
+# Public identifiers that require documentation.
 __all__ = (
     'format_pretty_table',
     'format_robust_table',

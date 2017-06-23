@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: June 23, 2017
+# Last Change: June 24, 2017
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -23,6 +23,21 @@ The :mod:`~humanfriendly.text` module contains simple functions to manipulate te
 import math
 import re
 import textwrap
+
+# Public identifiers that require documentation.
+__all__ = (
+    'compact',
+    'concatenate',
+    'dedent',
+    'format',
+    'is_empty_line',
+    'join_lines',
+    'pluralize',
+    'split',
+    'split_paragraphs',
+    'tokenize',
+    'trim_empty_lines',
+)
 
 
 def compact(text, *args, **kw):

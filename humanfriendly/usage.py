@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: May 6, 2017
+# Last Change: June 24, 2017
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -45,7 +45,7 @@ from importlib import import_module
 from humanfriendly.compat import StringIO
 from humanfriendly.text import dedent, split_paragraphs, trim_empty_lines
 
-# Public identifiers that require documentation (PEP-257).
+# Public identifiers that require documentation.
 __all__ = (
     'find_meta_variables',
     'format_usage',
