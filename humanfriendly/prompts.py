@@ -3,7 +3,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: May 4, 2017
+# Last Change: June 24, 2017
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -29,7 +29,7 @@ from humanfriendly.terminal import (
     terminal_supports_colors,
     warning,
 )
-from humanfriendly.text import compact, format, concatenate
+from humanfriendly.text import format, concatenate
 
 MAX_ATTEMPTS = 10
 """The number of times an interactive prompt is shown on invalid input (an integer)."""
@@ -328,23 +328,27 @@ def prepare_friendly_prompts():
     import readline  # NOQA
 
 
-def retry_limit():
+def retry_limit(limit=MAX_ATTEMPTS):
     """
-    Allow the user to provide valid input up to :data:`MAX_ATTEMPTS` times.
+    Allow the user to provide valid input up to `limit` times.
 
+    :param limit: The maximum number of attempts (a number,
+                  defaults to :data:`MAX_ATTEMPTS`).
+    :returns: A generator of numbers starting from one.
     :raises: :exc:`TooManyInvalidReplies` when an interactive prompt
              receives repeated invalid input (:data:`MAX_ATTEMPTS`).
 
     This function returns a generator for interactive prompts that want to
     repeat on invalid input without getting stuck in infinite loops.
     """
-    for i in range(MAX_ATTEMPTS):
+    for i in range(limit):
         yield i + 1
-    logger.warning("Too many invalid replies on interactive prompt, aborting! (after %i attempts)", MAX_ATTEMPTS)
-    raise TooManyInvalidReplies(compact("""
-        Received too many invalid replies on interactive prompt,
-        giving up! (tried %i times)
-    """, MAX_ATTEMPTS))
+    msg = "Received too many invalid replies on interactive prompt, giving up! (tried %i times)"
+    formatted_msg = msg % limit
+    # Make sure the event is logged.
+    logger.warning(formatted_msg)
+    # Force the caller to decide what to do now.
+    raise TooManyInvalidReplies(formatted_msg)
 
 
 class TooManyInvalidReplies(Exception):
