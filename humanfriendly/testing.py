@@ -40,6 +40,9 @@ from humanfriendly.text import compact, random_string
 # Initialize a logger for this module.
 logger = logging.getLogger(__name__)
 
+# A unique object reference used to detect missing attributes.
+NOTHING = object()
+
 # Public identifiers that require documentation.
 __all__ = (
     'CallableTimedOut',
@@ -165,7 +168,7 @@ class PatchedAttribute(ContextManager):
         self.object_to_patch = obj
         self.attribute_to_patch = name
         self.patched_value = value
-        self.original_value = None
+        self.original_value = NOTHING
 
     def __enter__(self):
         """
@@ -176,7 +179,7 @@ class PatchedAttribute(ContextManager):
         # Enable composition of context managers.
         super(PatchedAttribute, self).__enter__()
         # Patch the object's attribute.
-        self.original_value = getattr(self.object_to_patch, self.attribute_to_patch)
+        self.original_value = getattr(self.object_to_patch, self.attribute_to_patch, NOTHING)
         setattr(self.object_to_patch, self.attribute_to_patch, self.patched_value)
         return self.object_to_patch
 
@@ -185,7 +188,10 @@ class PatchedAttribute(ContextManager):
         # Enable composition of context managers.
         super(PatchedAttribute, self).__exit__(exc_type, exc_value, traceback)
         # Restore the object's attribute.
-        setattr(self.object_to_patch, self.attribute_to_patch, self.original_value)
+        if self.original_value is NOTHING:
+            delattr(self.object_to_patch, self.attribute_to_patch)
+        else:
+            setattr(self.object_to_patch, self.attribute_to_patch, self.original_value)
 
 
 class PatchedItem(ContextManager):
@@ -203,7 +209,7 @@ class PatchedItem(ContextManager):
         self.object_to_patch = obj
         self.item_to_patch = item
         self.patched_value = value
-        self.original_value = None
+        self.original_value = NOTHING
 
     def __enter__(self):
         """
@@ -214,7 +220,10 @@ class PatchedItem(ContextManager):
         # Enable composition of context managers.
         super(PatchedItem, self).__enter__()
         # Patch the object's item.
-        self.original_value = self.object_to_patch[self.item_to_patch]
+        try:
+            self.original_value = self.object_to_patch[self.item_to_patch]
+        except KeyError:
+            self.original_value = NOTHING
         self.object_to_patch[self.item_to_patch] = self.patched_value
         return self.object_to_patch
 
@@ -223,7 +232,10 @@ class PatchedItem(ContextManager):
         # Enable composition of context managers.
         super(PatchedItem, self).__exit__(exc_type, exc_value, traceback)
         # Restore the object's item.
-        self.object_to_patch[self.item_to_patch] = self.original_value
+        if self.original_value is NOTHING:
+            del self.object_to_patch[self.item_to_patch]
+        else:
+            self.object_to_patch[self.item_to_patch] = self.original_value
 
 
 class TemporaryDirectory(ContextManager):
