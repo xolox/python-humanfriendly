@@ -626,7 +626,6 @@ class HumanFriendlyTestCase(TestCase):
         assert output.strip() == humanfriendly.format_size(random_byte_count)
         # Test `humanfriendly --format-table'.
         returncode, output = run_cli(main, '--format-table', '--delimiter=\t', input='1\t2\t3\n4\t5\t6\n7\t8\t9')
-        print output
         assert output.strip() == dedent('''
             -------------
             | 1 | 2 | 3 |
