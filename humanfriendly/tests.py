@@ -20,8 +20,9 @@ import unittest
 
 # Modules included in our package.
 import humanfriendly
-from humanfriendly import cli, prompts
+from humanfriendly import prompts
 from humanfriendly import compact, dedent, trim_empty_lines
+from humanfriendly.cli import main
 from humanfriendly.compat import StringIO
 from humanfriendly.prompts import (
     TooManyInvalidReplies,
@@ -62,6 +63,7 @@ from humanfriendly.testing import (
     TemporaryDirectory,
     TestCase,
     retry,
+    run_cli,
 )
 from humanfriendly.text import random_string
 from humanfriendly.usage import (
@@ -607,23 +609,24 @@ class HumanFriendlyTestCase(TestCase):
     def test_cli(self):
         """Test the command line interface."""
         # Test that the usage message is printed by default.
-        returncode, output = main()
+        returncode, output = run_cli(main)
         assert 'Usage:' in output
         # Test that the usage message can be requested explicitly.
-        returncode, output = main('--help')
+        returncode, output = run_cli(main, '--help')
         assert 'Usage:' in output
         # Test handling of invalid command line options.
-        returncode, output = main('--unsupported-option')
+        returncode, output = run_cli(main, '--unsupported-option')
         assert returncode != 0
         # Test `humanfriendly --format-number'.
-        returncode, output = main('--format-number=1234567')
+        returncode, output = run_cli(main, '--format-number=1234567')
         assert output.strip() == '1,234,567'
         # Test `humanfriendly --format-size'.
         random_byte_count = random.randint(1024, 1024 * 1024)
-        returncode, output = main('--format-size=%i' % random_byte_count)
+        returncode, output = run_cli(main, '--format-size=%i' % random_byte_count)
         assert output.strip() == humanfriendly.format_size(random_byte_count)
         # Test `humanfriendly --format-table'.
-        returncode, output = main('--format-table', '--delimiter=\t', input='1\t2\t3\n4\t5\t6\n7\t8\t9')
+        returncode, output = run_cli(main, '--format-table', '--delimiter=\t', input='1\t2\t3\n4\t5\t6\n7\t8\t9')
+        print output
         assert output.strip() == dedent('''
             -------------
             | 1 | 2 | 3 |
@@ -633,13 +636,13 @@ class HumanFriendlyTestCase(TestCase):
         ''').strip()
         # Test `humanfriendly --format-timespan'.
         random_timespan = random.randint(5, 600)
-        returncode, output = main('--format-timespan=%i' % random_timespan)
+        returncode, output = run_cli(main, '--format-timespan=%i' % random_timespan)
         assert output.strip() == humanfriendly.format_timespan(random_timespan)
         # Test `humanfriendly --parse-size'.
-        returncode, output = main('--parse-size=5 KB')
+        returncode, output = run_cli(main, '--parse-size=5 KB')
         assert int(output) == humanfriendly.parse_size('5 KB')
         # Test `humanfriendly --run-command'.
-        returncode, output = main('--run-command', 'bash', '-c', 'sleep 2 && exit 42')
+        returncode, output = run_cli(main, '--run-command', 'bash', '-c', 'sleep 2 && exit 42')
         assert returncode == 42
 
     def test_ansi_style(self):
@@ -997,28 +1000,6 @@ class HumanFriendlyTestCase(TestCase):
             obj=entity, options=None, lines=lines,
         )
         return lines != saved_lines
-
-
-def main(*args, **kw):
-    """Test the command line interface without invoking a subprocess."""
-    returncode = 0
-    input_buffer = StringIO(kw.get('input', ''))
-    output_buffer = StringIO()
-    saved_argv = sys.argv
-    saved_stdin = sys.stdin
-    saved_stdout = sys.stdout
-    try:
-        sys.argv = [sys.argv[0]] + list(args)
-        sys.stdin = input_buffer
-        sys.stdout = output_buffer
-        cli.main()
-    except SystemExit as e:
-        returncode = e.code or 1
-    finally:
-        sys.argv = saved_argv
-        sys.stdin = saved_stdin
-        sys.stdout = saved_stdout
-    return returncode, output_buffer.getvalue()
 
 
 def normalize_timestamp(value, ndigits=1):

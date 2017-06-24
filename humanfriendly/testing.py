@@ -52,6 +52,7 @@ __all__ = (
     'TemporaryDirectory',
     'TestCase',
     'retry',
+    'run_cli',
 )
 
 
@@ -91,6 +92,45 @@ def retry(func, timeout=60, exc_type=AssertionError):
         time.sleep(pause)
         if pause < 1:
             pause *= 2
+
+
+def run_cli(entry_point, *arguments, **options):
+    """
+    Test a command line entry point.
+
+    :param entry_point: The function that implements the command line interface
+                        (a callable).
+    :param arguments: Any positional arguments (strings) become the command
+                      line arguments (:data:`sys.argv` items 1-N).
+    :param options: The following keyword arguments are supported:
+
+                    **input**
+                     Refer to :class:`CaptureOutput`.
+                    **merged**
+                     Refer to :class:`CaptureOutput`.
+                    **program_name**
+                     Used to set :data:`sys.argv` item 0.
+    :returns: A tuple with two values:
+
+              1. The return code (an integer).
+              2. The captured output (a string).
+    """
+    program_name = options.pop('program_name', sys.executable)
+    # Start capturing the standard output and error streams.
+    with CaptureOutput(**options) as output:
+        # Temporarily override sys.argv.
+        arguments = list(arguments)
+        arguments.insert(0, program_name)
+        with PatchedAttribute(sys, 'argv', arguments):
+            try:
+                # Call the command line interface.
+                entry_point()
+            except SystemExit as e:
+                # Intercept sys.exit() calls.
+                returncode = e.code
+            else:
+                returncode = 0
+            return returncode, output.getvalue()
 
 
 class CallableTimedOut(Exception):
@@ -344,17 +384,25 @@ class CaptureOutput(ContextManager):
 
     """Context manager that captures what's written to :data:`sys.stdout` and :data:`sys.stderr`."""
 
-    def __init__(self, merged=False):
+    def __init__(self, merged=False, input=''):
         """
         Initialize a :class:`CaptureOutput` object.
 
         :param merged: :data:`True` to merge the streams,
                        :data:`False` to capture them separately.
+        :param input: The data that reads from :data:`sys.stdin`
+                      should return (a string).
         """
+        self.stdin = StringIO(input)
         self.stdout = StringIO()
         self.stderr = self.stdout if merged else StringIO()
-        self.stdout_context = PatchedAttribute(sys, 'stdout', self.stdout)
-        self.stderr_context = PatchedAttribute(sys, 'stderr', self.stderr)
+        self.patched_attributes = [
+            PatchedAttribute(sys, name, getattr(self, name))
+            for name in 'stdin', 'stdout', 'stderr'
+        ]
+
+    stdin = None
+    """The :class:`~humanfriendly.compat.StringIO` object used to feed the standard input stream."""
 
     stdout = None
     """The :class:`~humanfriendly.compat.StringIO` object used to capture the standard output stream."""
@@ -365,15 +413,15 @@ class CaptureOutput(ContextManager):
     def __enter__(self):
         """Start capturing what's written to :data:`sys.stdout` and :data:`sys.stderr`."""
         super(CaptureOutput, self).__enter__()
-        self.stdout_context.__enter__()
-        self.stderr_context.__enter__()
+        for context in self.patched_attributes:
+            context.__enter__()
         return self
 
     def __exit__(self, exc_type=None, exc_value=None, traceback=None):
         """Stop capturing what's written to :data:`sys.stdout` and :data:`sys.stderr`."""
         super(CaptureOutput, self).__exit__(exc_type, exc_value, traceback)
-        sys.stdout_context.__exit__(exc_type, exc_value, traceback)
-        sys.stderr_context.__exit__(exc_type, exc_value, traceback)
+        for context in self.patched_attributes:
+            context.__exit__(exc_type, exc_value, traceback)
 
     def getvalue(self):
         """Get the text written to :data:`sys.stdout`."""
