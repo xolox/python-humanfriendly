@@ -10,10 +10,10 @@
 """Test suite for the `humanfriendly` package."""
 
 # Standard library modules.
-import logging
 import math
 import os
 import random
+import subprocess
 import sys
 import time
 import unittest
@@ -54,6 +54,15 @@ from humanfriendly.terminal import (
     show_pager,
     terminal_supports_colors,
 )
+from humanfriendly.testing import (
+    CallableTimedOut,
+    MockedProgram,
+    PatchedAttribute,
+    PatchedItem,
+    TemporaryDirectory,
+    TestCase,
+    retry,
+)
 from humanfriendly.text import random_string
 from humanfriendly.usage import (
     find_meta_variables,
@@ -66,20 +75,79 @@ from humanfriendly.usage import (
 from capturer import CaptureOutput
 
 
-class HumanFriendlyTestCase(unittest.TestCase):
+class HumanFriendlyTestCase(TestCase):
 
     """Container for the `humanfriendly` test suite."""
 
-    def setUp(self):
-        """Configure logging to the terminal."""
-        try:
-            import coloredlogs
-            coloredlogs.install(level=logging.DEBUG)
-        except ImportError:
-            logging.basicConfig(
-                level=logging.DEBUG,
-                format='%(asctime)s %(name)s[%(process)d] %(levelname)s %(message)s',
-                datefmt='%Y-%m-%d %H:%M:%S')
+    def test_retry_raise(self):
+        """Test :func:`~humanfriendly.testing.retry()` based on assertion errors."""
+        # Define a helper function that will raise an assertion error on the
+        # first call and return a string on the second call.
+        def success_helper():
+            if not hasattr(success_helper, 'was_called'):
+                setattr(success_helper, 'was_called', True)
+                assert False
+            else:
+                return 'yes'
+        assert retry(success_helper) == 'yes'
+
+        # Define a helper function that always raises an assertion error.
+        def failure_helper():
+            assert False
+        self.assertRaises(AssertionError, retry, failure_helper, timeout=1)
+
+    def test_retry_return(self):
+        """Test :func:`~humanfriendly.testing.retry()` based on return values."""
+        # Define a helper function that will return False on the first call and
+        # return a number on the second call.
+        def success_helper():
+            if not hasattr(success_helper, 'was_called'):
+                # On the first call we return False.
+                setattr(success_helper, 'was_called', True)
+                return False
+            else:
+                # On the second call we return a number.
+                return 42
+        assert retry(success_helper) == 42
+        self.assertRaises(CallableTimedOut, retry, lambda: False, timeout=1)
+
+    def test_mocked_program(self):
+        """Test :class:`humanfriendly.testing.MockedProgram`."""
+        name = random_string()
+        with MockedProgram(name=name, returncode=42) as directory:
+            assert os.path.isdir(directory)
+            assert os.path.isfile(os.path.join(directory, name))
+            assert subprocess.call(name) == 42
+
+    def test_temporary_directory(self):
+        """Test :class:`humanfriendly.testing.TemporaryDirectory`."""
+        with TemporaryDirectory() as directory:
+            assert os.path.isdir(directory)
+            temporary_file = os.path.join(directory, 'some-file')
+            with open(temporary_file, 'w') as handle:
+                handle.write("Hello world!")
+        assert not os.path.exists(temporary_file)
+        assert not os.path.exists(directory)
+
+    def test_patch_attribute(self):
+        """Test :class:`humanfriendly.testing.PatchedAttribute`."""
+        class Subject(object):
+            my_attribute = 42
+        instance = Subject()
+        assert instance.my_attribute == 42
+        with PatchedAttribute(instance, 'my_attribute', 13) as return_value:
+            assert return_value is instance
+            assert instance.my_attribute == 13
+        assert instance.my_attribute == 42
+
+    def test_patch_item(self):
+        """Test :class:`humanfriendly.testing.PatchedItem`."""
+        instance = dict(my_item=True)
+        assert instance['my_item'] is True
+        with PatchedItem(instance, 'my_item', False) as return_value:
+            assert return_value is instance
+            assert instance['my_item'] is False
+        assert instance['my_item'] is True
 
     def test_compact(self):
         """Test :func:`humanfriendly.text.compact()`."""
@@ -961,34 +1029,6 @@ def normalize_timestamp(value, ndigits=1):
     multitasking, processor scheduling, etc.
     """
     return '%.2f' % round(float(value), ndigits=ndigits)
-
-
-class PatchedAttribute(object):
-
-    """Context manager that temporary replaces an object attribute."""
-
-    def __init__(self, obj, name, value):
-        """
-        Initialize a :class:`PatchedAttribute` object.
-
-        :param obj: The object to patch.
-        :param name: An attribute name.
-        :param value: The value to set.
-        """
-        self.obj = obj
-        self.name = name
-        self.value = value
-        self.saved_value = None
-
-    def __enter__(self):
-        """Replace (patch) the attribute."""
-        self.saved_value = getattr(self.obj, self.name)
-        setattr(self.obj, self.name, self.value)
-        return self.value
-
-    def __exit__(self, exc_type=None, exc_value=None, traceback=None):
-        """Restore the attribute to its original value."""
-        setattr(self.obj, self.name, self.saved_value)
 
 
 if __name__ == '__main__':

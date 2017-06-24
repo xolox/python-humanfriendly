@@ -66,6 +66,7 @@ pygments_style = 'sphinx'
 intersphinx_mapping = dict(
     python2=('https://docs.python.org/2', None),
     python3=('https://docs.python.org/3', None),
+    coloredlogs=('https://coloredlogs.readthedocs.io/en/latest/', None),
 )
 
 # -- Options for HTML output ---------------------------------------------------

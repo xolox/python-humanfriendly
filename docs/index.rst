@@ -60,12 +60,6 @@ The :mod:`humanfriendly.sphinx` module
 .. automodule:: humanfriendly.sphinx
    :members:
 
-The :mod:`humanfriendly.text` module
-------------------------------------
-
-.. automodule:: humanfriendly.text
-   :members:
-
 The :mod:`humanfriendly.tables` module
 --------------------------------------
 
@@ -76,6 +70,18 @@ The :mod:`humanfriendly.terminal` module
 ----------------------------------------
 
 .. automodule:: humanfriendly.terminal
+   :members:
+
+The :mod:`humanfriendly.testing` module
+---------------------------------------
+
+.. automodule:: humanfriendly.testing
+   :members:
+
+The :mod:`humanfriendly.text` module
+------------------------------------
+
+.. automodule:: humanfriendly.text
    :members:
 
 The :mod:`humanfriendly.usage` module
