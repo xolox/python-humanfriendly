@@ -398,7 +398,7 @@ class CaptureOutput(ContextManager):
         self.stderr = self.stdout if merged else StringIO()
         self.patched_attributes = [
             PatchedAttribute(sys, name, getattr(self, name))
-            for name in 'stdin', 'stdout', 'stderr'
+            for name in ('stdin', 'stdout', 'stderr')
         ]
 
     stdin = None
