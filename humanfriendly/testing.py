@@ -479,13 +479,10 @@ class TestCase(unittest.TestCase):
         try:
             callable(*args, **kwds)
         except exception as e:
-            if isinstance(e, type):
-                # Return the expected exception as a regular return value.
-                return e
-            else:
-                # Don't swallow exceptions we can't handle.
-                raise
+            # Return the expected exception as a regular return value.
+            return e
         else:
+            # Raise an exception when no exception was raised :-).
             assert False, "Expected an exception to be raised!"
 
     def skipTest(self, text, *args, **kw):
