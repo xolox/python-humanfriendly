@@ -8,10 +8,7 @@ python:
   - "3.6"
   - "pypy"
 install:
-  - pip install pip-accel
-  - pip-accel install coveralls
-  - pip-accel install --requirement=requirements-checks.txt
-  - LC_ALL=C pip-accel install .
+  - scripts/install-on-travis.sh
 script:
   - make check
   - make test

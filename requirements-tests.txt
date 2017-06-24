@@ -1,4 +1,5 @@
 # Test suite requirements.
 capturer >= 2.1
 coloredlogs >= 2.0
-pytest
+pytest >= 3.0.7
+pytest-cov >= 2.4.0
