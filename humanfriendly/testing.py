@@ -467,6 +467,27 @@ class TestCase(unittest.TestCase):
         # logging output that the test method is likely going to generate.
         sys.stderr.write("\n")
 
+    def assertRaises(self, exception, callable, *args, **kwds):
+        """
+        Replacement for :func:`unittest.TestCase.assertRaises()` that returns the exception.
+
+        Refer to the :func:`unittest.TestCase.assertRaises()` documentation for
+        details on argument handling. The return value is the caught exception.
+
+        This method does not support use as a context manager.
+        """
+        try:
+            callable(*args, **kwds)
+        except exception as e:
+            if isinstance(e, type):
+                # Return the expected exception as a regular return value.
+                return e
+            else:
+                # Don't swallow exceptions we can't handle.
+                raise
+        else:
+            assert False, "Expected an exception to be raised!"
+
     def skipTest(self, text, *args, **kw):
         """
         Enable backwards compatible "marking of tests to skip".

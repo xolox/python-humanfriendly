@@ -81,6 +81,11 @@ class HumanFriendlyTestCase(TestCase):
 
     """Container for the `humanfriendly` test suite."""
 
+    def test_assert_raises(self):
+        """Test :func:`~humanfriendly.testing.TestCase.assertRaises()`."""
+        e = self.assertRaises(ValueError, humanfriendly.coerce_boolean, 'not a boolean')
+        assert isinstance(e, ValueError)
+
     def test_retry_raise(self):
         """Test :func:`~humanfriendly.testing.retry()` based on assertion errors."""
         # Define a helper function that will raise an assertion error on the
