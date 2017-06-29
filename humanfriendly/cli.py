@@ -43,8 +43,13 @@ Supported options:
 
   -s, --format-size=BYTES
 
+    Convert a count (given as the integer BYTES) into a human readable
+    string and print that string to standard output. (In Disk Space Units)
+
+  -S, --format-bytes=BYTES
+
     Convert a byte count (given as the integer BYTES) into a human readable
-    string and print that string to standard output.
+    string and print that string to standard output. (In RAM Space Units)
 
   -t, --format-timespan=SECONDS
 
@@ -91,8 +96,9 @@ from humanfriendly.terminal import output, usage, warning
 def main():
     """Command line interface for the ``humanfriendly`` program."""
     try:
-        options, arguments = getopt.getopt(sys.argv[1:], 'cd:hn:s:t:', [
-            'delimiter=', 'format-length=', 'format-number=', 'format-size=',
+        options, arguments = getopt.getopt(sys.argv[1:], 'cd:hn:s:S:t:', [
+            'delimiter=', 'format-length=', 'format-number=',
+            'format-size=', 'format-bytes=',
             'format-table', 'format-timespan=', 'parse-length=',
             'parse-size=', 'run-command', 'help',
         ])
@@ -117,6 +123,8 @@ def main():
             actions.append(functools.partial(print_formatted_number, value))
         elif option in ('-s', '--format-size'):
             actions.append(functools.partial(print_formatted_size, value))
+        elif option in ('-S', '--format-bytes'):
+            actions.append(functools.partial(print_formatted_size, value, True))
         elif option == '--format-table':
             should_format_table = True
         elif option in ('-t', '--format-timespan'):
@@ -160,9 +168,9 @@ def print_formatted_number(value):
     output(format_number(float(value)))
 
 
-def print_formatted_size(value):
+def print_formatted_size(value, binsize=False):
     """Print a human readable size."""
-    output(format_size(int(value)))
+    output(format_size(int(value), binary=binsize))
 
 
 def print_formatted_table(delimiter):
