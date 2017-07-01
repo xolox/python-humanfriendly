@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: January 16, 2017
+# Last Change: July 1, 2017
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -46,6 +46,7 @@ __all__ = (
     'is_unicode',
     'monotonic',
     'unicode',
+    'unittest',
 )
 
 try:
@@ -73,6 +74,14 @@ except ImportError:
         # We fall back to the old behavior of using time.time() instead of
         # failing when {time,monotonic}.monotonic() are both missing.
         from time import time as monotonic
+
+try:
+    # A replacement for Python 2.6:
+    # https://pypi.python.org/pypi/unittest2/
+    import unittest2 as unittest
+except ImportError:
+    # The standard library module (on other Python versions).
+    import unittest
 
 
 def coerce_string(value):

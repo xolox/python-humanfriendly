@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: June 24, 2017
+# Last Change: July 1, 2017
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -24,6 +24,7 @@ I have several reasons for doing so:
 """
 
 # Standard library module
+import functools
 import logging
 import os
 import pipes
@@ -31,10 +32,9 @@ import shutil
 import sys
 import tempfile
 import time
-import unittest
 
 # Modules included in our package.
-from humanfriendly.compat import StringIO
+from humanfriendly.compat import StringIO, unicode, unittest
 from humanfriendly.text import compact, random_string
 
 # Initialize a logger for this module.
@@ -444,6 +444,40 @@ class TestCase(unittest.TestCase):
 
     """Subclass of :class:`unittest.TestCase` with automatic logging and other miscellaneous features."""
 
+    exceptionsToSkip = []
+    """A list of exception types that are translated into skipped tests."""
+
+    def __init__(self, *args, **kw):
+        """Wrap test methods using :func:`skipTestWrapper()`."""
+        # Initialize our superclass.
+        super(TestCase, self).__init__(*args, **kw)
+        # Wrap all of the test methods so that we can customize the
+        # skipping of tests based on the exceptions they raise.
+        for name in dir(self.__class__):
+            if name.startswith('test_'):
+                setattr(self, name, functools.partial(
+                    self.skipTestWrapper,
+                    getattr(self, name),
+                ))
+
+    def assertRaises(self, exception, callable, *args, **kwds):
+        """
+        Replacement for :func:`unittest.TestCase.assertRaises()` that returns the exception.
+
+        Refer to the :func:`unittest.TestCase.assertRaises()` documentation for
+        details on argument handling. The return value is the caught exception.
+
+        .. warning:: This method does not support use as a context manager.
+        """
+        try:
+            callable(*args, **kwds)
+        except exception as e:
+            # Return the expected exception as a regular return value.
+            return e
+        else:
+            # Raise an exception when no exception was raised :-).
+            assert False, "Expected an exception to be raised!"
+
     def setUp(self, log_level=logging.DEBUG):
         """setUp(log_level=logging.DEBUG)
         Automatically configure logging to the terminal.
@@ -479,35 +513,70 @@ class TestCase(unittest.TestCase):
         # logging output that the test method is likely going to generate.
         sys.stderr.write("\n")
 
-    def assertRaises(self, exception, callable, *args, **kwds):
+    def shouldSkipTest(self, exception):
         """
-        Replacement for :func:`unittest.TestCase.assertRaises()` that returns the exception.
+        Decide whether a test that raised an exception should be skipped.
 
-        Refer to the :func:`unittest.TestCase.assertRaises()` documentation for
-        details on argument handling. The return value is the caught exception.
+        :param exception: The exception that was raised by the test.
+        :returns: :data:`True` to translate the exception into a skipped test,
+                  :data:`False` to propagate the exception as usual.
 
-        This method does not support use as a context manager.
+        The :func:`shouldSkipTest()` method skips exceptions listed in the
+        :attr:`exceptionsToSkip` attribute. This enables subclasses of
+        :class:`TestCase` to customize the default behavior with a one liner.
         """
-        try:
-            callable(*args, **kwds)
-        except exception as e:
-            # Return the expected exception as a regular return value.
-            return e
-        else:
-            # Raise an exception when no exception was raised :-).
-            assert False, "Expected an exception to be raised!"
+        return isinstance(exception, tuple(self.exceptionsToSkip))
 
     def skipTest(self, text, *args, **kw):
         """
-        Enable backwards compatible "marking of tests to skip".
+        Enable skipping of tests.
 
-        By calling this method from a return statement in the test to be
-        skipped, that test can be marked as skipped when possible, without
-        breaking the test suite when :func:`unittest.TestCase.skipTest()`
-        isn't available (in Python 2.6 and 3.0).
+        This method was added in humanfriendly 3.3 as a fall back for the
+        :func:`unittest.TestCase.skipTest()` method that was added in Python
+        2.7 and 3.1 (because humanfriendly also supports Python 2.6).
+
+        Since then `humanfriendly` has gained a conditional dependency on
+        unittest2_ which enables actual skipping of tests (instead of just
+        mocking it) on Python 2.6.
+
+        This method now remains for backwards compatibility (and just because
+        it's a nice shortcut).
+
+        .. _unittest2: https://pypi.python.org/pypi/unittest2
         """
-        reason = compact(text, *args, **kw)
+        raise unittest.SkipTest(compact(text, *args, **kw))
+
+    def skipTestWrapper(self, test_method, *args, **kw):
+        """
+        Wrap test methods to translate exceptions into skipped tests.
+
+        :param test_method: The test method to wrap.
+        :param args: The positional arguments to the test method.
+        :param kw: The keyword arguments to the test method.
+        :returns: The return value of the test method.
+
+        When a :class:`TestCase` object is initialized, :func:`__init__()`
+        wraps all of the ``test_*`` methods with :func:`skipTestWrapper()`.
+
+        When a test method raises an exception, :func:`skipTestWrapper()` will
+        catch the exception and call :func:`shouldSkipTest()` to decide whether
+        to translate the exception into a skipped test.
+
+        When :func:`shouldSkipTest()` returns :data:`True` the exception is
+        swallowed and :exc:`unittest.SkipTest` is raised instead of the
+        original exception.
+        """
         try:
-            super(TestCase, self).skipTest(reason)
-        except AttributeError:
-            logger.warning("%s", reason)
+            return test_method(*args, **kw)
+        except BaseException as e:
+            if self.shouldSkipTest(e):
+                if isinstance(e, unittest.SkipTest):
+                    # We prefer to preserve the original
+                    # exception and stack trace.
+                    raise
+                else:
+                    # If the original exception wasn't a unittest.SkipTest
+                    # exception then we will translate it into one.
+                    raise unittest.SkipTest(unicode(e))
+            else:
+                raise

@@ -4,7 +4,7 @@
 # Tests for the `humanfriendly' package.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: June 24, 2017
+# Last Change: July 1, 2017
 # URL: https://humanfriendly.readthedocs.io
 
 """Test suite for the `humanfriendly` package."""
@@ -80,6 +80,13 @@ from capturer import CaptureOutput
 class HumanFriendlyTestCase(TestCase):
 
     """Container for the `humanfriendly` test suite."""
+
+    exceptionsToSkip = [NotImplementedError]
+    """Translate NotImplementedError into skipped tests."""
+
+    def test_skipping(self):
+        """Make sure custom exception types can be skipped."""
+        raise NotImplementedError()
 
     def test_assert_raises(self):
         """Test :func:`~humanfriendly.testing.TestCase.assertRaises()`."""

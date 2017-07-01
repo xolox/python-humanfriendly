@@ -3,7 +3,7 @@
 # Setup script for the `humanfriendly' package.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: May 4, 2017
+# Last Change: July 1, 2017
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -47,7 +47,7 @@ def get_install_requires():
     install_requires = []
     if 'bdist_wheel' not in sys.argv:
         if sys.version_info[:2] <= (2, 6) or sys.version_info[:2] == (3, 0):
-            install_requires.append('importlib')
+            install_requires.extend(('importlib', 'unittest2'))
         if sys.version_info[:2] < (3, 3):
             install_requires.append('monotonic')
     return sorted(install_requires)
@@ -62,7 +62,7 @@ def get_extras_require():
             'python_version == "2.6"',
             'python_version == "3.0"',
         ])
-        extras_require[expression] = ['importlib']
+        extras_require[expression] = ['importlib', 'unittest2']
         # Conditional `monotonic' dependency.
         expression = ':%s' % ' or '.join([
             'python_version == "2.6"',
