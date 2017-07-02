@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: July 1, 2017
+# Last Change: July 2, 2017
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -282,6 +282,42 @@ class TemporaryDirectory(ContextManager):
         if self.temporary_directory is not None:
             shutil.rmtree(self.temporary_directory)
             self.temporary_directory = None
+
+
+class MockedHomeDirectory(PatchedItem, TemporaryDirectory):
+
+    """
+    Context manager to temporarily change ``$HOME`` (the current user's profile directory).
+
+    This class is a composition of the :class:`PatchedItem` and
+    :class:`TemporaryDirectory` context managers.
+    """
+
+    def __init__(self):
+        """Initialize a :class:`MockedHomeDirectory` object."""
+        PatchedItem.__init__(self, os.environ, 'HOME', os.environ.get('HOME'))
+        TemporaryDirectory.__init__(self)
+
+    def __enter__(self):
+        """
+        Activate the custom ``$PATH``.
+
+        :returns: The pathname of the directory that has
+                  been added to ``$PATH`` (a string).
+        """
+        # Get the temporary directory.
+        directory = TemporaryDirectory.__enter__(self)
+        # Override the value to patch now that we have
+        # the pathname of the temporary directory.
+        self.patched_value = directory
+        # Temporary patch $HOME.
+        PatchedItem.__enter__(self)
+        # Pass the pathname of the temporary directory to the caller.
+        return directory
+
+    def __exit__(self, exc_type=None, exc_value=None, traceback=None):
+        """Deactivate the custom ``$HOME``."""
+        super(MockedHomeDirectory, self).__exit__(exc_type, exc_value, traceback)
 
 
 class CustomSearchPath(PatchedItem, TemporaryDirectory):
