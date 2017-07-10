@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: July 2, 2017
+# Last Change: July 10, 2017
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -118,22 +118,43 @@ def run_cli(entry_point, *arguments, **options):
               1. The return code (an integer).
               2. The captured output (a string).
     """
-    program_name = options.pop('program_name', sys.executable)
-    # Start capturing the standard output and error streams.
-    with CaptureOutput(**options) as output:
+    # Add the `program_name' option to the arguments.
+    arguments = list(arguments)
+    arguments.insert(0, options.pop('program_name', sys.executable))
+    # Log the command line arguments (and the fact that we're about to call the
+    # command line entry point function).
+    logger.debug("Calling command line entry point with arguments: %s", arguments)
+    # Prepare to capture the return code and output even if the command line
+    # interface raises an exception (whether the exception type is SystemExit
+    # or something else).
+    returncode = 0
+    output = None
+    try:
         # Temporarily override sys.argv.
-        arguments = list(arguments)
-        arguments.insert(0, program_name)
         with PatchedAttribute(sys, 'argv', arguments):
-            try:
-                # Call the command line interface.
-                entry_point()
-            except SystemExit as e:
-                # Intercept sys.exit() calls.
-                returncode = e.code
-            else:
-                returncode = 0
-            return returncode, output.getvalue()
+            # Manipulate the standard input/output/error streams.
+            with CaptureOutput(**options) as capturer:
+                try:
+                    # Call the command line interface.
+                    entry_point()
+                finally:
+                    # Get the output even if an exception is raised.
+                    output = capturer.getvalue()
+    except BaseException as e:
+        if isinstance(e, SystemExit):
+            logger.debug("Intercepting return code %s from SystemExit exception.", e.code)
+            returncode = e.code
+        else:
+            logger.warning("Defaulting return code to 1 due to raised exception.", exc_info=True)
+            returncode = 1
+    else:
+        logger.debug("Command line entry point returned successfully!")
+    finally:
+        if output:
+            logger.debug("Command line output: %r", output)
+        else:
+            logger.debug("No command line output captured.")
+        return returncode, output
 
 
 class CallableTimedOut(Exception):

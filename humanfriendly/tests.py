@@ -4,7 +4,7 @@
 # Tests for the `humanfriendly' package.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: July 1, 2017
+# Last Change: July 10, 2017
 # URL: https://humanfriendly.readthedocs.io
 
 """Test suite for the `humanfriendly` package."""
@@ -162,6 +162,27 @@ class HumanFriendlyTestCase(TestCase):
             assert return_value is instance
             assert instance['my_item'] is False
         assert instance['my_item'] is True
+
+    def test_run_cli_intercepts_exit(self):
+        """Test that run_cli() intercepts SystemExit."""
+        returncode, output = run_cli(lambda: sys.exit(42))
+        self.assertEqual(returncode, 42)
+
+    def test_run_cli_intercepts_error(self):
+        """Test that run_cli() intercepts exceptions."""
+        returncode, output = run_cli(self.run_cli_raise_other)
+        self.assertEqual(returncode, 1)
+
+    def run_cli_raise_other(self):
+        """run_cli() sample that raises an exception."""
+        raise ValueError()
+
+    def test_run_cli_intercepts_output(self):
+        """Test that run_cli() intercepts output."""
+        expected_output = random_string() + "\n"
+        returncode, output = run_cli(lambda: sys.stdout.write(expected_output))
+        self.assertEqual(returncode, 0)
+        self.assertEqual(output, expected_output)
 
     def test_compact(self):
         """Test :func:`humanfriendly.text.compact()`."""
