@@ -128,7 +128,8 @@ def run_cli(entry_point, *arguments, **options):
     # interface raises an exception (whether the exception type is SystemExit
     # or something else).
     returncode = 0
-    output = None
+    stdout = None
+    stderr = None
     try:
         # Temporarily override sys.argv.
         with PatchedAttribute(sys, 'argv', arguments):
@@ -139,7 +140,8 @@ def run_cli(entry_point, *arguments, **options):
                     entry_point()
                 finally:
                     # Get the output even if an exception is raised.
-                    output = capturer.getvalue()
+                    stdout = capturer.stdout.getvalue()
+                    stderr = capturer.stderr.getvalue()
     except BaseException as e:
         if isinstance(e, SystemExit):
             logger.debug("Intercepting return code %s from SystemExit exception.", e.code)
@@ -150,11 +152,12 @@ def run_cli(entry_point, *arguments, **options):
     else:
         logger.debug("Command line entry point returned successfully!")
     finally:
-        if output:
-            logger.debug("Command line output: %r", output)
-        else:
-            logger.debug("No command line output captured.")
-        return returncode, output
+        for name, value in (('stdout', stdout), ('stderr', stderr)):
+            if value:
+                logger.debug("Output on %s:\n%s", name, value)
+            else:
+                logger.debug("No output on %s.", name)
+        return returncode, stdout
 
 
 class CallableTimedOut(Exception):
