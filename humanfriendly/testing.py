@@ -141,6 +141,7 @@ def run_cli(entry_point, *arguments, **options):
               1. The return code (an integer).
               2. The captured output (a string).
     """
+    merged = options.get('merged', False)
     # Add the `program_name' option to the arguments.
     arguments = list(arguments)
     arguments.insert(0, options.pop('program_name', sys.executable))
@@ -182,7 +183,7 @@ def run_cli(entry_point, *arguments, **options):
     # diagnose test failures (but avoid duplicate logging when merged=True).
     merged_streams = [('merged streams', stdout)]
     separate_streams = [('stdout', stdout), ('stderr', stderr)]
-    streams = merged_streams if stdout is stderr else separate_streams
+    streams = merged_streams if merged else separate_streams
     for name, value in streams:
         if value:
             logger.debug("Output on %s:\n%s", name, value)
