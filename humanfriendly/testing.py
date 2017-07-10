@@ -54,9 +54,32 @@ __all__ = (
     'PatchedItem',
     'TemporaryDirectory',
     'TestCase',
+    'configure_logging',
     'retry',
     'run_cli',
 )
+
+
+def configure_logging(log_level=logging.DEBUG):
+    """configure_logging(log_level=logging.DEBUG)
+    Automatically configure logging to the terminal.
+
+    :param log_level: The log verbosity (a number, defaults to
+                      :data:`logging.DEBUG`).
+
+    When :mod:`coloredlogs` is installed :func:`coloredlogs.install()` will be
+    used to configure logging to the terminal. When this fails with an
+    :exc:`~exceptions.ImportError` then :func:`logging.basicConfig()` is used
+    as a fall back.
+    """
+    try:
+        import coloredlogs
+        coloredlogs.install(level=log_level)
+    except ImportError:
+        logging.basicConfig(
+            level=log_level,
+            format='%(asctime)s %(name)s[%(process)d] %(levelname)s %(message)s',
+            datefmt='%Y-%m-%d %H:%M:%S')
 
 
 def retry(func, timeout=60, exc_type=AssertionError):
@@ -142,6 +165,10 @@ def run_cli(entry_point, *arguments, **options):
                     # Get the output even if an exception is raised.
                     stdout = capturer.stdout.getvalue()
                     stderr = capturer.stderr.getvalue()
+                    # Reconfigure logging to the terminal because it is very
+                    # likely that the entry point function has changed the
+                    # configured log level.
+                    configure_logging()
     except BaseException as e:
         if isinstance(e, SystemExit):
             logger.debug("Intercepting return code %s from SystemExit exception.", e.code)
@@ -542,17 +569,14 @@ class TestCase(unittest.TestCase):
         """setUp(log_level=logging.DEBUG)
         Automatically configure logging to the terminal.
 
-        :param log_level: The log verbosity (a number, defaults to
-                          :data:`logging.DEBUG`).
+        :param log_level: Refer to :func:`configure_logging()`.
 
         The :func:`setUp()` method is automatically called by
         :class:`unittest.TestCase` before each test method starts.
         It does two things:
 
-        - When :mod:`coloredlogs` is installed :func:`coloredlogs.install()`
-          will be used to configure logging to the terminal. When this fails
-          with an :exc:`~exceptions.ImportError` then
-          :func:`logging.basicConfig()` is used as a fall back.
+        - Logging to the terminal is configured using
+          :func:`configure_logging()`.
 
         - Before the test method starts a newline is emitted, to separate the
           name of the test method (which will be printed to the terminal by
@@ -560,14 +584,7 @@ class TestCase(unittest.TestCase):
           that the test method is likely going to generate.
         """
         # Configure logging to the terminal.
-        try:
-            import coloredlogs
-            coloredlogs.install(level=log_level)
-        except ImportError:
-            logging.basicConfig(
-                level=log_level,
-                format='%(asctime)s %(name)s[%(process)d] %(levelname)s %(message)s',
-                datefmt='%Y-%m-%d %H:%M:%S')
+        configure_logging(log_level)
         # Separate the name of the test method (printed by the superclass
         # and/or py.test without a newline at the end) from the first line of
         # logging output that the test method is likely going to generate.
