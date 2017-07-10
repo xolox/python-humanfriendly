@@ -178,13 +178,17 @@ def run_cli(entry_point, *arguments, **options):
             returncode = 1
     else:
         logger.debug("Command line entry point returned successfully!")
-    finally:
-        for name, value in (('stdout', stdout), ('stderr', stderr)):
-            if value:
-                logger.debug("Output on %s:\n%s", name, value)
-            else:
-                logger.debug("No output on %s.", name)
-        return returncode, stdout
+    # Always log the output captured on stdout/stderr, to make it easier to
+    # diagnose test failures (but avoid duplicate logging when merged=True).
+    merged_streams = [('merged streams', stdout)]
+    separate_streams = [('stdout', stdout), ('stderr', stderr)]
+    streams = merged_streams if stdout is stderr else separate_streams
+    for name, value in streams:
+        if value:
+            logger.debug("Output on %s:\n%s", name, value)
+        else:
+            logger.debug("No output on %s.", name)
+    return returncode, stdout
 
 
 class CallableTimedOut(Exception):
