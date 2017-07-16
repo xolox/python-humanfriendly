@@ -58,6 +58,7 @@ __all__ = (
     'make_dirs',
     'retry',
     'run_cli',
+    'touch',
 )
 
 
