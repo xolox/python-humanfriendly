@@ -147,7 +147,13 @@ class HumanFriendlyTestCase(TestCase):
     def test_touch(self):
         """Test :func:`humanfriendly.testing.touch()`."""
         with TemporaryDirectory() as directory:
+            # Create a file in the temporary directory.
             filename = os.path.join(directory, random_string())
+            assert not os.path.isfile(filename)
+            touch(filename)
+            assert os.path.isfile(filename)
+            # Create a file in a subdirectory.
+            filename = os.path.join(directory, random_string(), random_string())
             assert not os.path.isfile(filename)
             touch(filename)
             assert os.path.isfile(filename)

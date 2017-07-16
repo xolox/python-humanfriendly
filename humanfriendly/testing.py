@@ -55,6 +55,7 @@ __all__ = (
     'TemporaryDirectory',
     'TestCase',
     'configure_logging',
+    'make_dirs',
     'retry',
     'run_cli',
 )
@@ -80,6 +81,16 @@ def configure_logging(log_level=logging.DEBUG):
             level=log_level,
             format='%(asctime)s %(name)s[%(process)d] %(levelname)s %(message)s',
             datefmt='%Y-%m-%d %H:%M:%S')
+
+
+def make_dirs(pathname):
+    """
+    Create missing directories.
+
+    :param pathname: The pathname of a directory (a string).
+    """
+    if not os.path.isdir(pathname):
+        os.makedirs(pathname)
 
 
 def retry(func, timeout=60, exc_type=AssertionError):
@@ -197,7 +208,11 @@ def touch(filename):
     The equivalent of the UNIX ``touch`` program in Python.
 
     :param filename: The pathname of the file to touch (a string).
+
+    Note that missing directories are automatically created using
+    :func:`make_dirs()`.
     """
+    make_dirs(os.path.dirname(filename))
     with open(filename, 'a'):
         os.utime(filename, None)
 
