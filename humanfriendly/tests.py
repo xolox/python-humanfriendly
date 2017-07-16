@@ -4,7 +4,7 @@
 # Tests for the `humanfriendly' package.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: July 10, 2017
+# Last Change: July 16, 2017
 # URL: https://humanfriendly.readthedocs.io
 
 """Test suite for the `humanfriendly` package."""
@@ -64,6 +64,7 @@ from humanfriendly.testing import (
     TestCase,
     retry,
     run_cli,
+    touch,
 )
 from humanfriendly.text import random_string
 from humanfriendly.usage import (
@@ -142,6 +143,14 @@ class HumanFriendlyTestCase(TestCase):
                 handle.write("Hello world!")
         assert not os.path.exists(temporary_file)
         assert not os.path.exists(directory)
+
+    def test_touch(self):
+        """Test :func:`humanfriendly.testing.touch()`."""
+        with TemporaryDirectory() as directory:
+            filename = os.path.join(directory, random_string())
+            assert not os.path.isfile(filename)
+            touch(filename)
+            assert os.path.isfile(filename)
 
     def test_patch_attribute(self):
         """Test :class:`humanfriendly.testing.PatchedAttribute`."""

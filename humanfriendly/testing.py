@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: July 10, 2017
+# Last Change: July 16, 2017
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -190,6 +190,16 @@ def run_cli(entry_point, *arguments, **options):
         else:
             logger.debug("No output on %s.", name)
     return returncode, stdout
+
+
+def touch(filename):
+    """
+    The equivalent of the UNIX ``touch`` program in Python.
+
+    :param filename: The pathname of the file to touch (a string).
+    """
+    with open(filename, 'a'):
+        os.utime(filename, None)
 
 
 class CallableTimedOut(Exception):
