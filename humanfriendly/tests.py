@@ -673,8 +673,8 @@ class HumanFriendlyTestCase(TestCase):
         # Test `humanfriendly --parse-length'.
         returncode, output = run_cli(main, '--parse-length=5 km')
         assert int(output) == humanfriendly.parse_length('5 km')
-        returncode, output = run_cli(main, '--parse-length=1.05 mm')
-        assert float(output) == humanfriendly.parse_length('1.05 mm')
+        returncode, output = run_cli(main, '--parse-length=1.05 km')
+        assert float(output) == humanfriendly.parse_length('1.05 km')
         # Test `humanfriendly --run-command'.
         returncode, output = run_cli(main, '--run-command', 'bash', '-c', 'sleep 2 && exit 42')
         assert returncode == 42
