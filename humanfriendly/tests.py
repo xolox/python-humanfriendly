@@ -645,7 +645,7 @@ class HumanFriendlyTestCase(TestCase):
         returncode, output = run_cli(main, '--format-length=%i' % random_len)
         assert output.strip() == humanfriendly.format_length(random_len)
         random_len = float(random_len)/12345.6
-        returncode, output = run_cli(main, '--format-length=%i' % random_len)
+        returncode, output = run_cli(main, '--format-length=%f' % random_len)
         assert output.strip() == humanfriendly.format_length(random_len)
         # Test `humanfriendly --format-bytes'.
         random_byte_count = random.randint(1024, 1024 * 1024)
