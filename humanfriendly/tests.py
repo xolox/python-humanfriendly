@@ -640,7 +640,13 @@ class HumanFriendlyTestCase(TestCase):
         # Test `humanfriendly --format-size'.
         random_byte_count = random.randint(1024, 1024 * 1024)
         returncode, output = run_cli(main, '--format-size=%i' % random_byte_count)
-        assert output.strip() == humanfriendly.format_size(random_byte_count)
+        # Test `humanfriendly --format-length'.
+        random_len = random.randint(1024, 1024 * 1024)
+        returncode, output = run_cli(main, '--format-length=%i' % random_len)
+        assert output.strip() == humanfriendly.format_length(random_len)
+        random_len = float(random_len)/12345.6
+        returncode, output = run_cli(main, '--format-length=%i' % random_len)
+        assert output.strip() == humanfriendly.format_length(random_len)
         # Test `humanfriendly --format-bytes'.
         random_byte_count = random.randint(1024, 1024 * 1024)
         returncode, output = run_cli(main, '--format-bytes=%i' % random_byte_count)
@@ -664,6 +670,11 @@ class HumanFriendlyTestCase(TestCase):
         # Test `humanfriendly --parse-size'.
         returncode, output = run_cli(main, '--parse-size=5 YiB')
         assert int(output) == humanfriendly.parse_size('5 YB', binary=True)
+        # Test `humanfriendly --parse-length'.
+        returncode, output = run_cli(main, '--parse-length=5 km')
+        assert int(output) == humanfriendly.parse_length('5 km')
+        returncode, output = run_cli(main, '--parse-length=1.05 mm')
+        assert int(output) == humanfriendly.parse_length('1.05 mm')
         # Test `humanfriendly --run-command'.
         returncode, output = run_cli(main, '--run-command', 'bash', '-c', 'sleep 2 && exit 42')
         assert returncode == 42
