@@ -296,7 +296,7 @@ class HumanFriendlyTestCase(TestCase):
         self.assertEqual(1000 ** 7, humanfriendly.parse_size('1 ZB'))
         self.assertEqual(1000 ** 8, humanfriendly.parse_size('1 YB'))
         self.assertEqual(1000 ** 3 * 1.5, humanfriendly.parse_size('1.5 GB'))
-        self.assertRaises(humanfriendly.InvalidSize, humanfriendly.parse_size, '1z')
+        self.assertRaises(humanfriendly.InvalidSize, humanfriendly.parse_size, '1q')
         self.assertRaises(humanfriendly.InvalidSize, humanfriendly.parse_size, 'a')
 
     def test_format_length(self):
