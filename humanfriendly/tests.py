@@ -641,6 +641,10 @@ class HumanFriendlyTestCase(TestCase):
         random_byte_count = random.randint(1024, 1024 * 1024)
         returncode, output = run_cli(main, '--format-size=%i' % random_byte_count)
         assert output.strip() == humanfriendly.format_size(random_byte_count)
+        # Test `humanfriendly --format-bytes'.
+        random_byte_count = random.randint(1024, 1024 * 1024)
+        returncode, output = run_cli(main, '--format-bytes=%i' % random_byte_count)
+        assert output.strip() == humanfriendly.format_size(random_byte_count, binary=True)
         # Test `humanfriendly --format-table'.
         returncode, output = run_cli(main, '--format-table', '--delimiter=\t', input='1\t2\t3\n4\t5\t6\n7\t8\t9')
         assert output.strip() == dedent('''
@@ -657,6 +661,9 @@ class HumanFriendlyTestCase(TestCase):
         # Test `humanfriendly --parse-size'.
         returncode, output = run_cli(main, '--parse-size=5 KB')
         assert int(output) == humanfriendly.parse_size('5 KB')
+        # Test `humanfriendly --parse-size'.
+        returncode, output = run_cli(main, '--parse-size=5 YiB')
+        assert int(output) == humanfriendly.parse_size('5 YB', binary=True)
         # Test `humanfriendly --run-command'.
         returncode, output = run_cli(main, '--run-command', 'bash', '-c', 'sleep 2 && exit 42')
         assert returncode == 42
