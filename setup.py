@@ -50,6 +50,11 @@ def get_install_requires():
             install_requires.extend(('importlib', 'unittest2'))
         if sys.version_info[:2] < (3, 3):
             install_requires.append('monotonic')
+    if sys.platform == 'win32':
+        # GNU Readline is not present on Windows, which causes humanfriendly
+        # to raise an ImportError at runtime.
+        # pyreadline is a pure-python alternative that solves this issue
+        install_requires.extend('pyreadline')
     return sorted(install_requires)
 
 

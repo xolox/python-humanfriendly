@@ -8,3 +8,6 @@ docs/_static/
 docs/_templates/
 docs/build/
 htmlcov/
+*.pyc
+__pycache__/
+.vscode
