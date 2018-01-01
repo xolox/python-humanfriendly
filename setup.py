@@ -3,7 +3,7 @@
 # Setup script for the `humanfriendly' package.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: July 1, 2017
+# Last Change: January 1, 2018
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -50,6 +50,8 @@ def get_install_requires():
             install_requires.extend(('importlib', 'unittest2'))
         if sys.version_info[:2] < (3, 3):
             install_requires.append('monotonic')
+        if sys.platform == 'win32':
+            install_requires.append('pyreadline')
     return sorted(install_requires)
 
 
@@ -57,7 +59,7 @@ def get_extras_require():
     """Get the conditional dependencies for wheel distributions."""
     extras_require = {}
     if have_environment_marker_support():
-        # Conditional `importlib' dependency.
+        # Conditional `importlib' and `unittest2' dependencies.
         expression = ':%s' % ' or '.join([
             'python_version == "2.6"',
             'python_version == "3.0"',
@@ -72,6 +74,9 @@ def get_extras_require():
             'python_version == "3.2"',
         ])
         extras_require[expression] = ['monotonic']
+        # Conditional `pyreadline' dependency.
+        expression = ':sys_platform == "win32"'
+        extras_require[expression] = 'pyreadline'
     return extras_require
 
 

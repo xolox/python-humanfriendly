@@ -1,6 +1,8 @@
 *.egg-info/
+*.pyc
 .coverage
 .coverage.*
+__pycache__/
 dist/*.tar.gz
 dist/*.zip
 docs/_build/
