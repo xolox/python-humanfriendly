@@ -3,3 +3,7 @@ capturer >= 2.1
 coloredlogs >= 2.0
 pytest >= 3.0.7
 pytest-cov >= 2.4.0
+
+# pytest release 3.3 drops Python 2.6 compatibility:
+# https://docs.pytest.org/en/latest/changelog.html#pytest-3-3-0-2017-11-23
+pytest < 3.3 ; python_version < '2.7'
