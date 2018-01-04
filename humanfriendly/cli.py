@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: May 18, 2017
+# Last Change: January 4, 2018
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -46,20 +46,25 @@ Supported options:
     Convert a byte count (given as the integer BYTES) into a human readable
     string and print that string to standard output.
 
+  -b, --binary
+
+    Change the output of -s, --format-size to use binary multiples of bytes
+    (base-2) instead of the default decimal multiples of bytes (base-10).
+
   -t, --format-timespan=SECONDS
 
     Convert a number of seconds (given as the floating point number SECONDS)
     into a human readable timespan and print that string to standard output.
 
-  --parse-size=VALUE
-
-    Parse a human readable data size (given as the string VALUE) and print the
-    number of bytes to standard output.
-
   --parse-length=VALUE
 
     Parse a human readable length (given as the string VALUE) and print the
     number of metres to standard output.
+
+  --parse-size=VALUE
+
+    Parse a human readable data size (given as the string VALUE) and print the
+    number of bytes to standard output.
 
   -h, --help
 
@@ -91,10 +96,10 @@ from humanfriendly.terminal import output, usage, warning
 def main():
     """Command line interface for the ``humanfriendly`` program."""
     try:
-        options, arguments = getopt.getopt(sys.argv[1:], 'cd:hn:s:t:', [
-            'delimiter=', 'format-length=', 'format-number=', 'format-size=',
-            'format-table', 'format-timespan=', 'parse-length=',
-            'parse-size=', 'run-command', 'help',
+        options, arguments = getopt.getopt(sys.argv[1:], 'cd:l:n:s:bt:h', [
+            'run-command', 'format-table', 'delimiter=', 'format-length=',
+            'format-number=', 'format-size=', 'binary', 'format-timespan=',
+            'parse-length=', 'parse-size=', 'help',
         ])
     except Exception as e:
         warning("Error: %s", e)
@@ -102,6 +107,7 @@ def main():
     actions = []
     delimiter = None
     should_format_table = False
+    binary = any(o in ('-b', '--binary') for o, v in options)
     for option, value in options:
         if option in ('-d', '--delimiter'):
             delimiter = value
@@ -116,7 +122,7 @@ def main():
         elif option in ('-n', '--format-number'):
             actions.append(functools.partial(print_formatted_number, value))
         elif option in ('-s', '--format-size'):
-            actions.append(functools.partial(print_formatted_size, value))
+            actions.append(functools.partial(print_formatted_size, value, binary))
         elif option == '--format-table':
             should_format_table = True
         elif option in ('-t', '--format-timespan'):
@@ -160,9 +166,9 @@ def print_formatted_number(value):
     output(format_number(float(value)))
 
 
-def print_formatted_size(value):
+def print_formatted_size(value, binary):
     """Print a human readable size."""
-    output(format_size(int(value)))
+    output(format_size(int(value), binary=binary))
 
 
 def print_formatted_table(delimiter):

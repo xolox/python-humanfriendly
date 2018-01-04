@@ -84,12 +84,14 @@ line based on the Python package with the same name.
    formatted number to standard output."
    "``-s``, ``--format-size=BYTES``","Convert a byte count (given as the integer ``BYTES``) into a human readable
    string and print that string to standard output."
+   "``-b``, ``--binary``","Change the output of ``-s``, ``--format-size`` to use binary multiples of bytes
+   (base-2) instead of the default decimal multiples of bytes (base-10)."
    "``-t``, ``--format-timespan=SECONDS``","Convert a number of seconds (given as the floating point number ``SECONDS``)
    into a human readable timespan and print that string to standard output."
-   ``--parse-size=VALUE``,"Parse a human readable data size (given as the string ``VALUE``) and print the
-   number of bytes to standard output."
    ``--parse-length=VALUE``,"Parse a human readable length (given as the string ``VALUE``) and print the
    number of metres to standard output."
+   ``--parse-size=VALUE``,"Parse a human readable data size (given as the string ``VALUE``) and print the
+   number of bytes to standard output."
    "``-h``, ``--help``",Show this message and exit.
 
 .. [[[end]]]

@@ -313,11 +313,17 @@ class HumanFriendlyTestCase(TestCase):
         self.assertEqual('1 GB', humanfriendly.format_size(1000 ** 3))
         self.assertEqual('1 TB', humanfriendly.format_size(1000 ** 4))
         self.assertEqual('1 PB', humanfriendly.format_size(1000 ** 5))
+        self.assertEqual('1 EB', humanfriendly.format_size(1000 ** 6))
+        self.assertEqual('1 ZB', humanfriendly.format_size(1000 ** 7))
+        self.assertEqual('1 YB', humanfriendly.format_size(1000 ** 8))
         self.assertEqual('1 KiB', humanfriendly.format_size(1024 ** 1, binary=True))
         self.assertEqual('1 MiB', humanfriendly.format_size(1024 ** 2, binary=True))
         self.assertEqual('1 GiB', humanfriendly.format_size(1024 ** 3, binary=True))
         self.assertEqual('1 TiB', humanfriendly.format_size(1024 ** 4, binary=True))
         self.assertEqual('1 PiB', humanfriendly.format_size(1024 ** 5, binary=True))
+        self.assertEqual('1 EiB', humanfriendly.format_size(1024 ** 6, binary=True))
+        self.assertEqual('1 ZiB', humanfriendly.format_size(1024 ** 7, binary=True))
+        self.assertEqual('1 YiB', humanfriendly.format_size(1024 ** 8, binary=True))
         self.assertEqual('45 KB', humanfriendly.format_size(1000 * 45))
         self.assertEqual('2.9 TB', humanfriendly.format_size(1000 ** 4 * 2.9))
 
@@ -333,8 +339,14 @@ class HumanFriendlyTestCase(TestCase):
         self.assertEqual(1024, humanfriendly.parse_size('1 kilobyte', binary=True))
         self.assertEqual(1000 ** 2 * 69, humanfriendly.parse_size('69 MB'))
         self.assertEqual(1000 ** 3, humanfriendly.parse_size('1 GB'))
+        self.assertEqual(1000 ** 4, humanfriendly.parse_size('1 TB'))
+        self.assertEqual(1000 ** 5, humanfriendly.parse_size('1 PB'))
+        self.assertEqual(1000 ** 6, humanfriendly.parse_size('1 EB'))
+        self.assertEqual(1000 ** 7, humanfriendly.parse_size('1 ZB'))
+        self.assertEqual(1000 ** 8, humanfriendly.parse_size('1 YB'))
         self.assertEqual(1000 ** 3 * 1.5, humanfriendly.parse_size('1.5 GB'))
-        self.assertRaises(humanfriendly.InvalidSize, humanfriendly.parse_size, '1z')
+        self.assertEqual(1024 ** 8 * 1.5, humanfriendly.parse_size('1.5 YiB'))
+        self.assertRaises(humanfriendly.InvalidSize, humanfriendly.parse_size, '1q')
         self.assertRaises(humanfriendly.InvalidSize, humanfriendly.parse_size, 'a')
 
     def test_format_length(self):
@@ -670,6 +682,17 @@ class HumanFriendlyTestCase(TestCase):
         random_byte_count = random.randint(1024, 1024 * 1024)
         returncode, output = run_cli(main, '--format-size=%i' % random_byte_count)
         assert output.strip() == humanfriendly.format_size(random_byte_count)
+        # Test `humanfriendly --format-size --binary'.
+        random_byte_count = random.randint(1024, 1024 * 1024)
+        returncode, output = run_cli(main, '--format-size=%i' % random_byte_count, '--binary')
+        assert output.strip() == humanfriendly.format_size(random_byte_count, binary=True)
+        # Test `humanfriendly --format-length'.
+        random_len = random.randint(1024, 1024 * 1024)
+        returncode, output = run_cli(main, '--format-length=%i' % random_len)
+        assert output.strip() == humanfriendly.format_length(random_len)
+        random_len = float(random_len) / 12345.6
+        returncode, output = run_cli(main, '--format-length=%f' % random_len)
+        assert output.strip() == humanfriendly.format_length(random_len)
         # Test `humanfriendly --format-table'.
         returncode, output = run_cli(main, '--format-table', '--delimiter=\t', input='1\t2\t3\n4\t5\t6\n7\t8\t9')
         assert output.strip() == dedent('''
@@ -686,6 +709,14 @@ class HumanFriendlyTestCase(TestCase):
         # Test `humanfriendly --parse-size'.
         returncode, output = run_cli(main, '--parse-size=5 KB')
         assert int(output) == humanfriendly.parse_size('5 KB')
+        # Test `humanfriendly --parse-size'.
+        returncode, output = run_cli(main, '--parse-size=5 YiB')
+        assert int(output) == humanfriendly.parse_size('5 YB', binary=True)
+        # Test `humanfriendly --parse-length'.
+        returncode, output = run_cli(main, '--parse-length=5 km')
+        assert int(output) == humanfriendly.parse_length('5 km')
+        returncode, output = run_cli(main, '--parse-length=1.05 km')
+        assert float(output) == humanfriendly.parse_length('1.05 km')
         # Test `humanfriendly --run-command'.
         returncode, output = run_cli(main, '--run-command', 'bash', '-c', 'sleep 2 && exit 42')
         assert returncode == 42
