@@ -1,7 +1,7 @@
 # Test suite requirements.
 capturer >= 2.1
 coloredlogs >= 2.0
-pytest >= 3.0.7
+pytest >= 3.0.7 ; python_version > '2.6'
 pytest-cov >= 2.4.0
 
 # pytest release 3.3 drops Python 2.6 compatibility:
