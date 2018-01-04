@@ -4,7 +4,7 @@
 # Tests for the `humanfriendly' package.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: July 16, 2017
+# Last Change: January 4, 2018
 # URL: https://humanfriendly.readthedocs.io
 
 """Test suite for the `humanfriendly` package."""
@@ -527,19 +527,17 @@ class HumanFriendlyTestCase(TestCase):
         # Test automatic timer.
         automatic_timer = humanfriendly.Timer()
         time.sleep(1)
-        self.assertEqual(normalize_timestamp(humanfriendly.round_number(
-            automatic_timer.elapsed_time,
-            keep_width=True,
-        )), '1.00')
+        # XXX The following normalize_timestamp(ndigits=0) calls are intended
+        #     to compensate for unreliable clock sources in virtual machines
+        #     like those encountered on Travis CI, see also:
+        #     https://travis-ci.org/xolox/python-humanfriendly/jobs/323944263
+        self.assertEqual(normalize_timestamp(automatic_timer.elapsed_time, 0), '1.00')
         # Test resumable timer.
         resumable_timer = humanfriendly.Timer(resumable=True)
         for i in range(2):
             with resumable_timer:
                 time.sleep(1)
-        self.assertEqual(normalize_timestamp(humanfriendly.round_number(
-            resumable_timer.elapsed_time,
-            keep_width=True,
-        )), '2.00')
+        self.assertEqual(normalize_timestamp(resumable_timer.elapsed_time, 0), '2.00')
         # Make sure Timer.__enter__() returns the timer object.
         with humanfriendly.Timer(resumable=True) as timer:
             assert timer is not None
