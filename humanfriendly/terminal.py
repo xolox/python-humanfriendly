@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: May 18, 2017
+# Last Change: January 4, 2018
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -194,6 +194,8 @@ def ansi_style(**kw):
                   'green', 'yellow', 'blue', 'magenta', 'cyan' or 'white') or
                   :data:`None` (the default) which means no escape sequence to
                   switch color will be emitted.
+    :param bright: Use high intensity colors instead of default colors
+                   (a boolean, defaults to :data:`False`).
     :param readline_hints: If :data:`True` then :func:`readline_wrap()` is
                            applied to the generated ANSI escape sequences (the
                            default is :data:`False`).
@@ -204,6 +206,14 @@ def ansi_style(**kw):
     :returns: The ANSI escape sequences to enable the requested text styles or
               an empty string if no styles were requested.
     :raises: :exc:`~exceptions.ValueError` when an invalid color name is given.
+
+    Even though the `color` argument only supports eight "portable colors", the
+    use of `bright=True` and `faint=True` increases the total number of
+    available colors to around 24 (it may be slightly lower, for example
+    because faint black is just black). You can use the ``humanfriendly
+    --demo`` command to get a demonstration of the available colors:
+
+    .. image:: images/ansi-demo.png
     """
     # Start with sequences that change text styles.
     sequences = [str(ANSI_TEXT_STYLES[k]) for k, v in kw.items() if k in ANSI_TEXT_STYLES and v]
@@ -214,7 +224,10 @@ def ansi_style(**kw):
         if color_name not in ANSI_COLOR_CODES:
             msg = "Invalid color name %r! (expected one of %s)"
             raise ValueError(msg % (color_name, concatenate(sorted(ANSI_COLOR_CODES))))
-        sequences.append('3%i' % ANSI_COLOR_CODES[color_name])
+        sequences.append('%i%i' % (
+            9 if kw.get('bright') else 3,
+            ANSI_COLOR_CODES[color_name],
+        ))
     if sequences:
         encoded = ANSI_CSI + ';'.join(sequences) + ANSI_SGR
         return readline_wrap(encoded) if kw.get('readline_hints') else encoded

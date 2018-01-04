@@ -92,6 +92,8 @@ line based on the Python package with the same name.
    number of metres to standard output."
    ``--parse-size=VALUE``,"Parse a human readable data size (given as the string ``VALUE``) and print the
    number of bytes to standard output."
+   ``--demo``,"Demonstrate changing the style and color of the terminal font using ANSI
+   escape sequences."
    "``-h``, ``--help``",Show this message and exit.
 
 .. [[[end]]]

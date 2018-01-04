@@ -66,6 +66,11 @@ Supported options:
     Parse a human readable data size (given as the string VALUE) and print the
     number of bytes to standard output.
 
+  --demo
+
+    Demonstrate changing the style and color of the terminal font using ANSI
+    escape sequences.
+
   -h, --help
 
     Show this message and exit.
@@ -90,7 +95,15 @@ from humanfriendly import (
     Spinner,
     Timer,
 )
-from humanfriendly.terminal import output, usage, warning
+from humanfriendly.terminal import (
+    ANSI_COLOR_CODES,
+    ANSI_TEXT_STYLES,
+    HIGHLIGHT_COLOR,
+    ansi_wrap,
+    output,
+    usage,
+    warning
+)
 
 
 def main():
@@ -99,7 +112,7 @@ def main():
         options, arguments = getopt.getopt(sys.argv[1:], 'cd:l:n:s:bt:h', [
             'run-command', 'format-table', 'delimiter=', 'format-length=',
             'format-number=', 'format-size=', 'binary', 'format-timespan=',
-            'parse-length=', 'parse-size=', 'help',
+            'parse-length=', 'parse-size=', 'demo', 'help',
         ])
     except Exception as e:
         warning("Error: %s", e)
@@ -127,6 +140,8 @@ def main():
             should_format_table = True
         elif option in ('-t', '--format-timespan'):
             actions.append(functools.partial(print_formatted_timespan, value))
+        elif option == '--demo':
+            actions.append(demonstrate_ansi_formatting)
         elif option in ('-h', '--help'):
             usage(__doc__)
             return
@@ -193,3 +208,31 @@ def print_parsed_length(value):
 def print_parsed_size(value):
     """Parse a human readable data size and print the number of bytes."""
     output(parse_size(value))
+
+
+def demonstrate_ansi_formatting():
+    """Demonstrate the use of ANSI escape sequences."""
+    # First we demonstrate the supported text styles.
+    output("%s", ansi_wrap("Text styles:", bold=True))
+    styles = ['normal', 'bright']
+    styles.extend(ANSI_TEXT_STYLES.keys())
+    for style_name in sorted(styles):
+        options = dict(color=HIGHLIGHT_COLOR)
+        if style_name != 'normal':
+            options[style_name] = True
+        style_label = style_name.replace('_', ' ').capitalize()
+        output(" - %s", ansi_wrap(style_label, **options))
+    # Now we demonstrate the supported colors.
+    intensities = [
+        ('faint', dict(faint=True)),
+        ('normal', dict()),
+        ('bright', dict(bright=True)),
+    ]
+    output("\n%s" % ansi_wrap("Color intensities:", bold=True))
+    output(format_table([
+        [color_name] + [
+            ansi_wrap("XXXXXX", color=color_name, **kw)
+            for label, kw in intensities
+        ]
+        for color_name in sorted(ANSI_COLOR_CODES.keys())
+    ], column_names=["Color", "Faint", "Normal", "Bright"]))
