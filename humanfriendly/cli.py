@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: January 4, 2018
+# Last Change: January 14, 2018
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -85,6 +85,8 @@ import sys
 
 # Modules included in our package.
 from humanfriendly import (
+    Spinner,
+    Timer,
     format_length,
     format_number,
     format_size,
@@ -92,17 +94,18 @@ from humanfriendly import (
     format_timespan,
     parse_length,
     parse_size,
-    Spinner,
-    Timer,
 )
+from humanfriendly.tables import format_smart_table
 from humanfriendly.terminal import (
     ANSI_COLOR_CODES,
     ANSI_TEXT_STYLES,
     HIGHLIGHT_COLOR,
+    ansi_strip,
     ansi_wrap,
+    find_terminal_size,
     output,
     usage,
-    warning
+    warning,
 )
 
 
@@ -213,7 +216,7 @@ def print_parsed_size(value):
 def demonstrate_ansi_formatting():
     """Demonstrate the use of ANSI escape sequences."""
     # First we demonstrate the supported text styles.
-    output("%s", ansi_wrap("Text styles:", bold=True))
+    output('%s', ansi_wrap('Text styles:', bold=True))
     styles = ['normal', 'bright']
     styles.extend(ANSI_TEXT_STYLES.keys())
     for style_name in sorted(styles):
@@ -221,18 +224,52 @@ def demonstrate_ansi_formatting():
         if style_name != 'normal':
             options[style_name] = True
         style_label = style_name.replace('_', ' ').capitalize()
-        output(" - %s", ansi_wrap(style_label, **options))
-    # Now we demonstrate the supported colors.
-    intensities = [
-        ('faint', dict(faint=True)),
-        ('normal', dict()),
-        ('bright', dict(bright=True)),
-    ]
-    output("\n%s" % ansi_wrap("Color intensities:", bold=True))
-    output(format_table([
-        [color_name] + [
-            ansi_wrap("XXXXXX", color=color_name, **kw)
-            for label, kw in intensities
+        output(' - %s', ansi_wrap(style_label, **options))
+    # Now we demonstrate named foreground and background colors.
+    for color_type, color_label in (('color', 'Foreground colors'),
+                                    ('background', 'Background colors')):
+        intensities = [
+            ('normal', dict()),
+            ('bright', dict(bright=True)),
         ]
-        for color_name in sorted(ANSI_COLOR_CODES.keys())
-    ], column_names=["Color", "Faint", "Normal", "Bright"]))
+        if color_type != 'background':
+            intensities.insert(0, ('faint', dict(faint=True)))
+        output('\n%s' % ansi_wrap('%s:' % color_label, bold=True))
+        output(format_smart_table([
+            [color_name] + [
+                ansi_wrap(
+                    'XXXXXX' if color_type != 'background' else (' ' * 6),
+                    **dict(kw.items() + [(color_type, color_name)])
+                ) for label, kw in intensities
+            ] for color_name in sorted(ANSI_COLOR_CODES.keys())
+        ], column_names=['Color'] + [
+            label.capitalize() for label, kw in intensities
+        ]))
+    # Demonstrate support for 256 colors as well.
+    demonstrate_256_colors(0, 7, 'standard colors')
+    demonstrate_256_colors(8, 15, 'high-intensity colors')
+    demonstrate_256_colors(16, 231, '216 colors')
+    demonstrate_256_colors(232, 255, 'gray scale colors')
+
+
+def demonstrate_256_colors(i, j, group=None):
+    """Demonstrate 256 color mode support."""
+    # Generate the label.
+    label = '256 color mode'
+    if group:
+        label += ' (%s)' % group
+    output('\n' + ansi_wrap('%s:' % label, bold=True))
+    # Generate a simple rendering of the colors in the requested range and
+    # check if it will fit on a single line (given the terminal's width).
+    single_line = ''.join(' ' + ansi_wrap(str(n), color=n) for n in range(i, j + 1))
+    lines, columns = find_terminal_size()
+    if columns >= len(ansi_strip(single_line)):
+        output(single_line)
+    else:
+        # Generate a more complex rendering of the colors that will nicely wrap
+        # over multiple lines without using too many lines.
+        width = len(str(j)) + 1
+        colors_per_line = columns / width
+        colors = [ansi_wrap(str(n).rjust(width), color=n) for n in range(i, j + 1)]
+        blocks = [colors[n:n + colors_per_line] for n in range(0, len(colors), colors_per_line)]
+        output('\n'.join(''.join(b) for b in blocks))

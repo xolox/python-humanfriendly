@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: January 4, 2018
+# Last Change: January 14, 2018
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -18,6 +18,7 @@ escape sequences work.
 
 # Standard library modules.
 import codecs
+import numbers
 import os
 import re
 import subprocess
@@ -190,10 +191,16 @@ def ansi_style(**kw):
     """
     Generate ANSI escape sequences for the given color and/or style(s).
 
-    :param color: The name of a color (one of the strings 'black', 'red',
-                  'green', 'yellow', 'blue', 'magenta', 'cyan' or 'white') or
-                  :data:`None` (the default) which means no escape sequence to
-                  switch color will be emitted.
+    :param color: The foreground color. Two types of values are supported:
+
+                  - The name of a color (one of the strings 'black', 'red',
+                    'green', 'yellow', 'blue', 'magenta', 'cyan' or 'white').
+                  - An integer that refers to the 256 color mode palette.
+
+                  The value :data:`None` (the default) means no escape
+                  sequence to switch color will be emitted.
+    :param background: The background color (see the description
+                       of the `color` argument).
     :param bright: Use high intensity colors instead of default colors
                    (a boolean, defaults to :data:`False`).
     :param readline_hints: If :data:`True` then :func:`readline_wrap()` is
@@ -207,29 +214,50 @@ def ansi_style(**kw):
               an empty string if no styles were requested.
     :raises: :exc:`~exceptions.ValueError` when an invalid color name is given.
 
-    Even though the `color` argument only supports eight "portable colors", the
-    use of `bright=True` and `faint=True` increases the total number of
-    available colors to around 24 (it may be slightly lower, for example
-    because faint black is just black). You can use the ``humanfriendly
-    --demo`` command to get a demonstration of the available colors:
+    Even though only eight named colors are supported, the use of `bright=True`
+    and `faint=True` increases the number of available colors to around 24 (it
+    may be slightly lower, for example because faint black is just black).
+
+    Starting in version 4.7 support for 256 color mode was added. While this
+    significantly increases the available colors it's not very human friendly
+    in usage because you need to look up color codes in the `256 color mode
+    palette <https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit>`_.
+
+    You can use the ``humanfriendly --demo`` command to get a demonstration of
+    the available colors, see also the screen shot below. Note that the small
+    font size in the screen shot was so that the demonstration of 256 color
+    mode support would fit into a single screen shot without scrolling :-)
+    (I wasn't feeling very creative).
 
     .. image:: images/ansi-demo.png
     """
     # Start with sequences that change text styles.
-    sequences = [str(ANSI_TEXT_STYLES[k]) for k, v in kw.items() if k in ANSI_TEXT_STYLES and v]
+    sequences = [ANSI_TEXT_STYLES[k] for k, v in kw.items() if k in ANSI_TEXT_STYLES and v]
     # Append the color code (if any).
-    color_name = kw.get('color')
-    if color_name:
-        # Validate the color name.
-        if color_name not in ANSI_COLOR_CODES:
-            msg = "Invalid color name %r! (expected one of %s)"
-            raise ValueError(msg % (color_name, concatenate(sorted(ANSI_COLOR_CODES))))
-        sequences.append('%i%i' % (
-            9 if kw.get('bright') else 3,
-            ANSI_COLOR_CODES[color_name],
-        ))
+    for color_type in 'color', 'background':
+        color_value = kw.get(color_type)
+        if isinstance(color_value, numbers.Number):
+            # Numeric values are assumed to be 256 color codes.
+            sequences.extend((
+                39 if color_type == 'background' else 38,
+                5, int(color_value)
+            ))
+        elif color_value:
+            # Other values are assumed to be strings containing one of the known color names.
+            if color_value not in ANSI_COLOR_CODES:
+                msg = "Invalid color value %r! (expected an integer or one of the strings %s)"
+                raise ValueError(msg % (color_value, concatenate(map(repr, sorted(ANSI_COLOR_CODES)))))
+            # Pick the right offset for foreground versus background
+            # colors and regular intensity versus bright colors.
+            offset = (
+                (100 if kw.get('bright') else 40)
+                if color_type == 'background'
+                else (90 if kw.get('bright') else 30)
+            )
+            # Combine the offset and color code into a single integer.
+            sequences.append(offset + ANSI_COLOR_CODES[color_value])
     if sequences:
-        encoded = ANSI_CSI + ';'.join(sequences) + ANSI_SGR
+        encoded = ANSI_CSI + ';'.join(map(str, sequences)) + ANSI_SGR
         return readline_wrap(encoded) if kw.get('readline_hints') else encoded
     else:
         return ''
