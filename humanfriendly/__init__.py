@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: January 14, 2018
+# Last Change: January 20, 2018
 # URL: https://humanfriendly.readthedocs.io
 
 """The main module of the `humanfriendly` package."""
@@ -52,6 +52,7 @@ erase_line_code = '\r\x1b[K'
 hide_cursor_code = '\x1b[?25l'
 show_cursor_code = '\x1b[?25h'
 
+# Named tuples to define units of size.
 SizeUnit = collections.namedtuple('SizeUnit', 'divider, symbol, name')
 CombinedUnit = collections.namedtuple('CombinedUnit', 'decimal, binary')
 
@@ -107,7 +108,7 @@ def coerce_boolean(value):
             return False
         else:
             msg = "Failed to coerce string to boolean! (%r)"
-            raise ValueError(msg % value)
+            raise ValueError(format(msg, value))
     else:
         return bool(value)
 
@@ -208,7 +209,7 @@ def parse_size(size, binary=False):
                     return int(tokens[0] * (unit.binary.divider if binary else unit.decimal.divider))
     # We failed to parse the size specification.
     msg = "Failed to parse size! (input %r was tokenized as %r)"
-    raise InvalidSize(msg % (size, tokens))
+    raise InvalidSize(format(msg, size, tokens))
 
 
 def format_length(num_metres, keep_width=False):
@@ -277,7 +278,7 @@ def parse_length(length):
                     return tokens[0] * unit['divider']
     # We failed to parse the length specification.
     msg = "Failed to parse length! (input %r was tokenized as %r)"
-    raise InvalidLength(msg % (length, tokens))
+    raise InvalidLength(format(msg, length, tokens))
 
 
 def format_number(number, num_decimals=2):
@@ -464,7 +465,7 @@ def parse_timespan(timespan):
                     return float(tokens[0]) * unit['divider']
     # We failed to parse the timespan specification.
     msg = "Failed to parse timespan! (input %r was tokenized as %r)"
-    raise InvalidTimespan(msg % (timespan, tokens))
+    raise InvalidTimespan(format(msg, timespan, tokens))
 
 
 def parse_date(datestring):
@@ -535,7 +536,7 @@ def parse_date(datestring):
             return (year, month, day, 0, 0, 0)
     except Exception:
         msg = "Invalid date! (expected 'YYYY-MM-DD' or 'YYYY-MM-DD HH:MM:SS' but got: %r)"
-        raise InvalidDate(msg % datestring)
+        raise InvalidDate(format(msg, datestring))
 
 
 def format_path(pathname):
@@ -936,7 +937,7 @@ class InvalidDate(Exception):
     >>> parse_date('2013-06-XY')
     Traceback (most recent call last):
       File "humanfriendly.py", line 206, in parse_date
-        raise InvalidDate, msg % datestring
+        raise InvalidDate(format(msg, datestring))
     humanfriendly.InvalidDate: Invalid date! (expected 'YYYY-MM-DD' or 'YYYY-MM-DD HH:MM:SS' but got: '2013-06-XY')
     """
 
@@ -952,7 +953,7 @@ class InvalidSize(Exception):
     >>> parse_size('5 Z')
     Traceback (most recent call last):
       File "humanfriendly/__init__.py", line 267, in parse_size
-        raise InvalidSize(msg % (size, tokens))
+        raise InvalidSize(format(msg, size, tokens))
     humanfriendly.InvalidSize: Failed to parse size! (input '5 Z' was tokenized as [5, 'Z'])
     """
 
@@ -968,7 +969,7 @@ class InvalidLength(Exception):
     >>> parse_length('5 Z')
     Traceback (most recent call last):
       File "humanfriendly/__init__.py", line 267, in parse_length
-        raise InvalidLength(msg % (length, tokens))
+        raise InvalidLength(format(msg, length, tokens))
     humanfriendly.InvalidLength: Failed to parse length! (input '5 Z' was tokenized as [5, 'Z'])
     """
 
@@ -984,6 +985,6 @@ class InvalidTimespan(Exception):
     >>> parse_timespan('1 age')
     Traceback (most recent call last):
       File "humanfriendly/__init__.py", line 419, in parse_timespan
-        raise InvalidTimespan(msg % (timespan, tokens))
+        raise InvalidTimespan(format(msg, timespan, tokens))
     humanfriendly.InvalidTimespan: Failed to parse timespan! (input '1 age' was tokenized as [1, 'age'])
     """
