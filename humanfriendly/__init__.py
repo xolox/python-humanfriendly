@@ -113,6 +113,28 @@ def coerce_boolean(value):
         return bool(value)
 
 
+def coerce_pattern(value, flags=0):
+    """
+    Coerce strings to compiled regular expressions.
+
+    :param value: A string containing a regular expression pattern
+                  or a compiled regular expression.
+    :param flags: The flags used to compile the pattern (an integer).
+    :returns: A compiled regular expression.
+    :raises: :exc:`~exceptions.ValueError` when `value` isn't a string
+             and also isn't a compiled regular expression.
+    """
+    if is_string(value):
+        value = re.compile(value, flags)
+    else:
+        empty_pattern = re.compile('')
+        pattern_type = type(empty_pattern)
+        if not isinstance(value, pattern_type):
+            msg = "Failed to coerce value to compiled regular expression! (%r)"
+            raise ValueError(format(msg, value))
+    return value
+
+
 def format_size(num_bytes, keep_width=False, binary=False):
     """
     Format a byte count as a human readable file size.

@@ -4,7 +4,7 @@
 # Tests for the `humanfriendly' package.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: January 13, 2018
+# Last Change: January 20, 2018
 # URL: https://humanfriendly.readthedocs.io
 
 """Test suite for the `humanfriendly` package."""
@@ -12,6 +12,7 @@
 # Standard library modules.
 import math
 import os
+import re
 import random
 import subprocess
 import sys
@@ -21,7 +22,7 @@ import unittest
 # Modules included in our package.
 import humanfriendly
 from humanfriendly import prompts
-from humanfriendly import compact, dedent, trim_empty_lines
+from humanfriendly import coerce_pattern, compact, dedent, trim_empty_lines
 from humanfriendly.cli import main
 from humanfriendly.compat import StringIO
 from humanfriendly.prompts import (
@@ -236,6 +237,19 @@ class HumanFriendlyTestCase(TestCase):
         for value in [False, 'FALSE', 'False', 'false', 'off', 'no', '0']:
             self.assertEqual(False, humanfriendly.coerce_boolean(value))
         self.assertRaises(ValueError, humanfriendly.coerce_boolean, 'not a boolean')
+
+    def test_pattern_coercion(self):
+        """Test :func:`humanfriendly.coerce_pattern()`."""
+        empty_pattern = re.compile('')
+        # Make sure strings are converted to compiled regular expressions.
+        assert isinstance(coerce_pattern('foobar'), type(empty_pattern))
+        # Make sure compiled regular expressions pass through untouched.
+        assert empty_pattern is coerce_pattern(empty_pattern)
+        # Make sure flags are respected.
+        pattern = coerce_pattern('foobar', re.IGNORECASE)
+        assert pattern.match('FOOBAR')
+        # Make sure invalid values raise the expected exception.
+        self.assertRaises(ValueError, coerce_pattern, [])
 
     def test_format_timespan(self):
         """Test :func:`humanfriendly.format_timespan()`."""
