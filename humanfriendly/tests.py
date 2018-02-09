@@ -436,6 +436,7 @@ class HumanFriendlyTestCase(TestCase):
         """Test :func:`humanfriendly.parse_length()`."""
         self.assertEqual(0, humanfriendly.parse_length('0m'))
         self.assertEqual(42, humanfriendly.parse_length('42'))
+        self.assertEqual(1.5, humanfriendly.parse_length('1.5'))
         self.assertEqual(42, humanfriendly.parse_length('42m'))
         self.assertEqual(1000, humanfriendly.parse_length('1km'))
         self.assertEqual(0.153, humanfriendly.parse_length('15.3 cm'))
