@@ -290,7 +290,7 @@ def parse_length(length):
     if tokens and isinstance(tokens[0], numbers.Number):
         # If the input contains only a number, it's assumed to be the number of metres.
         if len(tokens) == 1:
-            return int(tokens[0])
+            return tokens[0]
         # Otherwise we expect to find two tokens: A number and a unit.
         if len(tokens) == 2 and is_string(tokens[1]):
             normalized_unit = tokens[1].lower()
