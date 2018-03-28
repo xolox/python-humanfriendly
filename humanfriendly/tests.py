@@ -4,7 +4,7 @@
 # Tests for the `humanfriendly' package.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: January 20, 2018
+# Last Change: March 28, 2018
 # URL: https://humanfriendly.readthedocs.io
 
 """Test suite for the `humanfriendly` package."""
@@ -39,6 +39,7 @@ from humanfriendly.sphinx import (
 from humanfriendly.tables import (
     format_pretty_table,
     format_robust_table,
+    format_rst_table,
     format_smart_table,
 )
 from humanfriendly.terminal import (
@@ -518,6 +519,34 @@ class HumanFriendlyTestCase(TestCase):
             multi line column!
             ------------------
         """).strip()
+
+    def test_rst_tables(self):
+        """Test :func:`humanfriendly.tables.format_rst_table()`."""
+        # Generate a table with column names.
+        column_names = ['One', 'Two', 'Three']
+        data = [['1', '2', '3'], ['a', 'b', 'c']]
+        self.assertEquals(
+            format_rst_table(data, column_names),
+            dedent("""
+                ===  ===  =====
+                One  Two  Three
+                ===  ===  =====
+                1    2    3
+                a    b    c
+                ===  ===  =====
+            """).rstrip(),
+        )
+        # Generate a table without column names.
+        data = [['1', '2', '3'], ['a', 'b', 'c']]
+        self.assertEquals(
+            format_rst_table(data),
+            dedent("""
+                =  =  =
+                1  2  3
+                a  b  c
+                =  =  =
+            """).rstrip(),
+        )
 
     def test_concatenate(self):
         """Test :func:`humanfriendly.concatenate()`."""
