@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: March 28, 2018
+# Last Change: March 31, 2018
 # URL: https://humanfriendly.readthedocs.io
 
 """The main module of the `humanfriendly` package."""
@@ -39,7 +39,7 @@ from humanfriendly.prompts import prompt_for_choice  # NOQA
 from humanfriendly.compat import is_string, monotonic
 
 # Semi-standard module versioning.
-__version__ = '4.9'
+__version__ = '4.10'
 
 # Spinners are redrawn at most this many seconds.
 minimum_spinner_interval = 0.2
@@ -660,6 +660,32 @@ class Timer(object):
         if self.start_time:
             self.total_time += monotonic() - self.start_time
             self.start_time = 0.0
+
+    def sleep(self, seconds):
+        """
+        Easy to use rate limiting of repeating actions.
+
+        :param seconds: The number of seconds to sleep (an
+                        integer or floating point number).
+
+        This method sleeps for the given number of seconds minus the
+        :attr:`elapsed_time`. If the resulting duration is negative
+        :func:`time.sleep()` will still be called, but the argument
+        given to it will be the number 0 (negative numbers cause
+        :func:`time.sleep()` to raise an exception).
+
+        The use case for this is to initialize a :class:`Timer` inside
+        the body of a :keyword:`for` or :keyword:`while` loop and call
+        :func:`Timer.sleep()` at the end of the loop body to rate limit
+        whatever it is that is being done inside the loop body.
+
+        For posterity: Although the implementation of :func:`sleep()` only
+        requires a single line of code I've added it to :mod:`humanfriendly`
+        anyway because now that I've thought about how to tackle this once I
+        never want to have to think about it again :-P (unless I find ways to
+        improve this).
+        """
+        time.sleep(max(0, seconds - self.elapsed_time))
 
     @property
     def elapsed_time(self):
