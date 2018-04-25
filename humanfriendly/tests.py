@@ -4,20 +4,20 @@
 # Tests for the `humanfriendly' package.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: March 28, 2018
+# Last Change: April 26, 2018
 # URL: https://humanfriendly.readthedocs.io
 
 """Test suite for the `humanfriendly` package."""
 
 # Standard library modules.
+import datetime
 import math
 import os
-import re
 import random
+import re
 import subprocess
 import sys
 import time
-import unittest
 
 # Modules included in our package.
 import humanfriendly
@@ -291,6 +291,11 @@ class HumanFriendlyTestCase(TestCase):
         assert '5 minutes and 0.3 seconds' == humanfriendly.format_timespan(300.300)
         assert '1 second and 15 milliseconds' == humanfriendly.format_timespan(1.015, detailed=True)
         assert '10 seconds and 15 milliseconds' == humanfriendly.format_timespan(10.015, detailed=True)
+        # Test the datetime.timedelta support:
+        # https://github.com/xolox/python-humanfriendly/issues/27
+        now = datetime.datetime.now()
+        then = now - datetime.timedelta(hours=23)
+        assert '23 hours' == humanfriendly.format_timespan(now - then)
 
     def test_parse_timespan(self):
         """Test :func:`humanfriendly.parse_timespan()`."""
@@ -1171,7 +1176,3 @@ def normalize_timestamp(value, ndigits=1):
     multitasking, processor scheduling, etc.
     """
     return '%.2f' % round(float(value), ndigits=ndigits)
-
-
-if __name__ == '__main__':
-    unittest.main()

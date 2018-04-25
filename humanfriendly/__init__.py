@@ -8,6 +8,7 @@
 
 # Standard library modules.
 import collections
+import datetime
 import decimal
 import multiprocessing
 import numbers
@@ -132,6 +133,29 @@ def coerce_pattern(value, flags=0):
         if not isinstance(value, pattern_type):
             msg = "Failed to coerce value to compiled regular expression! (%r)"
             raise ValueError(format(msg, value))
+    return value
+
+
+def coerce_seconds(value):
+    """
+    Coerce a value to the number of seconds.
+
+    :param value: An :class:`int`, :class:`float` or
+                  :class:`datetime.timedelta` object.
+    :returns: An :class:`int` or :class:`float` value.
+
+    When `value` is a :class:`datetime.timedelta` object the
+    :func:`~datetime.timedelta.total_seconds()` method is called.
+    On Python 2.6 this method is not available so it is emulated.
+    """
+    if isinstance(value, datetime.timedelta):
+        if hasattr(value, 'total_seconds'):
+            return value.total_seconds()
+        else:
+            return (value.microseconds + (value.seconds + value.days * 24 * 3600) * 10**6) / 10**6
+    if not isinstance(value, numbers.Number):
+        msg = "Failed to coerce value to number of seconds! (%r)"
+        raise ValueError(format(msg, value))
     return value
 
 
@@ -375,13 +399,14 @@ def format_timespan(num_seconds, detailed=False, max_units=3):
     """
     Format a timespan in seconds as a human readable string.
 
-    :param num_seconds: Number of seconds (integer or float).
+    :param num_seconds: Any value accepted by :func:`coerce_seconds()`.
     :param detailed: If :data:`True` milliseconds are represented separately
                      instead of being represented as fractional seconds
                      (defaults to :data:`False`).
     :param max_units: The maximum number of units to show in the formatted time
                       span (an integer, defaults to three).
     :returns: The formatted timespan as a string.
+    :raise: See :func:`coerce_seconds()`.
 
     Some examples:
 
@@ -399,6 +424,7 @@ def format_timespan(num_seconds, detailed=False, max_units=3):
     >>> format_timespan(week * 52 + day * 2 + hour * 3)
     '1 year, 2 days and 3 hours'
     """
+    num_seconds = coerce_seconds(num_seconds)
     if num_seconds < 60 and not detailed:
         # Fast path.
         return pluralize(round_number(num_seconds), 'second')
