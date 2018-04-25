@@ -11,7 +11,17 @@ Changelog`_ . This project adheres to `semantic versioning`_.
 .. _Keep a Changelog: http://keepachangelog.com/
 .. _semantic versioning: http://semver.org/
 
-`Release 4.11`_ (2018-03-31)
+`Release 4.12`_ (2018-04-26)
+----------------------------
+
+- Make ``format_timespan()`` accept ``datetime.timedelta`` objects (fixes `#27`_).
+- Add ``license`` key to ``setup.py`` script (pointed out to me in `coloredlogs
+  pull request #53 <https://github.com/xolox/python-coloredlogs/pull/53>`_).
+
+.. _Release 4.12: https://github.com/xolox/python-humanfriendly/compare/4.11...4.12
+.. _#27: https://github.com/xolox/python-humanfriendly/issues/27
+
+`Release 4.11`_ (2018-04-26)
 ----------------------------
 
 Added this changelog as requested in `#23`_.
