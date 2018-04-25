@@ -3,7 +3,7 @@
 # Setup script for the `humanfriendly' package.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: January 1, 2018
+# Last Change: April 26, 2018
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -108,6 +108,7 @@ setup(
     url='https://humanfriendly.readthedocs.io',
     author="Peter Odding",
     author_email='peter@peterodding.com',
+    license='MIT',
     packages=find_packages(),
     entry_points=dict(console_scripts=[
         'humanfriendly = humanfriendly.cli:main',
