@@ -1,5 +1,14 @@
+API documentation
+=================
+
+The following API documentation was automatically generated from the source
+code of `humanfriendly` |release|:
+
+.. contents::
+   :local:
+
 A note about backwards compatibility
-====================================
+------------------------------------
 
 The `humanfriendly` package started out as a single :mod:`humanfriendly`
 module. Eventually this module grew to a size that necessitated splitting up
@@ -20,61 +29,61 @@ package in your project, make sure to at least pin the major version number in
 order to avoid unexpected surprises.
 
 The :mod:`humanfriendly` module
-===============================
+-------------------------------
 
 .. automodule:: humanfriendly
    :members:
 
 The :mod:`humanfriendly.cli` module
-===================================
+-----------------------------------
 
 .. automodule:: humanfriendly.cli
    :members:
 
 The :mod:`humanfriendly.compat` module
-======================================
+--------------------------------------
 
 .. automodule:: humanfriendly.compat
    :members:
 
 The :mod:`humanfriendly.prompts` module
-=======================================
+---------------------------------------
 
 .. automodule:: humanfriendly.prompts
    :members:
 
 The :mod:`humanfriendly.sphinx` module
-======================================
+--------------------------------------
 
 .. automodule:: humanfriendly.sphinx
    :members:
 
 The :mod:`humanfriendly.tables` module
-======================================
+--------------------------------------
 
 .. automodule:: humanfriendly.tables
    :members:
 
 The :mod:`humanfriendly.terminal` module
-========================================
+----------------------------------------
 
 .. automodule:: humanfriendly.terminal
    :members:
 
 The :mod:`humanfriendly.testing` module
-=======================================
+---------------------------------------
 
 .. automodule:: humanfriendly.testing
    :members:
 
 The :mod:`humanfriendly.text` module
-====================================
+------------------------------------
 
 .. automodule:: humanfriendly.text
    :members:
 
 The :mod:`humanfriendly.usage` module
-=====================================
+-------------------------------------
 
 .. automodule:: humanfriendly.usage
    :members:
