@@ -127,9 +127,9 @@ Contact
 -------
 
 The latest version of `humanfriendly` is available on PyPI_ and GitHub_. The
-documentation is hosted on `Read the Docs`_. For bug reports please create an
-issue on GitHub_. If you have questions, suggestions, etc. feel free to send me
-an e-mail at `peter@peterodding.com`_.
+documentation is hosted on `Read the Docs`_ and includes a changelog_. For bug
+reports please create an issue on GitHub_. If you have questions, suggestions,
+etc. feel free to send me an e-mail at `peter@peterodding.com`_.
 
 License
 -------
@@ -142,6 +142,7 @@ This software is licensed under the `MIT license`_.
 .. _#4: https://github.com/xolox/python-humanfriendly/issues/4
 .. _#8: https://github.com/xolox/python-humanfriendly/pull/8
 .. _#9: https://github.com/xolox/python-humanfriendly/pull/9
+.. _changelog: https://humanfriendly.readthedocs.io/en/latest/changelog.html
 .. _format_size(): https://humanfriendly.readthedocs.io/en/latest/#humanfriendly.format_size
 .. _GitHub: https://github.com/xolox/python-humanfriendly
 .. _MIT license: http://en.wikipedia.org/wiki/MIT_License
