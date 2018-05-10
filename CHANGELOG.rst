@@ -11,6 +11,20 @@ Changelog`_ . This project adheres to `semantic versioning`_.
 .. _Keep a Changelog: http://keepachangelog.com/
 .. _semantic versioning: http://semver.org/
 
+`Release 4.12.1`_ (2018-05-10)
+------------------------------
+
+It was reported in issue `#28`_ that ``humanfriendly --demo`` didn't work
+on Python 3 due to two unrelated ``TypeError`` exceptions. First I added
+a failing regression test to the test suite (`here's the failing build
+<https://travis-ci.org/xolox/python-humanfriendly/builds/377202561>`_)
+and then I applied the changes suggested in issue `#28`_, confirming that both
+issues are indeed fixed because the test now passes (`here's the successful
+build <https://travis-ci.org/xolox/python-humanfriendly/builds/377203446>`_).
+
+.. _Release 4.12.1: https://github.com/xolox/python-humanfriendly/compare/4.12...4.12.1
+.. _#28: https://github.com/xolox/python-humanfriendly/issues/28
+
 `Release 4.12`_ (2018-04-26)
 ----------------------------
 
