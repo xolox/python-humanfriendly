@@ -239,7 +239,7 @@ def demonstrate_ansi_formatting():
             [color_name] + [
                 ansi_wrap(
                     'XXXXXX' if color_type != 'background' else (' ' * 6),
-                    **dict(kw.items() + [(color_type, color_name)])
+                    **dict(list(kw.items()) + [(color_type, color_name)])
                 ) for label, kw in intensities
             ] for color_name in sorted(ANSI_COLOR_CODES.keys())
         ], column_names=['Color'] + [
@@ -269,7 +269,7 @@ def demonstrate_256_colors(i, j, group=None):
         # Generate a more complex rendering of the colors that will nicely wrap
         # over multiple lines without using too many lines.
         width = len(str(j)) + 1
-        colors_per_line = columns / width
+        colors_per_line = int(columns / width)
         colors = [ansi_wrap(str(n).rjust(width), color=n) for n in range(i, j + 1)]
         blocks = [colors[n:n + colors_per_line] for n in range(0, len(colors), colors_per_line)]
         output('\n'.join(''.join(b) for b in blocks))
