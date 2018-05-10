@@ -4,7 +4,7 @@
 # Tests for the `humanfriendly' package.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: April 26, 2018
+# Last Change: May 10, 2018
 # URL: https://humanfriendly.readthedocs.io
 
 """Test suite for the `humanfriendly` package."""
@@ -771,6 +771,22 @@ class HumanFriendlyTestCase(TestCase):
         # Test `humanfriendly --run-command'.
         returncode, output = run_cli(main, '--run-command', 'bash', '-c', 'sleep 2 && exit 42')
         assert returncode == 42
+        # Test `humanfriendly --demo'. The purpose of this test is
+        # to ensure that the demo runs successfully on all versions
+        # of Python and outputs the expected sections (recognized by
+        # their headings) without triggering exceptions. This was
+        # written as a regression test after issue #28 was reported:
+        # https://github.com/xolox/python-humanfriendly/issues/28
+        returncode, output = run_cli(main, '--demo')
+        assert returncode == 0
+        lines = [ansi_strip(l) for l in output.splitlines()]
+        assert "Text styles:" in lines
+        assert "Foreground colors:" in lines
+        assert "Background colors:" in lines
+        assert "256 color mode (standard colors):" in lines
+        assert "256 color mode (high-intensity colors):" in lines
+        assert "256 color mode (216 colors):" in lines
+        assert "256 color mode (gray scale colors):" in lines
 
     def test_ansi_style(self):
         """Test :func:`humanfriendly.terminal.ansi_style()`."""
