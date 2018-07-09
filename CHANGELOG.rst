@@ -11,6 +11,18 @@ Changelog`_ . This project adheres to `semantic versioning`_.
 .. _Keep a Changelog: http://keepachangelog.com/
 .. _semantic versioning: http://semver.org/
 
+`Release 4.13`_ (2018-07-09)
+----------------------------
+
+Support for *italic* text rendering on the terminal.
+
+I'm working on an awesome new project that's almost ready to publish, but then
+I noticed that I couldn't render italic text on the terminal using the
+humanfriendly package. I checked and sure enough my terminal supported it just
+fine, so I didn't see any reason not to fix this now 😇.
+
+.. _Release 4.13: https://github.com/xolox/python-humanfriendly/compare/4.12.1...4.13
+
 `Release 4.12.1`_ (2018-05-10)
 ------------------------------
 
