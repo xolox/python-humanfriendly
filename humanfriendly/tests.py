@@ -4,7 +4,7 @@
 # Tests for the `humanfriendly' package.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: May 10, 2018
+# Last Change: July 9, 2018
 # URL: https://humanfriendly.readthedocs.io
 
 """Test suite for the `humanfriendly` package."""
@@ -792,6 +792,7 @@ class HumanFriendlyTestCase(TestCase):
         """Test :func:`humanfriendly.terminal.ansi_style()`."""
         assert ansi_style(bold=True) == '%s1%s' % (ANSI_CSI, ANSI_SGR)
         assert ansi_style(faint=True) == '%s2%s' % (ANSI_CSI, ANSI_SGR)
+        assert ansi_style(italic=True) == '%s3%s' % (ANSI_CSI, ANSI_SGR)
         assert ansi_style(underline=True) == '%s4%s' % (ANSI_CSI, ANSI_SGR)
         assert ansi_style(inverse=True) == '%s7%s' % (ANSI_CSI, ANSI_SGR)
         assert ansi_style(strike_through=True) == '%s9%s' % (ANSI_CSI, ANSI_SGR)

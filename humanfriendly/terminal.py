@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: January 14, 2018
+# Last Change: July 9, 2018
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -62,7 +62,7 @@ A dictionary with (name, number) pairs of `portable color codes`_. Used by
 .. _portable color codes: http://en.wikipedia.org/wiki/ANSI_escape_code#Colors
 """
 
-ANSI_TEXT_STYLES = dict(bold=1, faint=2, underline=4, inverse=7, strike_through=9)
+ANSI_TEXT_STYLES = dict(bold=1, faint=2, italic=3, underline=4, inverse=7, strike_through=9)
 """
 A dictionary with (name, number) pairs of text styles (effects). Used by
 :func:`ansi_style()` to generate ANSI escape sequences that change text
@@ -206,7 +206,7 @@ def ansi_style(**kw):
     :param readline_hints: If :data:`True` then :func:`readline_wrap()` is
                            applied to the generated ANSI escape sequences (the
                            default is :data:`False`).
-    :param kw: Any additional keyword arguments are expected to match an entry
+    :param kw: Any additional keyword arguments are expected to match a key
                in the :data:`ANSI_TEXT_STYLES` dictionary. If the argument's
                value evaluates to :data:`True` the respective style will be
                enabled.
