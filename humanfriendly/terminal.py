@@ -220,7 +220,10 @@ def ansi_style(**kw):
     and `faint=True` increases the number of available colors to around 24 (it
     may be slightly lower, for example because faint black is just black).
 
-    Starting in version 4.7 support for 256 color mode was added. While this
+    Support for 8-bit colors
+    ------------------------
+
+    In `release 4.7`_ support for 256 color mode was added. While this
     significantly increases the available colors it's not very human friendly
     in usage because you need to look up color codes in the `256 color mode
     palette <https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit>`_.
@@ -232,6 +235,17 @@ def ansi_style(**kw):
     (I wasn't feeling very creative).
 
     .. image:: images/ansi-demo.png
+
+    Support for 24-bit colors
+    -------------------------
+
+    In `release 4.14`_ support for 24-bit colors was added by accepting a tuple
+    or list with three integers representing the RGB (red, green, blue) value
+    of a color. This is not included in the demo because rendering millions of
+    colors was deemed unpractical ;-).
+
+    .. _release 4.7: http://humanfriendly.readthedocs.io/en/latest/changelog.html#release-4-7-2018-01-14
+    .. _release 4.14: http://humanfriendly.readthedocs.io/en/latest/changelog.html#release-4-14-2018-07-13
     """
     # Start with sequences that change text styles.
     sequences = [ANSI_TEXT_STYLES[k] for k, v in kw.items() if k in ANSI_TEXT_STYLES and v]

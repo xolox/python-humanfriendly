@@ -11,6 +11,14 @@ Changelog`_ . This project adheres to `semantic versioning`_.
 .. _Keep a Changelog: http://keepachangelog.com/
 .. _semantic versioning: http://semver.org/
 
+`Release 4.14`_ (2018-07-13)
+----------------------------
+
+Support for 24-bit (RGB) terminal colors. Works by accepting a tuple or
+list with three integers representing an RGB (red, green, blue) color.
+
+.. _Release 4.14: https://github.com/xolox/python-humanfriendly/compare/4.13...4.14
+
 `Release 4.13`_ (2018-07-09)
 ----------------------------
 
