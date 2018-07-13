@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: July 9, 2018
+# Last Change: July 13, 2018
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -191,11 +191,13 @@ def ansi_style(**kw):
     """
     Generate ANSI escape sequences for the given color and/or style(s).
 
-    :param color: The foreground color. Two types of values are supported:
+    :param color: The foreground color. Three types of values are supported:
 
                   - The name of a color (one of the strings 'black', 'red',
                     'green', 'yellow', 'blue', 'magenta', 'cyan' or 'white').
                   - An integer that refers to the 256 color mode palette.
+                  - A tuple or list with three integers representing an RGB
+                    (red, green, blue) value.
 
                   The value :data:`None` (the default) means no escape
                   sequence to switch color will be emitted.
@@ -236,7 +238,14 @@ def ansi_style(**kw):
     # Append the color code (if any).
     for color_type in 'color', 'background':
         color_value = kw.get(color_type)
-        if isinstance(color_value, numbers.Number):
+        if isinstance(color_value, (tuple, list)):
+            if len(color_value) != 3:
+                msg = "Invalid color value %r! (expected tuple or list with three numbers)"
+                raise ValueError(msg % color_value)
+            sequences.append(48 if color_type == 'background' else 38)
+            sequences.append(2)
+            sequences.extend(map(int, color_value))
+        elif isinstance(color_value, numbers.Number):
             # Numeric values are assumed to be 256 color codes.
             sequences.extend((
                 39 if color_type == 'background' else 38,
