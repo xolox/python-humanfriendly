@@ -872,6 +872,14 @@ class HumanFriendlyTestCase(TestCase):
         # Line breaks.
         assert html_to_ansi("Let's try some<br>line<br>breaks") == \
             "Let's try some\nline\nbreaks"
+        # Check that decimal entities are decoded.
+        assert html_to_ansi("&#38;") == "&"
+        # Check that named entities are decoded.
+        assert html_to_ansi("&amp;") == "&"
+        assert html_to_ansi("&gt;") == ">"
+        assert html_to_ansi("&lt;") == "<"
+        # Check that hexadecimal entities are decoded.
+        assert html_to_ansi("&#x26;") == "&"
 
     def test_generate_output(self):
         """Test the :func:`humanfriendly.terminal.output()` function."""

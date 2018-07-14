@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: July 13, 2018
+# Last Change: July 14, 2018
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -51,6 +51,7 @@ __all__ = (
     'is_string',
     'is_unicode',
     'monotonic',
+    'unichr',
     'unicode',
     'unittest',
 )
@@ -58,6 +59,7 @@ __all__ = (
 try:
     # Python 2.
     unicode = unicode
+    unichr = unichr
     basestring = basestring
     interactive_prompt = raw_input
     from HTMLParser import HTMLParser
@@ -65,6 +67,7 @@ try:
 except (ImportError, NameError):
     # Python 3.
     unicode = str
+    unichr = chr
     basestring = str
     interactive_prompt = input
     from html.parser import HTMLParser

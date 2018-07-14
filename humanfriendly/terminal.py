@@ -18,6 +18,7 @@ escape sequences work.
 
 # Standard library modules.
 import codecs
+import htmlentitydefs
 import numbers
 import os
 import re
@@ -38,7 +39,7 @@ except ImportError:
 # Modules included in our package. We import find_meta_variables() here to
 # preserve backwards compatibility with older versions of humanfriendly where
 # that function was defined in this module.
-from humanfriendly.compat import HTMLParser, StringIO, coerce_string, is_unicode
+from humanfriendly.compat import HTMLParser, StringIO, coerce_string, is_unicode, unichr
 from humanfriendly.text import concatenate, format
 from humanfriendly.usage import find_meta_variables, format_usage  # NOQA
 
@@ -736,9 +737,17 @@ class HTMLConverter(HTMLParser):
         else:
             self.output.write(ANSI_RESET)
 
+    def handle_charref(self, value):
+        """
+        Process a decimal or hexadecimal numeric character reference.
+
+        :param value: The decimal or hexadecimal value (a string).
+        """
+        self.output.write(unichr(int(value[1:], 16) if value.startswith('x') else int(value)))
+
     def handle_data(self, data):
         """
-        Handle textual data.
+        Process textual data.
 
         :param data: The decoded text (a string).
         """
@@ -755,7 +764,7 @@ class HTMLConverter(HTMLParser):
 
     def handle_endtag(self, tag):
         """
-        Handle the end of an HTML tag.
+        Process the end of an HTML tag.
 
         :param tag: The name of the tag (a string).
         """
@@ -776,9 +785,17 @@ class HTMLConverter(HTMLParser):
             else:
                 self.emit_style(new_style)
 
+    def handle_entityref(self, name):
+        """
+        Process a named character reference.
+
+        :param name: The name of the character reference (a string).
+        """
+        self.output.write(unichr(htmlentitydefs.name2codepoint[name]))
+
     def handle_starttag(self, tag, attrs):
         """
-        Handle the start of an HTML tag.
+        Process the start of an HTML tag.
 
         :param tag: The name of the tag (a string).
         :param attrs: A list of tuples with two strings each.
@@ -789,18 +806,18 @@ class HTMLConverter(HTMLParser):
             # can render the link text before the URL (with the reasoning that
             # this is the most intuitive way to present a link in a plain text
             # interface).
-            self.link_url = next((v for n, v in attrs if n == 'href'), "")
-        elif tag in ('b', 'strong'):
+            self.link_url = next((v for n, v in attrs if n == 'href'), '')
+        elif tag == 'b' or tag == 'strong':
             self.push_styles(bold=True)
         elif tag == 'br':
             self.output.write('\n')
-        elif tag in ('code', 'pre'):
+        elif tag == 'code' or tag == 'pre':
             self.push_styles(color='yellow')
-        elif tag in ('del', 's'):
+        elif tag == 'del' or tag == 's':
             self.push_styles(strike_through=True)
-        elif tag in ('em', 'i'):
+        elif tag == 'em' or tag == 'i':
             self.push_styles(italic=True)
-        elif tag in ('ins', 'u'):
+        elif tag == 'ins' or tag == 'u':
             self.push_styles(underline=True)
         elif tag == 'span':
             styles = {}
