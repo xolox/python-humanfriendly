@@ -11,6 +11,22 @@ Changelog`_ . This project adheres to `semantic versioning`_.
 .. _Keep a Changelog: http://keepachangelog.com/
 .. _semantic versioning: http://semver.org/
 
+`Release 4.15`_ (2018-07-14)
+----------------------------
+
+Added the ``ansi_to_html()`` function which is a shortcut for the
+``HTMLConverter`` class that's based on ``html.parser.HTMLParser``.
+
+This new functionality converts HTML with simple text formatting tags like
+``<b>`` for bold, ``<i>`` for italic, ``<u>`` for underline, ``<span>`` for
+colors, etc. to text with ANSI escape sequences.
+
+I'm still working on that awesome new project, this functionality was born
+there but seemed like a useful addition to the ``humanfriendly`` package, given
+the flexibility that this provides 😇.
+
+.. _Release 4.15: https://github.com/xolox/python-humanfriendly/compare/4.14...4.15
+
 `Release 4.14`_ (2018-07-13)
 ----------------------------
 
