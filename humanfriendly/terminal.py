@@ -18,7 +18,6 @@ escape sequences work.
 
 # Standard library modules.
 import codecs
-import htmlentitydefs
 import numbers
 import os
 import re
@@ -39,7 +38,7 @@ except ImportError:
 # Modules included in our package. We import find_meta_variables() here to
 # preserve backwards compatibility with older versions of humanfriendly where
 # that function was defined in this module.
-from humanfriendly.compat import HTMLParser, StringIO, coerce_string, is_unicode, unichr
+from humanfriendly.compat import HTMLParser, StringIO, coerce_string, name2codepoint, is_unicode, unichr
 from humanfriendly.text import concatenate, format
 from humanfriendly.usage import find_meta_variables, format_usage  # NOQA
 
@@ -791,7 +790,7 @@ class HTMLConverter(HTMLParser):
 
         :param name: The name of the character reference (a string).
         """
-        self.output.write(unichr(htmlentitydefs.name2codepoint[name]))
+        self.output.write(unichr(name2codepoint[name]))
 
     def handle_starttag(self, tag, attrs):
         """

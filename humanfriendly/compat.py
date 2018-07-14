@@ -51,6 +51,7 @@ __all__ = (
     'is_string',
     'is_unicode',
     'monotonic',
+    'name2codepoint',
     'unichr',
     'unicode',
     'unittest',
@@ -64,6 +65,7 @@ try:
     interactive_prompt = raw_input
     from HTMLParser import HTMLParser
     from StringIO import StringIO
+    from htmlentitydefs import name2codepoint
 except (ImportError, NameError):
     # Python 3.
     unicode = str
@@ -72,6 +74,7 @@ except (ImportError, NameError):
     interactive_prompt = input
     from html.parser import HTMLParser
     from io import StringIO
+    from html.entities import name2codepoint
 
 try:
     # Python 3.3 and higher.
