@@ -40,7 +40,7 @@ from humanfriendly.prompts import prompt_for_choice  # NOQA
 from humanfriendly.compat import is_string, monotonic
 
 # Semi-standard module versioning.
-__version__ = '4.15'
+__version__ = '4.15.1'
 
 # Spinners are redrawn at most this many seconds.
 minimum_spinner_interval = 0.2

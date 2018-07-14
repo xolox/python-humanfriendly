@@ -11,6 +11,18 @@ Changelog`_ . This project adheres to `semantic versioning`_.
 .. _Keep a Changelog: http://keepachangelog.com/
 .. _semantic versioning: http://semver.org/
 
+`Release 4.15.1`_ (2018-07-14)
+------------------------------
+
+Bug fixes for HTML to ANSI conversion.
+
+HTML entities were being omitted from conversion because I had neglected to
+define the ``handle_charref()`` and ``handle_entityref()`` methods (whose
+definitions are so conveniently given in the documentation of the
+``HTMLParser`` class 😇).
+
+.. _Release 4.15.1: https://github.com/xolox/python-humanfriendly/compare/4.15...4.15.1
+
 `Release 4.15`_ (2018-07-14)
 ----------------------------
 
