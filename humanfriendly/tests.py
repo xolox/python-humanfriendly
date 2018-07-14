@@ -4,7 +4,7 @@
 # Tests for the `humanfriendly' package.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: July 13, 2018
+# Last Change: July 14, 2018
 # URL: https://humanfriendly.readthedocs.io
 
 """Test suite for the `humanfriendly` package."""
@@ -54,6 +54,7 @@ from humanfriendly.terminal import (
     connected_to_terminal,
     find_terminal_size,
     get_pager_command,
+    html_to_ansi,
     message,
     output,
     show_pager,
@@ -829,6 +830,48 @@ class HumanFriendlyTestCase(TestCase):
         assert ansi_wrap(text, bold=True).startswith(ANSI_CSI)
         # Make sure ansi_wrap() ends the text by resetting the ANSI styles.
         assert ansi_wrap(text, bold=True).endswith(ANSI_RESET)
+
+    def test_html_to_ansi(self):
+        """Test the :func:`humanfriendly.terminal.html_to_ansi()` function."""
+        assert html_to_ansi("Just some plain text") == "Just some plain text"
+        # Hyperlinks.
+        assert html_to_ansi('<a href="https://python.org">python.org</a>') == \
+            '\x1b[4;94mpython.org\x1b[0m (\x1b[4;94mhttps://python.org\x1b[0m)'
+        # Make sure `mailto:' prefixes are stripped (they're not at all useful in a terminal).
+        assert html_to_ansi('<a href="mailto:peter@peterodding.com">peter@peterodding.com</a>') == \
+            '\x1b[4;94mpeter@peterodding.com\x1b[0m'
+        # Bold text.
+        assert html_to_ansi("Let's try <b>bold</b>") == \
+            ("Let's try %s" % ansi_wrap("bold", bold=True))
+        assert html_to_ansi("Let's try <span style=\"font-weight: bold\">bold</span>") == \
+            ("Let's try %s" % ansi_wrap("bold", bold=True))
+        # Italic text.
+        assert html_to_ansi("Let's try <i>italic</i>") == \
+            ("Let's try %s" % ansi_wrap("italic", italic=True))
+        assert html_to_ansi("Let's try <span style=\"font-style: italic\">italic</span>") == \
+            ("Let's try %s" % ansi_wrap("italic", italic=True))
+        # Underlined text.
+        assert html_to_ansi("Let's try <ins>underline</ins>") == \
+            ("Let's try %s" % ansi_wrap("underline", underline=True))
+        assert html_to_ansi("Let's try <span style=\"text-decoration: underline\">underline</span>") == \
+            ("Let's try %s" % ansi_wrap("underline", underline=True))
+        # Strike-through text.
+        assert html_to_ansi("Let's try <s>strike-through</s>") == \
+            ("Let's try %s" % ansi_wrap("strike-through", strike_through=True))
+        assert html_to_ansi("Let's try <span style=\"text-decoration: line-through\">strike-through</span>") == \
+            ("Let's try %s" % ansi_wrap("strike-through", strike_through=True))
+        # Pre-formatted text.
+        assert html_to_ansi("Let's try <code>pre-formatted</code>") == \
+            ("Let's try %s" % ansi_wrap("pre-formatted", color='yellow'))
+        # Text colors (with a 6 digit hexadecimal color value).
+        assert html_to_ansi("Let's try <span style=\"color: #AABBCC\">text colors</s>") == \
+            ("Let's try %s" % ansi_wrap("text colors", color=(0xAA, 0xBB, 0xCC)))
+        # Background colors (with an rgb(N, N, N) expression).
+        assert html_to_ansi("Let's try <span style=\"background-color: rgb(50, 50, 50)\">background colors</s>") == \
+            ("Let's try %s" % ansi_wrap("background colors", background=(50, 50, 50)))
+        # Line breaks.
+        assert html_to_ansi("Let's try some<br>line<br>breaks") == \
+            "Let's try some\nline\nbreaks"
 
     def test_generate_output(self):
         """Test the :func:`humanfriendly.terminal.output()` function."""

@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: July 1, 2017
+# Last Change: July 13, 2018
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -14,6 +14,11 @@ code that is compatible with Python 2 and Python 3.
 
    Alias for :func:`python2:basestring` (in Python 2) or :class:`python3:str`
    (in Python 3). See also :func:`is_string()`.
+
+.. data:: HTMLParser
+
+   Alias for :func:`python2:HTMLParser.HTMLParser` (in Python 2) or
+   :func:`python3:html.parser.HTMLParser` (in Python 3).
 
 .. data:: interactive_prompt
 
@@ -38,6 +43,7 @@ code that is compatible with Python 2 and Python 3.
 """
 
 __all__ = (
+    'HTMLParser',
     'StringIO',
     'basestring',
     'coerce_string',
@@ -54,12 +60,14 @@ try:
     unicode = unicode
     basestring = basestring
     interactive_prompt = raw_input
+    from HTMLParser import HTMLParser
     from StringIO import StringIO
 except (ImportError, NameError):
     # Python 3.
     unicode = str
     basestring = str
     interactive_prompt = input
+    from html.parser import HTMLParser
     from io import StringIO
 
 try:

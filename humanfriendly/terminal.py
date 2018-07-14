@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: July 13, 2018
+# Last Change: July 14, 2018
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -38,7 +38,7 @@ except ImportError:
 # Modules included in our package. We import find_meta_variables() here to
 # preserve backwards compatibility with older versions of humanfriendly where
 # that function was defined in this module.
-from humanfriendly.compat import coerce_string, is_unicode
+from humanfriendly.compat import HTMLParser, StringIO, coerce_string, is_unicode
 from humanfriendly.text import concatenate, format
 from humanfriendly.usage import find_meta_variables, format_usage  # NOQA
 
@@ -441,6 +441,22 @@ def connected_to_terminal(stream=None):
         return False
 
 
+def html_to_ansi(data):
+    """
+    Convert HTML with simple text formatting to text with ANSI escape sequences.
+
+    :param data: The HTML to convert (a string).
+    :returns: Text with ANSI escape sequences (a string).
+
+    Please refer to the documentation of the :class:`HTMLConverter` class for
+    more details about the conversion process (like which tags are supported).
+    """
+    converter = HTMLConverter()
+    converter.feed(data)
+    converter.close()
+    return converter.output.getvalue()
+
+
 def terminal_supports_colors(stream=None):
     """
     Check if a stream is connected to a terminal that supports ANSI escape sequences.
@@ -630,3 +646,292 @@ def get_pager_command(text=None):
         command_line.append('--no-init')
         command_line.append('--quit-if-one-screen')
     return command_line
+
+
+class HTMLConverter(HTMLParser):
+
+    """
+    Convert HTML with simple text formatting to text with ANSI escape sequences.
+
+    The following text styles are supported:
+
+    - Bold: ``<b>``, ``<strong>`` and ``<span style="font-weight: bold;">``
+    - Italic: ``<i>``, ``<em>`` and ``<span style="font-style: italic;">``
+    - Strike-through: ``<del>``, ``<s>`` and ``<span style="text-decoration: line-through;">``
+    - Underline: ``<ins>``, ``<u>`` and ``<span style="text-decoration: underline">``
+
+    Colors can be specified as follows:
+
+    - Foreground color: ``<span style="color: #RRGGBB;">``
+    - Background color: ``<span style="background-color: #RRGGBB;">``
+
+    Some more details:
+
+    - Nested tags are supported, within reasonable limits.
+
+    - Text in ``<code>`` and ``<pre>`` tags will be highlighted in a
+      different color from the main text (currently this is yellow).
+
+    - ``<a href="URL">TEXT</a>`` is converted to the format "TEXT (URL)" where
+      the uppercase symbols are highlighted in light blue with an underline.
+
+    - ``<br>`` is converted to a plain text line break.
+
+    Implementation notes:
+
+    - A list of dictionaries with style information is used as a stack where
+      new styling can be pushed and a pop will restore the previous styling.
+      When new styling is pushed, it is merged with (but overrides) the current
+      styling.
+
+    - If you're going to be converting a lot of HTML it might be useful from
+      a performance standpoint to re-use an existing :class:`HTMLConverter`
+      object for unrelated HTML fragments, in this case take a look at the
+      :func:`__call__()` method (it makes this use case very easy).
+    """
+
+    def __init__(self, *args, **kw):
+        """
+        Initialize an :class:`HTMLConverter` object.
+
+        :param callback: Optional keyword argument to provide a function that
+                         will be called to process text fragments before they
+                         are emitted on the output stream.
+        :param output: Optional keyword argument to redirect the output to the
+                       given file-like object. If this is not given a new
+                       :class:`python3:~io.StringIO` object is created.
+        """
+        # Hide our optional keyword arguments from the superclass.
+        self.callback = kw.pop("callback", None)
+        self.output = kw.pop("output", None)
+        # Initialize the superclass.
+        HTMLParser.__init__(self, *args, **kw)
+
+    def __call__(self, data):
+        """
+        Reset the parser, convert some HTML and get the text with ANSI escape sequences.
+
+        :param data: The HTML to convert to text (a string).
+        :returns: The converted text (only in case `output` is
+                  a :class:`~python3:io.StringIO` object).
+        """
+        self.reset()
+        self.feed(data)
+        self.close()
+        if isinstance(self.output, StringIO):
+            return self.output.getvalue()
+
+    def emit_style(self, style=None):
+        """
+        Emit an ANSI escape sequence for the given or current style to the output stream.
+
+        :param style: A dictionary with arguments for :func:`ansi_style()` or
+                      :data:`None`, in which case the style at the top of the
+                      stack is emitted.
+        """
+        if style is None:
+            style = self.stack[-1]
+        if style:
+            self.output.write(ansi_style(**style))
+        else:
+            self.output.write(ANSI_RESET)
+
+    def handle_data(self, data):
+        """
+        Handle textual data.
+
+        :param data: The decoded text (a string).
+        """
+        if self.link_url:
+            # Link text is captured literally so that we can reliably check
+            # whether the text and the URL of the link are the same string.
+            self.link_text = data
+        elif self.callback:
+            # Text that is not part of a link is passed to the user defined
+            # callback to allow for arbitrary pre-processing.
+            data = self.callback(data)
+        # All text is emitted unmodified on the output stream.
+        self.output.write(data)
+
+    def handle_endtag(self, tag):
+        """
+        Handle the end of an HTML tag.
+
+        :param tag: The name of the tag (a string).
+        """
+        if tag in ('a', 'b', 'code', 'del', 'em', 'i', 'ins', 'pre', 's', 'strong', 'span', 'u'):
+            old_style = self.stack.pop(-1)
+            new_style = self.stack[-1]
+            if tag == 'a':
+                if self.urls_match(self.link_text, self.link_url):
+                    # Don't render the URL when it's part of the link text.
+                    self.emit_style(new_style)
+                else:
+                    self.emit_style(new_style)
+                    self.output.write(' (')
+                    self.emit_style(old_style)
+                    self.output.write(self.render_url(self.link_url))
+                    self.emit_style(new_style)
+                    self.output.write(')')
+            else:
+                self.emit_style(new_style)
+
+    def handle_starttag(self, tag, attrs):
+        """
+        Handle the start of an HTML tag.
+
+        :param tag: The name of the tag (a string).
+        :param attrs: A list of tuples with two strings each.
+        """
+        if tag == 'a':
+            self.push_styles(color='blue', bright=True, underline=True)
+            # Store the URL that the link points to for later use, so that we
+            # can render the link text before the URL (with the reasoning that
+            # this is the most intuitive way to present a link in a plain text
+            # interface).
+            self.link_url = next((v for n, v in attrs if n == 'href'), "")
+        elif tag in ('b', 'strong'):
+            self.push_styles(bold=True)
+        elif tag == 'br':
+            self.output.write('\n')
+        elif tag in ('code', 'pre'):
+            self.push_styles(color='yellow')
+        elif tag in ('del', 's'):
+            self.push_styles(strike_through=True)
+        elif tag in ('em', 'i'):
+            self.push_styles(italic=True)
+        elif tag in ('ins', 'u'):
+            self.push_styles(underline=True)
+        elif tag == 'span':
+            styles = {}
+            css = next((v for n, v in attrs if n == 'style'), "")
+            for rule in css.split(';'):
+                name, _, value = rule.partition(':')
+                name = name.strip()
+                value = value.strip()
+                if name == 'background-color':
+                    styles['background'] = self.parse_color(value)
+                elif name == 'color':
+                    styles['color'] = self.parse_color(value)
+                elif name == 'font-style' and value == 'italic':
+                    styles['italic'] = True
+                elif name == 'font-weight' and value == 'bold':
+                    styles['bold'] = True
+                elif name == 'text-decoration' and value == 'line-through':
+                    styles['strike_through'] = True
+                elif name == 'text-decoration' and value == 'underline':
+                    styles['underline'] = True
+            self.push_styles(**styles)
+
+    def normalize_url(self, url):
+        """
+        Normalize a URL to enable string equality comparison.
+
+        :param url: The URL to normalize (a string).
+        :returns: The normalized URL (a string).
+        """
+        return re.sub('^mailto:', '', url)
+
+    def parse_color(self, value):
+        """
+        Convert a CSS color to something that :func:`ansi_style()` understands.
+
+        :param value: A string like ``rgb(1,2,3)``, ``#AABBCC`` or ``yellow``.
+        :returns: A color value supported by :func:`ansi_style()` or :data:`None`.
+        """
+        # Parse an 'rgb(N,N,N)' expression.
+        if value.startswith('rgb'):
+            tokens = re.findall(r'\d+', value)
+            if len(tokens) == 3:
+                return tuple(map(int, tokens))
+        # Parse an '#XXXXXX' expression.
+        elif value.startswith('#'):
+            value = value[1:]
+            length = len(value)
+            if length == 6:
+                # Six hex digits (proper notation).
+                return (
+                    int(value[:2], 16),
+                    int(value[2:4], 16),
+                    int(value[4:6], 16),
+                )
+            elif length == 3:
+                # Three hex digits (shorthand).
+                return (
+                    int(value[0], 16),
+                    int(value[1], 16),
+                    int(value[2], 16),
+                )
+        # Try to recognize a named color.
+        value = value.lower()
+        if value in ANSI_COLOR_CODES:
+            return value
+
+    def push_styles(self, **changes):
+        """
+        Push new style information onto the stack.
+
+        :param changes: Any keyword arguments are passed on to :func:`.ansi_style()`.
+
+        This method is a helper for :func:`handle_starttag()`
+        that does the following:
+
+        1. Make a copy of the current styles (from the top of the stack),
+        2. Apply the given `changes` to the copy of the current styles,
+        3. Add the new styles to the stack,
+        3. Emit the appropriate ANSI escape sequence to the output stream.
+        """
+        new_style = dict(self.stack[-1])
+        new_style.update(changes)
+        self.stack.append(new_style)
+        self.emit_style(new_style)
+
+    def render_url(self, url):
+        """
+        Prepare a URL for rendering on the terminal.
+
+        :param url: The URL to simplify (a string).
+        :returns: The simplified URL (a string).
+
+        This method pre-processes a URL before rendering on the terminal. The
+        following modifications are made:
+
+        - The ``mailto:`` prefix is stripped.
+        - Spaces are converted to ``%20``.
+        - A trailing parenthesis is converted to ``%29``.
+        """
+        url = re.sub('^mailto:', '', url)
+        url = re.sub(' ', '%20', url)
+        url = re.sub(r'\)$', '%29', url)
+        return url
+
+    def reset(self):
+        """
+        Reset the state of the HTML parser and ANSI converter.
+
+        When `output` is a :class:`~python3:io.StringIO` object a new
+        instance will be created (and the old one garbage collected).
+        """
+        # Reset the state of the superclass.
+        HTMLParser.reset(self)
+        # Reset our instance variables.
+        self.link_text = None
+        self.link_url = None
+        if self.output is None or isinstance(self.output, StringIO):
+            # If the caller specified something like output=sys.stdout then it
+            # doesn't make much sense to negate that choice here in reset().
+            self.output = StringIO()
+        self.stack = [dict()]
+
+    def urls_match(self, a, b):
+        """
+        Compare two URLs for equality using :func:`normalize_url()`.
+
+        :param a: A string containing a URL.
+        :param b: A string containing a URL.
+        :returns: :data:`True` if the URLs are the same, :data:`False` otherwise.
+
+        This method is used by :func:`handle_endtag()` to omit the URL of a
+        hyperlink (``<a href="...">``) when the link text is that same URL.
+        """
+        return self.normalize_url(a) == self.normalize_url(b)
