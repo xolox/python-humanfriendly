@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: July 20, 2018
+# Last Change: July 21, 2018
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -441,17 +441,18 @@ def connected_to_terminal(stream=None):
         return False
 
 
-def html_to_ansi(data):
+def html_to_ansi(data, callback=None):
     """
     Convert HTML with simple text formatting to text with ANSI escape sequences.
 
     :param data: The HTML to convert (a string).
+    :param callback: Optional callback to pass to :class:`HTMLConverter`.
     :returns: Text with ANSI escape sequences (a string).
 
     Please refer to the documentation of the :class:`HTMLConverter` class for
     more details about the conversion process (like which tags are supported).
     """
-    converter = HTMLConverter()
+    converter = HTMLConverter(callback=callback)
     converter.feed(data)
     converter.close()
     return converter.output.getvalue()
