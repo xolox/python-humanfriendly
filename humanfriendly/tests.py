@@ -880,6 +880,14 @@ class HumanFriendlyTestCase(TestCase):
         assert html_to_ansi("&lt;") == "<"
         # Check that hexadecimal entities are decoded.
         assert html_to_ansi("&#x26;") == "&"
+        # Check that the text callback is actually called.
+
+        def callback(text):
+            return text.replace(':wink:', ';-)')
+
+        assert ':wink:' not in html_to_ansi('<b>:wink:</b>', callback=callback)
+        # Check that the text callback doesn't process preformatted text.
+        assert ':wink:' in html_to_ansi('<code>:wink:</code>', callback=callback)
         # Try a somewhat convoluted but nevertheless real life example from my
         # personal chat archives that causes humanfriendly releases 4.15 and
         # 4.15.1 to raise an exception.

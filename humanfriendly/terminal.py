@@ -695,9 +695,12 @@ class HTMLConverter(HTMLParser):
         """
         Initialize an :class:`HTMLConverter` object.
 
-        :param callback: Optional keyword argument to provide a function that
+        :param callback: Optional keyword argument to specify a function that
                          will be called to process text fragments before they
                          are emitted on the output stream.
+
+                         Note that link text and preformatted text fragments
+                         are not processed by this callback.
         :param output: Optional keyword argument to redirect the output to the
                        given file-like object. If this is not given a new
                        :class:`python3:~io.StringIO` object is created.
@@ -759,9 +762,10 @@ class HTMLConverter(HTMLParser):
             # Link text is captured literally so that we can reliably check
             # whether the text and the URL of the link are the same string.
             self.link_text = data
-        elif self.callback:
-            # Text that is not part of a link is passed to the user defined
-            # callback to allow for arbitrary pre-processing.
+        elif self.callback and self.preformatted_text_level == 0:
+            # Text that is not part of a link and not preformatted text is
+            # passed to the user defined callback to allow for arbitrary
+            # pre-processing.
             data = self.callback(data)
         # All text is emitted unmodified on the output stream.
         self.output.write(data)
@@ -792,6 +796,8 @@ class HTMLConverter(HTMLParser):
                     self.output.write(')')
             else:
                 self.emit_style(new_style)
+            if tag in ('code', 'pre'):
+                self.preformatted_text_level -= 1
 
     def handle_entityref(self, name):
         """
@@ -821,6 +827,7 @@ class HTMLConverter(HTMLParser):
             self.output.write('\n')
         elif tag == 'code' or tag == 'pre':
             self.push_styles(color='yellow')
+            self.preformatted_text_level += 1
         elif tag == 'del' or tag == 's':
             self.push_styles(strike_through=True)
         elif tag == 'em' or tag == 'i':
@@ -946,6 +953,7 @@ class HTMLConverter(HTMLParser):
         # Reset our instance variables.
         self.link_text = None
         self.link_url = None
+        self.preformatted_text_level = 0
         if self.output is None or isinstance(self.output, StringIO):
             # If the caller specified something like output=sys.stdout then it
             # doesn't make much sense to negate that choice here in reset().
