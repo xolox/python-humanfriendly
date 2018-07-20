@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: July 14, 2018
+# Last Change: July 20, 2018
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -721,6 +721,11 @@ class HTMLConverter(HTMLParser):
         if isinstance(self.output, StringIO):
             return self.output.getvalue()
 
+    @property
+    def current_style(self):
+        """Get the current style from the top of the stack (a dictionary)."""
+        return self.stack[-1] if self.stack else {}
+
     def emit_style(self, style=None):
         """
         Emit an ANSI escape sequence for the given or current style to the output stream.
@@ -729,8 +734,7 @@ class HTMLConverter(HTMLParser):
                       :data:`None`, in which case the style at the top of the
                       stack is emitted.
         """
-        if style is None:
-            style = self.stack[-1]
+        style = self.current_style if style is None else style
         if style:
             self.output.write(ansi_style(**style))
         else:
@@ -768,8 +772,12 @@ class HTMLConverter(HTMLParser):
         :param tag: The name of the tag (a string).
         """
         if tag in ('a', 'b', 'code', 'del', 'em', 'i', 'ins', 'pre', 's', 'strong', 'span', 'u'):
-            old_style = self.stack.pop(-1)
-            new_style = self.stack[-1]
+            old_style = self.current_style
+            # The following conditional isn't necessary for well formed
+            # HTML but prevents raising exceptions on malformed HTML.
+            if self.stack:
+                self.stack.pop(-1)
+            new_style = self.current_style
             if tag == 'a':
                 if self.urls_match(self.link_text, self.link_url):
                     # Don't render the URL when it's part of the link text.
@@ -897,8 +905,12 @@ class HTMLConverter(HTMLParser):
         3. Add the new styles to the stack,
         3. Emit the appropriate ANSI escape sequence to the output stream.
         """
-        new_style = dict(self.stack[-1])
-        new_style.update(changes)
+        prototype = self.current_style
+        if prototype:
+            new_style = dict(prototype)
+            new_style.update(changes)
+        else:
+            new_style = changes
         self.stack.append(new_style)
         self.emit_style(new_style)
 
@@ -937,7 +949,7 @@ class HTMLConverter(HTMLParser):
             # If the caller specified something like output=sys.stdout then it
             # doesn't make much sense to negate that choice here in reset().
             self.output = StringIO()
-        self.stack = [dict()]
+        self.stack = []
 
     def urls_match(self, a, b):
         """
