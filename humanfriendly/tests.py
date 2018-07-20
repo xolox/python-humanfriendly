@@ -4,7 +4,7 @@
 # Tests for the `humanfriendly' package.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: July 20, 2018
+# Last Change: July 21, 2018
 # URL: https://humanfriendly.readthedocs.io
 
 """Test suite for the `humanfriendly` package."""
@@ -883,7 +883,14 @@ class HumanFriendlyTestCase(TestCase):
         # Try a somewhat convoluted but nevertheless real life example from my
         # personal chat archives that causes humanfriendly releases 4.15 and
         # 4.15.1 to raise an exception.
-        assert html_to_ansi(u'Tweakers zit er idd nog steeds:\n\npeter@peter-work&gt; curl -s <a href="tweakers.net">tweakers.net</a> | grep -i hosting                                                                                  \n          &lt;a href="<a href="http://www.true.nl/webhosting/">http://www.true.nl/webhosting/</a>" rel="external" id="true" title="Hosting door True"&gt;&lt;/a&gt;\n            Hosting door &lt;a href="<a href="http://www.true.nl/vps/">http://www.true.nl/vps/</a>" title="VPS hosting" rel="external"&gt;True</a>')
+        assert html_to_ansi(u'''
+            Tweakers zit er idd nog steeds:<br><br>
+            peter@peter-work&gt; curl -s <a href="tweakers.net">tweakers.net</a> | grep -i hosting<br>
+            &lt;a href="<a href="http://www.true.nl/webhosting/">http://www.true.nl/webhosting/</a>"
+                rel="external" id="true" title="Hosting door True"&gt;&lt;/a&gt;<br>
+            Hosting door &lt;a href="<a href="http://www.true.nl/vps/">http://www.true.nl/vps/</a>"
+                title="VPS hosting" rel="external"&gt;True</a>
+        ''')
 
     def test_generate_output(self):
         """Test the :func:`humanfriendly.terminal.output()` function."""
