@@ -72,7 +72,7 @@ from humanfriendly.testing import (
     run_cli,
     touch,
 )
-from humanfriendly.text import random_string
+from humanfriendly.text import compact_empty_lines, random_string
 from humanfriendly.usage import (
     find_meta_variables,
     format_usage,
@@ -214,6 +214,21 @@ class HumanFriendlyTestCase(TestCase):
         assert compact('''
             More {type} template notation
         ''', type='readable') == 'More readable template notation'
+
+    def test_compact_empty_lines(self):
+        """Test :func:`humanfriendly.text.compact_empty_lines()`."""
+        # Simple strings pass through untouched.
+        assert compact_empty_lines('foo') == 'foo'
+        # Horizontal whitespace remains untouched.
+        assert compact_empty_lines('\tfoo') == '\tfoo'
+        # Line breaks should be preserved.
+        assert compact_empty_lines('foo\nbar') == 'foo\nbar'
+        # Vertical whitespace should be preserved.
+        assert compact_empty_lines('foo\n\nbar') == 'foo\n\nbar'
+        # Vertical whitespace should be compressed.
+        assert compact_empty_lines('foo\n\n\nbar') == 'foo\n\nbar'
+        assert compact_empty_lines('foo\n\n\n\nbar') == 'foo\n\nbar'
+        assert compact_empty_lines('foo\n\n\n\n\nbar') == 'foo\n\nbar'
 
     def test_dedent(self):
         """Test :func:`humanfriendly.text.dedent()`."""

@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: June 24, 2017
+# Last Change: July 21, 2018
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -73,6 +73,23 @@ def compact(text, *args, **kw):
     non_whitespace_tokens = text.split()
     compacted_text = ' '.join(non_whitespace_tokens)
     return format(compacted_text, *args, **kw)
+
+
+def compact_empty_lines(text):
+    """
+    Replace repeating empty lines with a single empty line (similar to ``cat -s``).
+
+    :param text: The text in which to compact empty lines (a string).
+    :returns: The text with empty lines compacted (a string).
+    """
+    i = 0
+    lines = text.splitlines(True)
+    while i < len(lines):
+        if i > 0 and is_empty_line(lines[i - 1]) and is_empty_line(lines[i]):
+            lines.pop(i)
+        else:
+            i += 1
+    return ''.join(lines)
 
 
 def concatenate(items):
