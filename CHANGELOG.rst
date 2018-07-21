@@ -11,6 +11,15 @@ Changelog`_ . This project adheres to `semantic versioning`_.
 .. _Keep a Changelog: http://keepachangelog.com/
 .. _semantic versioning: http://semver.org/
 
+`Release 4.16.1`_ (2018-07-21)
+------------------------------
+
+Yet another ANSI to HTML improvement: Emit an ANSI reset code before emitting
+ANSI escape sequences that change styles, so that previously activated styles
+don't inappropriately "leak through" to the text that follows.
+
+.. _Release 4.16.1: https://github.com/xolox/python-humanfriendly/compare/4.16...4.16.1
+
 `Release 4.16`_ (2018-07-21)
 ----------------------------
 
