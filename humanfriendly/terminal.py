@@ -39,7 +39,7 @@ except ImportError:
 # preserve backwards compatibility with older versions of humanfriendly where
 # that function was defined in this module.
 from humanfriendly.compat import HTMLParser, StringIO, coerce_string, name2codepoint, is_unicode, unichr
-from humanfriendly.text import concatenate, format
+from humanfriendly.text import compact_empty_lines, concatenate, format
 from humanfriendly.usage import find_meta_variables, format_usage  # NOQA
 
 ANSI_CSI = '\x1b['
@@ -453,9 +453,7 @@ def html_to_ansi(data, callback=None):
     more details about the conversion process (like which tags are supported).
     """
     converter = HTMLConverter(callback=callback)
-    converter.feed(data)
-    converter.close()
-    return converter.output.getvalue()
+    return converter(data)
 
 
 def terminal_supports_colors(stream=None):
@@ -676,7 +674,15 @@ class HTMLConverter(HTMLParser):
     - ``<a href="URL">TEXT</a>`` is converted to the format "TEXT (URL)" where
       the uppercase symbols are highlighted in light blue with an underline.
 
-    - ``<br>`` is converted to a plain text line break.
+    - ``<div>``, ``<p>`` and ``<pre>`` tags are considered block level tags
+      and are wrapped in vertical whitespace to prevent their content from
+      "running into" surrounding text. This may cause runs of multiple empty
+      lines to be emitted. As a *workaround* the :func:`__call__()` method
+      will automatically call :func:`.compact_empty_lines()` on the generated
+      output before returning it to the caller. Of course this won't work
+      when `output` is set to something like :data:`sys.stdout`.
+
+    - ``<br>`` is converted to a single plain text line break.
 
     Implementation notes:
 
@@ -690,6 +696,9 @@ class HTMLConverter(HTMLParser):
       object for unrelated HTML fragments, in this case take a look at the
       :func:`__call__()` method (it makes this use case very easy).
     """
+
+    BLOCK_TAGS = ('div', 'p', 'pre')
+    """The names of tags that are padded with vertical whitespace."""
 
     def __init__(self, *args, **kw):
         """
@@ -723,7 +732,7 @@ class HTMLConverter(HTMLParser):
         self.feed(data)
         self.close()
         if isinstance(self.output, StringIO):
-            return self.output.getvalue()
+            return compact_empty_lines(self.output.getvalue())
 
     @property
     def current_style(self):
@@ -798,6 +807,9 @@ class HTMLConverter(HTMLParser):
                 self.emit_style(new_style)
             if tag in ('code', 'pre'):
                 self.preformatted_text_level -= 1
+        if tag in self.BLOCK_TAGS:
+            # Emit an empty line after block level tags.
+            self.output.write('\n\n')
 
     def handle_entityref(self, name):
         """
@@ -814,6 +826,9 @@ class HTMLConverter(HTMLParser):
         :param tag: The name of the tag (a string).
         :param attrs: A list of tuples with two strings each.
         """
+        if tag in self.BLOCK_TAGS:
+            # Emit an empty line before block level tags.
+            self.output.write('\n\n')
         if tag == 'a':
             self.push_styles(color='blue', bright=True, underline=True)
             # Store the URL that the link points to for later use, so that we
