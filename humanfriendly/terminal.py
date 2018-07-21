@@ -220,8 +220,7 @@ def ansi_style(**kw):
     and `faint=True` increases the number of available colors to around 24 (it
     may be slightly lower, for example because faint black is just black).
 
-    Support for 8-bit colors
-    ------------------------
+    **Support for 8-bit colors**
 
     In `release 4.7`_ support for 256 color mode was added. While this
     significantly increases the available colors it's not very human friendly
@@ -234,10 +233,9 @@ def ansi_style(**kw):
     mode support would fit into a single screen shot without scrolling :-)
     (I wasn't feeling very creative).
 
-    .. image:: images/ansi-demo.png
+      .. image:: images/ansi-demo.png
 
-    Support for 24-bit colors
-    -------------------------
+    **Support for 24-bit colors**
 
     In `release 4.14`_ support for 24-bit colors was added by accepting a tuple
     or list with three integers representing the RGB (red, green, blue) value
@@ -940,7 +938,7 @@ class HTMLConverter(HTMLParser):
         1. Make a copy of the current styles (from the top of the stack),
         2. Apply the given `changes` to the copy of the current styles,
         3. Add the new styles to the stack,
-        3. Emit the appropriate ANSI escape sequence to the output stream.
+        4. Emit the appropriate ANSI escape sequence to the output stream.
         """
         prototype = self.current_style
         if prototype:
