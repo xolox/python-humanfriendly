@@ -448,7 +448,8 @@ def html_to_ansi(data, callback=None):
     :returns: Text with ANSI escape sequences (a string).
 
     Please refer to the documentation of the :class:`HTMLConverter` class for
-    more details about the conversion process (like which tags are supported).
+    details about the conversion process (like which tags are supported) and an
+    example with a screenshot.
     """
     converter = HTMLConverter(callback=callback)
     return converter(data)
@@ -661,6 +662,31 @@ class HTMLConverter(HTMLParser):
 
     - Foreground color: ``<span style="color: #RRGGBB;">``
     - Background color: ``<span style="background-color: #RRGGBB;">``
+
+    Here's a small demonstration:
+
+    .. code-block:: python
+
+       from humanfriendly.text import dedent
+       from humanfriendly.terminal import html_to_ansi
+
+       print(html_to_ansi(dedent('''
+         <b>Hello world!</b>
+         <i>Is this thing on?</i>
+         I guess I can <u>underline</u> or <s>strike-through</s> text?
+         And what about <span style="color: red">color</span>?
+       ''')))
+
+       rainbow_colors = [
+           '#FF0000', '#E2571E', '#FF7F00', '#FFFF00', '#00FF00',
+           '#96BF33', '#0000FF', '#4B0082', '#8B00FF', '#FFFFFF',
+       ]
+       html_rainbow = "".join('<span style="color: %s">o</span>' % c for c in rainbow_colors)
+       print(html_to_ansi("Let's try a rainbow: %s" % html_rainbow))
+
+    Here's what the results look like:
+
+      .. image:: images/html-to-ansi.png
 
     Some more details:
 
