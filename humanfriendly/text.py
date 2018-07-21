@@ -30,6 +30,7 @@ import textwrap
 # Public identifiers that require documentation.
 __all__ = (
     'compact',
+    'compact_empty_lines',
     'concatenate',
     'dedent',
     'format',
