@@ -739,6 +739,20 @@ class HTMLConverter(HTMLParser):
         """Get the current style from the top of the stack (a dictionary)."""
         return self.stack[-1] if self.stack else {}
 
+    def close(self):
+        """
+        Close previously opened ANSI escape sequences.
+
+        This method overrides the same method in the superclass to ensure that
+        an :data:`.ANSI_RESET` code is emitted when parsing reaches the end of
+        the input but a style is still active. This is intended to prevent
+        malformed HTML from messing up terminal output.
+        """
+        if any(self.stack):
+            self.output.write(ANSI_RESET)
+            self.stack = []
+        HTMLParser.close(self)
+
     def emit_style(self, style=None):
         """
         Emit an ANSI escape sequence for the given or current style to the output stream.
