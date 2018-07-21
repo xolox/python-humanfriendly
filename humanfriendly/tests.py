@@ -851,39 +851,38 @@ class HumanFriendlyTestCase(TestCase):
         assert html_to_ansi("Just some plain text") == "Just some plain text"
         # Hyperlinks.
         assert html_to_ansi('<a href="https://python.org">python.org</a>') == \
-            '\x1b[4;94mpython.org\x1b[0m (\x1b[4;94mhttps://python.org\x1b[0m)'
+            '\x1b[0m\x1b[4;94mpython.org\x1b[0m (\x1b[0m\x1b[4;94mhttps://python.org\x1b[0m)'
         # Make sure `mailto:' prefixes are stripped (they're not at all useful in a terminal).
         assert html_to_ansi('<a href="mailto:peter@peterodding.com">peter@peterodding.com</a>') == \
-            '\x1b[4;94mpeter@peterodding.com\x1b[0m'
+            '\x1b[0m\x1b[4;94mpeter@peterodding.com\x1b[0m'
         # Bold text.
-        assert html_to_ansi("Let's try <b>bold</b>") == \
-            ("Let's try %s" % ansi_wrap("bold", bold=True))
+        assert html_to_ansi("Let's try <b>bold</b>") == "Let's try \x1b[0m\x1b[1mbold\x1b[0m"
         assert html_to_ansi("Let's try <span style=\"font-weight: bold\">bold</span>") == \
-            ("Let's try %s" % ansi_wrap("bold", bold=True))
+            "Let's try \x1b[0m\x1b[1mbold\x1b[0m"
         # Italic text.
         assert html_to_ansi("Let's try <i>italic</i>") == \
-            ("Let's try %s" % ansi_wrap("italic", italic=True))
+            "Let's try \x1b[0m\x1b[3mitalic\x1b[0m"
         assert html_to_ansi("Let's try <span style=\"font-style: italic\">italic</span>") == \
-            ("Let's try %s" % ansi_wrap("italic", italic=True))
+            "Let's try \x1b[0m\x1b[3mitalic\x1b[0m"
         # Underlined text.
         assert html_to_ansi("Let's try <ins>underline</ins>") == \
-            ("Let's try %s" % ansi_wrap("underline", underline=True))
+            "Let's try \x1b[0m\x1b[4munderline\x1b[0m"
         assert html_to_ansi("Let's try <span style=\"text-decoration: underline\">underline</span>") == \
-            ("Let's try %s" % ansi_wrap("underline", underline=True))
+            "Let's try \x1b[0m\x1b[4munderline\x1b[0m"
         # Strike-through text.
         assert html_to_ansi("Let's try <s>strike-through</s>") == \
-            ("Let's try %s" % ansi_wrap("strike-through", strike_through=True))
+            "Let's try \x1b[0m\x1b[9mstrike-through\x1b[0m"
         assert html_to_ansi("Let's try <span style=\"text-decoration: line-through\">strike-through</span>") == \
-            ("Let's try %s" % ansi_wrap("strike-through", strike_through=True))
+            "Let's try \x1b[0m\x1b[9mstrike-through\x1b[0m"
         # Pre-formatted text.
         assert html_to_ansi("Let's try <code>pre-formatted</code>") == \
-            ("Let's try %s" % ansi_wrap("pre-formatted", color='yellow'))
+            "Let's try \x1b[0m\x1b[33mpre-formatted\x1b[0m"
         # Text colors (with a 6 digit hexadecimal color value).
         assert html_to_ansi("Let's try <span style=\"color: #AABBCC\">text colors</s>") == \
-            ("Let's try %s" % ansi_wrap("text colors", color=(0xAA, 0xBB, 0xCC)))
+            "Let's try \x1b[0m\x1b[38;2;170;187;204mtext colors\x1b[0m"
         # Background colors (with an rgb(N, N, N) expression).
         assert html_to_ansi("Let's try <span style=\"background-color: rgb(50, 50, 50)\">background colors</s>") == \
-            ("Let's try %s" % ansi_wrap("background colors", background=(50, 50, 50)))
+            "Let's try \x1b[0m\x1b[48;2;50;50;50mbackground colors\x1b[0m"
         # Line breaks.
         assert html_to_ansi("Let's try some<br>line<br>breaks") == \
             "Let's try some\nline\nbreaks"
