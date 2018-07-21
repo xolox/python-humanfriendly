@@ -785,11 +785,12 @@ class HTMLConverter(HTMLParser):
                       :data:`None`, in which case the style at the top of the
                       stack is emitted.
         """
+        # Clear the current text styles.
+        self.output.write(ANSI_RESET)
+        # Apply a new text style?
         style = self.current_style if style is None else style
         if style:
             self.output.write(ansi_style(**style))
-        else:
-            self.output.write(ANSI_RESET)
 
     def handle_charref(self, value):
         """
