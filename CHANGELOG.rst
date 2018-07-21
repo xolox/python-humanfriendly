@@ -11,6 +11,25 @@ Changelog`_ . This project adheres to `semantic versioning`_.
 .. _Keep a Changelog: http://keepachangelog.com/
 .. _semantic versioning: http://semver.org/
 
+`Release 4.16`_ (2018-07-21)
+----------------------------
+
+More HTML to ANSI improvements:
+
+- Added ``humanfriendly.text.compact_empty_lines()`` function.
+- Enable optional ``html_to_ansi(data[, callback])`` argument.
+- Added a code sample and screenshot to the ``HTMLConverter`` documentation.
+- Emit vertical whitespace for block tags like ``<div>``, ``<p>`` and ``<pre>``
+  and post-process the generated output in ``__call__()`` to compact empty lines.
+- Don't pre-process preformatted text using the user defined text callback.
+- Improve robustness against malformed HTML (previously an ``IndexError`` would
+  be raised when a closing ``</a>`` tag was encountered without a corresponding
+  opening ``<a>`` tag).
+- Emit an ANSI reset code when ``HTMLConverter.close()`` is called and a style
+  is still active (improves robustness against malformed HTML).
+
+.. _Release 4.16: https://github.com/xolox/python-humanfriendly/compare/4.15.1...4.16
+
 `Release 4.15.1`_ (2018-07-14)
 ------------------------------
 
