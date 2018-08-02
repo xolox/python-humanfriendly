@@ -61,9 +61,9 @@ This new functionality converts HTML with simple text formatting tags like
 ``<b>`` for bold, ``<i>`` for italic, ``<u>`` for underline, ``<span>`` for
 colors, etc. to text with ANSI escape sequences.
 
-I'm still working on that awesome new project, this functionality was born
-there but seemed like a useful addition to the ``humanfriendly`` package, given
-the flexibility that this provides 😇.
+I'm still working on that awesome new project (update: see chat-archive_), this
+functionality was born there but seemed like a useful addition to the
+``humanfriendly`` package, given the flexibility that this provides 😇.
 
 .. _Release 4.15: https://github.com/xolox/python-humanfriendly/compare/4.14...4.15
 
@@ -80,12 +80,13 @@ list with three integers representing an RGB (red, green, blue) color.
 
 Support for *italic* text rendering on the terminal.
 
-I'm working on an awesome new project that's almost ready to publish, but then
-I noticed that I couldn't render italic text on the terminal using the
-humanfriendly package. I checked and sure enough my terminal supported it just
-fine, so I didn't see any reason not to fix this now 😇.
+I'm working on an awesome new project (update: see chat-archive_) that's almost
+ready to publish, but then I noticed that I couldn't render italic text on the
+terminal using the humanfriendly package. I checked and sure enough my terminal
+supported it just fine, so I didn't see any reason not to fix this now 😇.
 
 .. _Release 4.13: https://github.com/xolox/python-humanfriendly/compare/4.12.1...4.13
+.. _chat-archive: https://chat-archive.readthedocs.io/
 
 `Release 4.12.1`_ (2018-05-10)
 ------------------------------

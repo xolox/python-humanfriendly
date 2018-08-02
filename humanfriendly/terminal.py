@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: July 21, 2018
+# Last Change: August 2, 2018
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -719,6 +719,14 @@ class HTMLConverter(HTMLParser):
       a performance standpoint to re-use an existing :class:`HTMLConverter`
       object for unrelated HTML fragments, in this case take a look at the
       :func:`__call__()` method (it makes this use case very easy).
+
+    .. versionadded:: 4.15
+       :class:`humanfriendly.terminal.HTMLConverter` was added to the
+       `humanfriendly` package during the initial development of my new
+       `chat-archive <https://chat-archive.readthedocs.io/>`_ project, whose
+       command line interface makes for a great demonstration of the
+       flexibility that this feature provides (hint: check out how the search
+       keyword highlighting combines with the regular highlighting).
     """
 
     BLOCK_TAGS = ('div', 'p', 'pre')
@@ -730,10 +738,9 @@ class HTMLConverter(HTMLParser):
 
         :param callback: Optional keyword argument to specify a function that
                          will be called to process text fragments before they
-                         are emitted on the output stream.
-
-                         Note that link text and preformatted text fragments
-                         are not processed by this callback.
+                         are emitted on the output stream. Note that link text
+                         and preformatted text fragments are not processed by
+                         this callback.
         :param output: Optional keyword argument to redirect the output to the
                        given file-like object. If this is not given a new
                        :class:`python3:~io.StringIO` object is created.
