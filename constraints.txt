@@ -1,0 +1,21 @@
+# This is a pip constraints file that is used to preserve Python 2.6
+# compatibility (on Travis CI). Why I'm still doing that in 2018 is
+# a good question, maybe simply to prove that I can :-P.
+
+# flake8 3.0.0 drops explicit support for Python 2.6:
+# http://flake8.pycqa.org/en/latest/release-notes/3.0.0.html
+flake8 < 3.0.0 ; python_version < '2.7'
+
+# flake8-docstrings 1.0.0 switches from pep257 to pydocstyle and I haven't been
+# able to find a combination of versions of flake8-docstrings and pydocstyle
+# that actually works on Python 2.6. Here's the changelog:
+# https://gitlab.com/pycqa/flake8-docstrings/blob/master/HISTORY.rst
+flake8-docstrings < 1.0.0 ; python_version < '2.7'
+
+# pyflakes 2.0.0 drops Python 2.6 compatibility:
+# https://github.com/PyCQA/pyflakes/blob/master/NEWS.txt
+pyflakes < 2.0.0 ; python_version < '2.7'
+
+# pytest 3.3 drops Python 2.6 compatibility:
+# https://docs.pytest.org/en/latest/changelog.html#pytest-3-3-0-2017-11-23
+pytest < 3.3 ; python_version < '2.7'
