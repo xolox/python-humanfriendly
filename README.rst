@@ -24,8 +24,8 @@ text interfaces more user friendly. Some example features:
   size.
 
 The `humanfriendly` package is currently tested on Python 2.6, 2.7, 3.4, 3.5,
-3.6 and PyPy (2.7) on Linux and Mac OS X. While the intention is to support
-Windows as well, you may encounter some rough edges.
+3.6, 3.7 and PyPy (2.7) on Linux and Mac OS X. While the intention is to
+support Windows as well, you may encounter some rough edges.
 
 .. contents::
    :local:
