@@ -1,7 +1,7 @@
 # Makefile for the 'humanfriendly' package.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: June 24, 2017
+# Last Change: October 20, 2018
 # URL: https://humanfriendly.readthedocs.io
 
 PACKAGE_NAME = humanfriendly
@@ -46,7 +46,7 @@ check: install
 test: install
 	@pip-accel install --quiet --requirement=requirements-tests.txt
 	@py.test --cov
-	@coverage combine
+	@coverage combine || true
 	@coverage html
 
 tox: install
