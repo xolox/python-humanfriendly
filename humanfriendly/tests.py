@@ -4,7 +4,7 @@
 # Tests for the `humanfriendly' package.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: July 21, 2018
+# Last Change: October 20, 2018
 # URL: https://humanfriendly.readthedocs.io
 
 """Test suite for the `humanfriendly` package."""
@@ -25,6 +25,7 @@ from humanfriendly import prompts
 from humanfriendly import coerce_pattern, compact, dedent, trim_empty_lines
 from humanfriendly.cli import main
 from humanfriendly.compat import StringIO
+from humanfriendly.decorators import cached
 from humanfriendly.prompts import (
     TooManyInvalidReplies,
     prompt_for_confirmation,
@@ -204,6 +205,16 @@ class HumanFriendlyTestCase(TestCase):
         returncode, output = run_cli(lambda: sys.stdout.write(expected_output))
         self.assertEqual(returncode, 0)
         self.assertEqual(output, expected_output)
+
+    def test_caching_decorator(self):
+        """Test the caching decorator."""
+        # Confirm that the caching decorator works.
+        a = cached(lambda: random.random())
+        b = cached(lambda: random.random())
+        assert a() == a()
+        assert b() == b()
+        # Confirm that functions have their own cache.
+        assert a() != b()
 
     def test_compact(self):
         """Test :func:`humanfriendly.text.compact()`."""

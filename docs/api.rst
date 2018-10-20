@@ -46,6 +46,12 @@ The :mod:`humanfriendly.compat` module
 .. automodule:: humanfriendly.compat
    :members:
 
+The :mod:`humanfriendly.decorators` module
+------------------------------------------
+
+.. automodule:: humanfriendly.decorators
+   :members:
+
 The :mod:`humanfriendly.prompts` module
 ---------------------------------------
 
