@@ -11,6 +11,24 @@ Changelog`_ . This project adheres to `semantic versioning`_.
 .. _Keep a Changelog: http://keepachangelog.com/
 .. _semantic versioning: http://semver.org/
 
+`Release 4.17`_ (2018-10-20)
+----------------------------
+
+- Add Python 3.7 to versions tested on Travis CI and using ``tox`` and document
+  compatibility with Python 3.7.
+
+- Add rudimentary caching decorator for functions:
+
+  Over the years I've used several variations on this function in multiple
+  projects and I'd like to consolidate all of those implementations into a
+  single one that's properly tested and documented.
+
+  Due to the simplicity and lack of external dependencies it seemed kind of
+  fitting to include this in the ``humanfriendly`` package, which has become
+  a form of extended standard library for my Python projects 😇.
+
+.. _Release 4.17: https://github.com/xolox/python-humanfriendly/compare/4.16.1...4.17
+
 `Release 4.16.1`_ (2018-07-21)
 ------------------------------
 
