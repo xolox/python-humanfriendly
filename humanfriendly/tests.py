@@ -257,6 +257,9 @@ class HumanFriendlyTestCase(TestCase):
         self.assertEqual('2 words', humanfriendly.pluralize(2, 'word'))
         self.assertEqual('1 box', humanfriendly.pluralize(1, 'box', 'boxes'))
         self.assertEqual('2 boxes', humanfriendly.pluralize(2, 'box', 'boxes'))
+        self.assertEqual('0.5 seconds', humanfriendly.pluralize(0.5, 'second'))
+        self.assertEqual('1.0 second', humanfriendly.pluralize(1.0, 'second'))
+        self.assertEqual('1.62 seconds', humanfriendly.pluralize(1.62, 'second'))
 
     def test_boolean_coercion(self):
         """Test :func:`humanfriendly.coerce_boolean()`."""
@@ -311,7 +314,7 @@ class HumanFriendlyTestCase(TestCase):
         # Make sure milliseconds are never shown separately when detailed=False.
         # https://github.com/xolox/python-humanfriendly/issues/10
         assert '1 minute, 1 second and 100 milliseconds' == humanfriendly.format_timespan(61.10, detailed=True)
-        assert '1 minute and 1.1 second' == humanfriendly.format_timespan(61.10, detailed=False)
+        assert '1 minute and 1.1 seconds' == humanfriendly.format_timespan(61.10, detailed=False)
         # Test for loss of precision as reported in issue 11:
         # https://github.com/xolox/python-humanfriendly/issues/11
         assert '1 minute and 0.3 seconds' == humanfriendly.format_timespan(60.300)
