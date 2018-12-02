@@ -4,8 +4,8 @@ humanfriendly: Human friendly input/output in Python
 .. image:: https://travis-ci.org/xolox/python-humanfriendly.svg?branch=master
    :target: https://travis-ci.org/xolox/python-humanfriendly
 
-.. image:: https://coveralls.io/repos/xolox/python-humanfriendly/badge.png?branch=master
-   :target: https://coveralls.io/r/xolox/python-humanfriendly?branch=master
+.. image:: https://coveralls.io/repos/github/xolox/python-humanfriendly/badge.svg?branch=master
+   :target: https://coveralls.io/github/xolox/python-humanfriendly?branch=master
 
 The functions and classes in the `humanfriendly` package can be used to make
 text interfaces more user friendly. Some example features:
@@ -145,7 +145,7 @@ This software is licensed under the `MIT license`_.
 .. _changelog: https://humanfriendly.readthedocs.io/en/latest/changelog.html
 .. _format_size(): https://humanfriendly.readthedocs.io/en/latest/#humanfriendly.format_size
 .. _GitHub: https://github.com/xolox/python-humanfriendly
-.. _MIT license: http://en.wikipedia.org/wiki/MIT_License
+.. _MIT license: https://en.wikipedia.org/wiki/MIT_License
 .. _parse_size(): https://humanfriendly.readthedocs.io/en/latest/#humanfriendly.parse_size
 .. _peter@peterodding.com: peter@peterodding.com
 .. _PyPI: https://pypi.python.org/pypi/humanfriendly
