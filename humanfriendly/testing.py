@@ -32,10 +32,11 @@ import shutil
 import sys
 import tempfile
 import time
+import unittest
 
 # Modules included in our package.
-from humanfriendly.compat import StringIO, unicode, unittest
-from humanfriendly.text import compact, random_string
+from humanfriendly.compat import StringIO, unicode
+from humanfriendly.text import random_string
 
 # Initialize a logger for this module.
 logger = logging.getLogger(__name__)
@@ -634,25 +635,6 @@ class TestCase(unittest.TestCase):
         :class:`TestCase` to customize the default behavior with a one liner.
         """
         return isinstance(exception, tuple(self.exceptionsToSkip))
-
-    def skipTest(self, text, *args, **kw):
-        """
-        Enable skipping of tests.
-
-        This method was added in humanfriendly 3.3 as a fall back for the
-        :func:`unittest.TestCase.skipTest()` method that was added in Python
-        2.7 and 3.1 (because humanfriendly also supports Python 2.6).
-
-        Since then `humanfriendly` has gained a conditional dependency on
-        unittest2_ which enables actual skipping of tests (instead of just
-        mocking it) on Python 2.6.
-
-        This method now remains for backwards compatibility (and just because
-        it's a nice shortcut).
-
-        .. _unittest2: https://pypi.python.org/pypi/unittest2
-        """
-        raise unittest.SkipTest(compact(text, *args, **kw))
 
     def skipTestWrapper(self, test_method, *args, **kw):
         """

@@ -46,9 +46,7 @@ def get_install_requires():
     """Get the conditional dependencies for source distributions."""
     install_requires = []
     if 'bdist_wheel' not in sys.argv:
-        if sys.version_info[:2] <= (2, 6) or sys.version_info[:2] == (3, 0):
-            install_requires.extend(('importlib', 'unittest2'))
-        if sys.version_info[:2] < (3, 3):
+        if sys.version_info.major == 2:
             install_requires.append('monotonic')
         if sys.platform == 'win32':
             install_requires.append('pyreadline')
@@ -59,19 +57,9 @@ def get_extras_require():
     """Get the conditional dependencies for wheel distributions."""
     extras_require = {}
     if have_environment_marker_support():
-        # Conditional `importlib' and `unittest2' dependencies.
-        expression = ':%s' % ' or '.join([
-            'python_version == "2.6"',
-            'python_version == "3.0"',
-        ])
-        extras_require[expression] = ['importlib', 'unittest2']
         # Conditional `monotonic' dependency.
         expression = ':%s' % ' or '.join([
-            'python_version == "2.6"',
             'python_version == "2.7"',
-            'python_version == "3.0"',
-            'python_version == "3.1"',
-            'python_version == "3.2"',
         ])
         extras_require[expression] = ['monotonic']
         # Conditional `pyreadline' dependency.
@@ -130,7 +118,6 @@ setup(
         'Natural Language :: English',
         'Programming Language :: Python',
         'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.4',

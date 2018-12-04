@@ -40,11 +40,11 @@ reset:
 	$(MAKE) install
 
 check: install
-	@pip install --quiet --constraint=constraints.txt --requirement=requirements-checks.txt
+	@pip install --quiet --requirement=requirements-checks.txt
 	@flake8
 
 test: install
-	@pip install --quiet --constraint=constraints.txt --requirement=requirements-tests.txt
+	@pip install --quiet --requirement=requirements-tests.txt
 	@py.test --cov
 	@coverage combine || true
 	@coverage html

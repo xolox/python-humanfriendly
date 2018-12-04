@@ -146,13 +146,9 @@ def coerce_seconds(value):
 
     When `value` is a :class:`datetime.timedelta` object the
     :func:`~datetime.timedelta.total_seconds()` method is called.
-    On Python 2.6 this method is not available so it is emulated.
     """
     if isinstance(value, datetime.timedelta):
-        if hasattr(value, 'total_seconds'):
-            return value.total_seconds()
-        else:
-            return (value.microseconds + (value.seconds + value.days * 24 * 3600) * 10**6) / 10**6
+        return value.total_seconds()
     if not isinstance(value, numbers.Number):
         msg = "Failed to coerce value to number of seconds! (%r)"
         raise ValueError(format(msg, value))
