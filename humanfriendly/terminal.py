@@ -51,7 +51,7 @@ ANSI_SGR = 'm'
 ANSI_ERASE_LINE = '%sK' % ANSI_CSI
 """The ANSI escape sequence to erase the current line (a string)."""
 
-ANSI_RESET = '%s0%s' % (ANSI_CSI, ANSI_SGR)
+ANSI_RESET = '{}0{}'.format(ANSI_CSI, ANSI_SGR)
 """The ANSI escape sequence to reset styling (a string)."""
 
 ANSI_COLOR_CODES = dict(black=0, red=1, green=2, yellow=3, blue=4, magenta=5, cyan=6, white=7)
@@ -180,7 +180,7 @@ def ansi_strip(text, readline_hints=True):
                            used to remove `readline hints`_ from the string.
     :returns: The text without ANSI escape sequences (a string).
     """
-    pattern = '%s.*?%s' % (re.escape(ANSI_CSI), re.escape(ANSI_SGR))
+    pattern = '{}.*?{}'.format(re.escape(ANSI_CSI), re.escape(ANSI_SGR))
     text = re.sub(pattern, '', text)
     if readline_hints:
         text = readline_strip(text)

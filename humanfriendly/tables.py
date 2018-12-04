@@ -249,7 +249,7 @@ def format_robust_table(data, column_names):
             stripped_column = column_text.strip()
             if '\n' not in stripped_column:
                 # Columns without line breaks are formatted inline.
-                lines.append("%s %s" % (column_names[column_index], stripped_column))
+                lines.append("{} {}".format(column_names[column_index], stripped_column))
             else:
                 # Columns with line breaks could very well contain indented
                 # lines, so we'll put the column name on a separate line. This

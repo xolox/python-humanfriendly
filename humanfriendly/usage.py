@@ -305,7 +305,7 @@ def render_paragraph(paragraph, meta_variables):
     # remainder of the line as pre-formatted text.
     if paragraph.startswith(USAGE_MARKER):
         tokens = paragraph.split()
-        return "**%s** `%s`" % (tokens[0], ' '.join(tokens[1:]))
+        return "**{}** `{}`".format(tokens[0], ' '.join(tokens[1:]))
     # Reformat the "Supported options:" line to highlight it in bold.
     if paragraph == 'Supported options:':
         return "**%s**" % paragraph

@@ -891,10 +891,10 @@ class Spinner(object):
                 if not label:
                     raise Exception("No label set for spinner!")
                 elif self.total and progress:
-                    label = "%s: %.2f%%" % (label, progress / (self.total / 100.0))
+                    label = "{}: {:.2f}%".format(label, progress / (self.total / 100.0))
                 elif self.timer and self.timer.elapsed_time > 2:
-                    label = "%s (%s)" % (label, self.timer.rounded)
-                self.stream.write("%s %s %s ..\r" % (erase_line_code, state, label))
+                    label = "{} ({})".format(label, self.timer.rounded)
+                self.stream.write("{} {} {} ..\r".format(erase_line_code, state, label))
                 self.counter += 1
 
     def sleep(self):

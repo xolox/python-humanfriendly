@@ -287,7 +287,7 @@ def pluralize(count, singular, plural=None):
     """
     if not plural:
         plural = singular + 's'
-    return '%s %s' % (count, singular if math.floor(float(count)) == 1 else plural)
+    return '{} {}'.format(count, singular if math.floor(float(count)) == 1 else plural)
 
 
 def random_string(length=(25, 100), characters=string.ascii_letters):
