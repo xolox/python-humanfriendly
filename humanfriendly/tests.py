@@ -4,7 +4,7 @@
 # Tests for the `humanfriendly' package.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: October 20, 2018
+# Last Change: February 21, 2019
 # URL: https://humanfriendly.readthedocs.io
 
 """Test suite for the `humanfriendly` package."""
@@ -73,7 +73,7 @@ from humanfriendly.testing import (
     run_cli,
     touch,
 )
-from humanfriendly.text import compact_empty_lines, random_string
+from humanfriendly.text import compact_empty_lines, generate_slug, random_string
 from humanfriendly.usage import (
     find_meta_variables,
     format_usage,
@@ -257,6 +257,16 @@ class HumanFriendlyTestCase(TestCase):
         self.assertEqual('2 words', humanfriendly.pluralize(2, 'word'))
         self.assertEqual('1 box', humanfriendly.pluralize(1, 'box', 'boxes'))
         self.assertEqual('2 boxes', humanfriendly.pluralize(2, 'box', 'boxes'))
+
+    def test_generate_slug(self):
+        """Test :func:`humanfriendly.text.generate_slug()`."""
+        # Test the basic functionality.
+        self.assertEqual('some-random-text', generate_slug('Some Random Text!'))
+        # Test that previous output doesn't change.
+        self.assertEqual('some-random-text', generate_slug('some-random-text'))
+        # Test that inputs which can't be converted to a slug raise an exception.
+        self.assertRaises(ValueError, generate_slug, ' ')
+        self.assertRaises(ValueError, generate_slug, '-')
 
     def test_boolean_coercion(self):
         """Test :func:`humanfriendly.coerce_boolean()`."""

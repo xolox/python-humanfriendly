@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: July 21, 2018
+# Last Change: February 21, 2019
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -221,6 +221,27 @@ def format(text, *args, **kw):
     if kw:
         text = text.format(**kw)
     return text
+
+
+def generate_slug(text, delimiter="-"):
+    """
+    Convert text to a normalized "slug" without whitespace.
+
+    :param text: The original text, for example ``Some Random Text!``.
+    :param delimiter: The delimiter used to separate words
+                      (defaults to the ``-`` character).
+    :returns: The slug text, for example ``some-random-text``.
+    :raises: :exc:`~exceptions.ValueError` when the provided
+             text is nonempty but results in an empty slug.
+    """
+    slug = text.lower()
+    escaped = delimiter.replace("\\", "\\\\")
+    slug = re.sub("[^a-z0-9]+", escaped, slug)
+    slug = slug.strip(delimiter)
+    if text and not slug:
+        msg = "The provided text %r results in an empty slug!"
+        raise ValueError(format(msg, text))
+    return slug
 
 
 def is_empty_line(text):
