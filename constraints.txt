@@ -31,3 +31,6 @@ attrs < 16.0.0 ; python_version < '2.7'
 # pycparser < 2.19 drops Python 2.6 compatibility:
 # https://github.com/eliben/pycparser/blob/master/CHANGES
 pycparser < 2.19 ; python_version < '2.7'
+
+# idna 2.8 drops Python 2.6 compatibility (not documented).
+idna < 2.8 ; python_version < '2.7'
