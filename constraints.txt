@@ -22,7 +22,7 @@ pytest < 3.3 ; python_version < '2.7'
 
 # pytest-cov 2.6.0 drops Python 3.4 compatibility:
 # https://pytest-cov.readthedocs.io/en/latest/changelog.html
-pytest-cov < 2.6.0 ; python_version < '3.4'
+pytest-cov < 2.6.0 ; python_version < '3.5'
 
 # attrs 16.0.0 (used by pytest) drops Python 2.6 compatibility:
 # http://www.attrs.org/en/stable/changelog.html
