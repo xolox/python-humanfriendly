@@ -11,6 +11,19 @@ Changelog`_ . This project adheres to `semantic versioning`_.
 .. _Keep a Changelog: http://keepachangelog.com/
 .. _semantic versioning: http://semver.org/
 
+`Release 4.18`_ (2019-02-21)
+----------------------------
+
+- Added ``humanfriendly.text.generate_slug()`` function.
+
+- Fixed "invalid escape sequence" DeprecationWarning (pointed out by Python >= 3.6).
+
+- Fought Travis CI (for way too long) in order to restore Python 2.6, 2.7, 3.4,
+  3.5, 3.6 and 3.7 compatibility in the Travis CI configuration (unrelated to
+  the ``humanfriendly`` package itself).
+
+.. _Release 4.18: https://github.com/xolox/python-humanfriendly/compare/4.17...4.18
+
 `Release 4.17`_ (2018-10-20)
 ----------------------------
 
