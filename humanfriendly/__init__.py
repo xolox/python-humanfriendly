@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: October 20, 2018
+# Last Change: February 21, 2019
 # URL: https://humanfriendly.readthedocs.io
 
 """The main module of the `humanfriendly` package."""
@@ -391,7 +391,7 @@ def round_number(count, keep_width=False):
     text = '%.2f' % float(count)
     if not keep_width:
         text = re.sub('0+$', '', text)
-        text = re.sub('\.$', '', text)
+        text = re.sub(r'\.$', '', text)
     return text
 
 
