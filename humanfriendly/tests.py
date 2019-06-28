@@ -296,6 +296,10 @@ class HumanFriendlyTestCase(TestCase):
         day = hour * 24
         week = day * 7
         year = week * 52
+        assert '1 nanosecond' == humanfriendly.format_timespan(0.000000001, detailed=True)
+        assert '500 nanoseconds' == humanfriendly.format_timespan(0.0000005, detailed=True)
+        assert '1 microsecond' == humanfriendly.format_timespan(0.000001, detailed=True)
+        assert '500 microseconds' == humanfriendly.format_timespan(0.0005, detailed=True)
         assert '1 millisecond' == humanfriendly.format_timespan(0.001, detailed=True)
         assert '500 milliseconds' == humanfriendly.format_timespan(0.5, detailed=True)
         assert '0.5 seconds' == humanfriendly.format_timespan(0.5, detailed=False)
@@ -328,6 +332,7 @@ class HumanFriendlyTestCase(TestCase):
         assert '5 minutes and 0.3 seconds' == humanfriendly.format_timespan(300.300)
         assert '1 second and 15 milliseconds' == humanfriendly.format_timespan(1.015, detailed=True)
         assert '10 seconds and 15 milliseconds' == humanfriendly.format_timespan(10.015, detailed=True)
+        assert '1 microsecond and 50 nanoseconds' == humanfriendly.format_timespan(0.00000105, detailed=True)
         # Test the datetime.timedelta support:
         # https://github.com/xolox/python-humanfriendly/issues/27
         now = datetime.datetime.now()
@@ -338,6 +343,10 @@ class HumanFriendlyTestCase(TestCase):
         """Test :func:`humanfriendly.parse_timespan()`."""
         self.assertEqual(0, humanfriendly.parse_timespan('0'))
         self.assertEqual(0, humanfriendly.parse_timespan('0s'))
+        self.assertEqual(0.000000001, humanfriendly.parse_timespan('1ns'))
+        self.assertEqual(0.000000051, humanfriendly.parse_timespan('51ns'))
+        self.assertEqual(0.000001, humanfriendly.parse_timespan('1us'))
+        self.assertEqual(0.000052, humanfriendly.parse_timespan('52us'))
         self.assertEqual(0.001, humanfriendly.parse_timespan('1ms'))
         self.assertEqual(0.001, humanfriendly.parse_timespan('1 millisecond'))
         self.assertEqual(0.5, humanfriendly.parse_timespan('500 milliseconds'))
