@@ -100,7 +100,7 @@ def format_smart_table(data, column_names):
     return format_robust_table(data, column_names)
 
 
-def format_pretty_table(data, column_names=None, horizontal_bar='-', vertical_bar='|'):
+def format_pretty_table(data, column_names=None, horizontal_bar='-', vertical_bar='|', style=None):
     """
     Render a table using characters like dashes and vertical bars to emulate borders.
 
@@ -112,6 +112,8 @@ def format_pretty_table(data, column_names=None, horizontal_bar='-', vertical_ba
                            string).
     :param vertical_bar: The character used to represent a vertical bar (a
                          string).
+    :param style: Name of the border style to use (from pretty_table_styles). Overrides the
+                  horizontal_bar and vertical_bar params.
     :returns: The rendered table (a string).
 
     Here's an example:
@@ -151,6 +153,13 @@ def format_pretty_table(data, column_names=None, horizontal_bar='-', vertical_ba
 
       .. image:: images/pretty-table.png
     """
+    if style:
+        delim = pretty_table_styles[style]
+        horizontal_bar = delim[0]
+        vertical_bar = delim[1]
+    else:
+        delim = horizontal_bar + vertical_bar + horizontal_bar * 10
+
     # Normalize the input because we'll have to iterate it more than once.
     data = [normalize_columns(r) for r in data]
     if column_names is not None:
@@ -167,10 +176,17 @@ def format_pretty_table(data, column_names=None, horizontal_bar='-', vertical_ba
             widths[column_index] = max(widths[column_index], ansi_width(column))
             if not (column_names and row_index == 0):
                 numeric_data[column_index].append(bool(NUMERIC_DATA_PATTERN.match(ansi_strip(column))))
-    # Create a horizontal bar of dashes as a delimiter.
-    line_delimiter = horizontal_bar * (sum(widths.values()) + len(widths) * 3 + 1)
+
+    # Format string for horizontal bar: "{l}----{m}----{m}...{m}----{r}"
+    line_delimiter = u'{{l}}{}{{r}}'.format(
+        u'{m}'.join(
+            horizontal_bar * (widths[column_index] + 2)
+            for column_index in range(len(widths))
+        ),
+    )
+
     # Start the table with a vertical bar.
-    lines = [line_delimiter]
+    lines = [line_delimiter.format(l=delim[2], m=delim[8], r=delim[3])]
     # Format the rows and columns.
     for row_index, row in enumerate(data):
         line = [vertical_bar]
@@ -183,11 +199,22 @@ def format_pretty_table(data, column_names=None, horizontal_bar='-', vertical_ba
             line.append(vertical_bar)
         lines.append(u''.join(line))
         if column_names and row_index == 0:
-            lines.append(line_delimiter)
+            lines.append(
+                line_delimiter.format(l=delim[6], m=delim[10], r=delim[7])
+            )
     # End the table with a vertical bar.
-    lines.append(line_delimiter)
+    lines.append(line_delimiter.format(l=delim[4], m=delim[9], r=delim[5]))
     # Join the lines, returning a single string.
     return u'\n'.join(lines)
+
+
+pretty_table_styles = {
+    "ascii": u"-|----------",
+    "box-light": u"─│┌┐└┘├┤┬┴┼",
+    "box-heavy": u"━┃┏┓┗┛┣┫┳┻╋",
+    "box-double": u"═║╔╗╚╝╠╣╦╩╬",
+    "box-arc": u"─│╭╮╰╯├┤┬┴┼"
+}
 
 
 def format_robust_table(data, column_names):
