@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: July 16, 2017
+# Last Change: February 6, 2020
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -206,7 +206,7 @@ def run_cli(entry_point, *arguments, **options):
 
 def touch(filename):
     """
-    The equivalent of the UNIX ``touch`` program in Python.
+    The equivalent of the UNIX :man:`touch` program in Python.
 
     :param filename: The pathname of the file to touch (a string).
 

@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: August 2, 2018
+# Last Change: February 6, 2020
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -357,13 +357,13 @@ def clean_terminal_output(text):
     (0x0D) and line feed (0x0A) characters and the ANSI 'erase line' escape
     sequence on interactive terminals. It's intended to clean up command output
     that was originally meant to be rendered on an interactive terminal and
-    that has been captured using e.g. the script_ program [#]_ or the
+    that has been captured using e.g. the :man:`script` program [#]_ or the
     :mod:`pty` module [#]_.
 
     .. [#] My coloredlogs_ package supports the ``coloredlogs --to-html``
-           command which uses script_ to fool a subprocess into thinking that
-           it's connected to an interactive terminal (in order to get it to
-           emit ANSI escape sequences).
+           command which uses :man:`script` to fool a subprocess into thinking
+           that it's connected to an interactive terminal (in order to get it
+           to emit ANSI escape sequences).
 
     .. [#] My capturer_ package uses the :mod:`pty` module to fool the current
            process and subprocesses into thinking they are connected to an
@@ -386,7 +386,6 @@ def clean_terminal_output(text):
 
     .. _capturer: https://pypi.python.org/pypi/capturer
     .. _coloredlogs: https://pypi.python.org/pypi/coloredlogs
-    .. _script: http://man7.org/linux/man-pages/man1/script.1.html
     """
     cleaned_lines = []
     current_line = ''
@@ -617,21 +616,20 @@ def get_pager_command(text=None):
 
     If the given text contains ANSI escape sequences the command ``less
     --RAW-CONTROL-CHARS`` is used, otherwise the environment variable
-    ``$PAGER`` is used (if ``$PAGER`` isn't set less_ is used).
+    ``$PAGER`` is used (if ``$PAGER`` isn't set :man:`less` is used).
 
-    When the selected pager is less_, the following options are used to make
-    the experience more user friendly:
+    When the selected pager is :man:`less`, the following options are used to
+    make the experience more user friendly:
 
-    - ``--quit-if-one-screen`` causes less_ to automatically exit if the entire
-      text can be displayed on the first screen. This makes the use of a pager
-      transparent for smaller texts (because the operator doesn't have to quit
-      the pager).
+    - ``--quit-if-one-screen`` causes :man:`less` to automatically exit if the
+      entire text can be displayed on the first screen. This makes the use of a
+      pager transparent for smaller texts (because the operator doesn't have to
+      quit the pager).
 
-    - ``--no-init`` prevents less_ from clearing the screen when it exits. This
-      ensures that the operator gets a chance to review the text (for example a
-      usage message) after quitting the pager, while composing the next command.
-
-    .. _less: http://man7.org/linux/man-pages/man1/less.1.html
+    - ``--no-init`` prevents :man:`less` from clearing the screen when it
+      exits. This ensures that the operator gets a chance to review the text
+      (for example a usage message) after quitting the pager, while composing
+      the next command.
     """
     # Compose the pager command.
     if text and ANSI_CSI in text:

@@ -385,7 +385,7 @@ infinite! :-)
 ---------------------------
 
 Make ``usage()`` and ``show_pager()`` more user friendly by changing how
-``less`` as a default pager is invoked (with specific options).
+:man:`less` as a default pager is invoked (with specific options).
 
 .. _Release 2.4: https://github.com/xolox/python-humanfriendly/compare/2.3.2...2.4
 
