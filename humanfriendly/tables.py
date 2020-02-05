@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: March 25, 2018
+# Last Change: February 6, 2020
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -152,7 +152,7 @@ def format_pretty_table(data, column_names=None, horizontal_bar='-', vertical_ba
       .. image:: images/pretty-table.png
     """
     # Normalize the input because we'll have to iterate it more than once.
-    data = [normalize_columns(r) for r in data]
+    data = [normalize_columns(r, expandtabs=True) for r in data]
     if column_names is not None:
         column_names = normalize_columns(column_names)
         if column_names:
@@ -326,8 +326,14 @@ def format_rst_table(data, column_names=None):
     return '\n'.join('  '.join(r) for r in data)
 
 
-def normalize_columns(row):
-    return [coerce_string(c) for c in row]
+def normalize_columns(row, expandtabs=False):
+    results = []
+    for value in row:
+        text = coerce_string(value)
+        if expandtabs:
+            text = text.expandtabs()
+        results.append(text)
+    return results
 
 
 def highlight_column_name(name):
