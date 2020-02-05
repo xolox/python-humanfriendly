@@ -4,7 +4,7 @@
 # Tests for the `humanfriendly' package.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: February 21, 2019
+# Last Change: February 6, 2020
 # URL: https://humanfriendly.readthedocs.io
 
 """Test suite for the `humanfriendly` package."""
@@ -33,6 +33,7 @@ from humanfriendly.prompts import (
     prompt_for_input,
 )
 from humanfriendly.sphinx import (
+    man_role,
     setup,
     special_methods_callback,
     usage_message_callback,
@@ -1237,6 +1238,7 @@ class HumanFriendlyTestCase(TestCase):
 
             def __init__(self):
                 self.callbacks = {}
+                self.roles = {}
 
             def __documented_special_method__(self):
                 """Documented unofficial special method."""
@@ -1245,6 +1247,9 @@ class HumanFriendlyTestCase(TestCase):
             def __undocumented_special_method__(self):
                 # Intentionally not documented :-).
                 pass
+
+            def add_role(self, name, callback):
+                self.roles[name] = callback
 
             def connect(self, event, callback):
                 self.callbacks.setdefault(event, []).append(callback)
@@ -1256,6 +1261,7 @@ class HumanFriendlyTestCase(TestCase):
         # Test event callback registration.
         fake_app = FakeApp()
         setup(fake_app)
+        assert man_role in fake_app.roles
         assert special_methods_callback in fake_app.callbacks['autodoc-skip-member']
         assert usage_message_callback in fake_app.callbacks['autodoc-process-docstring']
         # Test that `special methods' which are documented aren't skipped.
