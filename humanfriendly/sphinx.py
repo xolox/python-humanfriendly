@@ -8,15 +8,18 @@
 Customizations for and integration with the Sphinx_ documentation generator.
 
 The :mod:`humanfriendly.sphinx` module uses the `Sphinx extension API`_ to
-customize the process of generating Sphinx based Python documentation.
-The most relevant functions to take a look at are :func:`setup()`,
-:func:`enable_special_methods()` and :func:`enable_usage_formatting()`.
+customize the process of generating Sphinx based Python documentation. The
+most relevant functions to take a look at for users of this module are
+:func:`setup()`, :func:`enable_man_role()`, :func:`enable_special_methods()`
+and :func:`enable_usage_formatting()`.
 
 .. _Sphinx: http://www.sphinx-doc.org/
 .. _Sphinx extension API: http://sphinx-doc.org/extdev/appapi.html
 """
 
 # Standard library modules.
+import docutils.nodes
+import docutils.utils
 import logging
 import types
 
@@ -25,6 +28,15 @@ from humanfriendly.usage import USAGE_MARKER, render_usage
 
 # Initialize a logger for this module.
 logger = logging.getLogger(__name__)
+
+
+def enable_man_role(app):
+    """
+    Enable the ``:man:`` role for linking to Debian Linux manual pages.
+
+    :param app: The Sphinx application object.
+    """
+    app.add_role("man", man_role)
 
 
 def enable_special_methods(app):
@@ -55,6 +67,13 @@ def enable_usage_formatting(app):
     app.connect("autodoc-process-docstring", usage_message_callback)
 
 
+def man_role(role, rawtext, text, lineno, inliner, options={}, content=[]):
+    """Convert a Linux manual topic to a hyperlink."""
+    man_url = "https://manpages.debian.org/%s" % text
+    reference = docutils.nodes.reference(rawtext, docutils.utils.unescape(text), refuri=man_url, **options)
+    return [reference], []
+
+
 def setup(app):
     """
     Enable all of the provided Sphinx_ customizations.
@@ -77,13 +96,18 @@ def setup(app):
        ]
 
     When Sphinx sees the :mod:`humanfriendly.sphinx` name it will import the
-    module and call its :func:`setup()` function.
+    module and call its :func:`setup()` function. This function will then call
+    the following:
 
-    At the time of writing this just calls :func:`enable_special_methods()` and
-    :func:`enable_usage_formatting()`, but of course more functionality may be
-    added at a later stage. If you don't like that idea you may be better of
-    calling the individual functions from your own ``setup()`` function.
+    - :func:`enable_man_role()`
+    - :func:`enable_special_methods()`
+    - :func:`enable_usage_formatting()`
+
+    Of course more functionality may be added at a later stage. If you don't
+    like that idea you may be better of calling the individual functions from
+    your own ``setup()`` function.
     """
+    enable_man_role(app)
     enable_special_methods(app)
     enable_usage_formatting(app)
 
