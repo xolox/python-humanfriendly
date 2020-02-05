@@ -1261,7 +1261,7 @@ class HumanFriendlyTestCase(TestCase):
         # Test event callback registration.
         fake_app = FakeApp()
         setup(fake_app)
-        assert man_role in fake_app.roles
+        assert man_role == fake_app.roles['man']
         assert special_methods_callback in fake_app.callbacks['autodoc-skip-member']
         assert usage_message_callback in fake_app.callbacks['autodoc-process-docstring']
         # Test that `special methods' which are documented aren't skipped.
