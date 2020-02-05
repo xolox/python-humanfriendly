@@ -27,6 +27,34 @@ from humanfriendly.usage import USAGE_MARKER, render_usage
 logger = logging.getLogger(__name__)
 
 
+def enable_special_methods(app):
+    """
+    Enable documenting "special methods" using the autodoc_ extension.
+
+    :param app: The Sphinx application object.
+
+    This function connects the :func:`special_methods_callback()` function to
+    ``autodoc-skip-member`` events.
+
+    .. _autodoc: http://www.sphinx-doc.org/en/stable/ext/autodoc.html
+    """
+    app.connect("autodoc-skip-member", special_methods_callback)
+
+
+def enable_usage_formatting(app):
+    """
+    Reformat human friendly usage messages to reStructuredText_.
+
+    :param app: The Sphinx application object (as given to ``setup()``).
+
+    This function connects the :func:`usage_message_callback()` function to
+    ``autodoc-process-docstring`` events.
+
+    .. _reStructuredText: https://en.wikipedia.org/wiki/ReStructuredText
+    """
+    app.connect("autodoc-process-docstring", usage_message_callback)
+
+
 def setup(app):
     """
     Enable all of the provided Sphinx_ customizations.
@@ -60,20 +88,6 @@ def setup(app):
     enable_usage_formatting(app)
 
 
-def enable_special_methods(app):
-    """
-    Enable documenting "special methods" using the autodoc_ extension.
-
-    :param app: The Sphinx application object.
-
-    This function connects the :func:`special_methods_callback()` function to
-    ``autodoc-skip-member`` events.
-
-    .. _autodoc: http://www.sphinx-doc.org/en/stable/ext/autodoc.html
-    """
-    app.connect("autodoc-skip-member", special_methods_callback)
-
-
 def special_methods_callback(app, what, name, obj, skip, options):
     """
     Enable documenting "special methods" using the autodoc_ extension.
@@ -97,20 +111,6 @@ def special_methods_callback(app, what, name, obj, skip, options):
         return False
     else:
         return skip
-
-
-def enable_usage_formatting(app):
-    """
-    Reformat human friendly usage messages to reStructuredText_.
-
-    :param app: The Sphinx application object (as given to ``setup()``).
-
-    This function connects the :func:`usage_message_callback()` function to
-    ``autodoc-process-docstring`` events.
-
-    .. _reStructuredText: https://en.wikipedia.org/wiki/ReStructuredText
-    """
-    app.connect("autodoc-process-docstring", usage_message_callback)
 
 
 def usage_message_callback(app, what, name, obj, options, lines):
