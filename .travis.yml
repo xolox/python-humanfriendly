@@ -13,7 +13,7 @@ matrix:
     language: generic
 install:
   - scripts/travis.sh pip install --upgrade setuptools
-  - scripts/travis.sh pip install --upgrade --constraint=constraints.txt --requirement=requirements-travis.txt
+  - scripts/travis.sh pip install --upgrade --requirement=requirements-travis.txt
   - scripts/travis.sh LC_ALL=C pip install .
 script:
   - scripts/travis.sh make check
