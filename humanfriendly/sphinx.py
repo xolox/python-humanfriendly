@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: February 17, 2016
+# Last Change: February 6, 2020
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -71,7 +71,7 @@ def enable_special_methods(app):
 
     .. _autodoc: http://www.sphinx-doc.org/en/stable/ext/autodoc.html
     """
-    app.connect('autodoc-skip-member', special_methods_callback)
+    app.connect("autodoc-skip-member", special_methods_callback)
 
 
 def special_methods_callback(app, what, name, obj, skip, options):
@@ -93,7 +93,7 @@ def special_methods_callback(app, what, name, obj, skip, options):
     The parameters expected by this function are those defined for Sphinx event
     callback functions (i.e. I'm not going to document them here :-).
     """
-    if getattr(obj, '__doc__', None) and isinstance(obj, (types.FunctionType, types.MethodType)):
+    if getattr(obj, "__doc__", None) and isinstance(obj, (types.FunctionType, types.MethodType)):
         return False
     else:
         return skip
@@ -110,7 +110,7 @@ def enable_usage_formatting(app):
 
     .. _reStructuredText: https://en.wikipedia.org/wiki/ReStructuredText
     """
-    app.connect('autodoc-process-docstring', usage_message_callback)
+    app.connect("autodoc-process-docstring", usage_message_callback)
 
 
 def usage_message_callback(app, what, name, obj, options, lines):
@@ -135,7 +135,7 @@ def usage_message_callback(app, what, name, obj, options, lines):
         # Make sure we only modify docstrings containing a usage message.
         if lines[0].startswith(USAGE_MARKER):
             # Convert the usage message to reStructuredText.
-            text = render_usage('\n'.join(lines))
+            text = render_usage("\n".join(lines))
             # Clear the existing line buffer.
             while lines:
                 lines.pop()
