@@ -1,7 +1,7 @@
 # Makefile for the 'humanfriendly' package.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: October 20, 2018
+# Last Change: February 6, 2020
 # URL: https://humanfriendly.readthedocs.io
 
 PACKAGE_NAME = humanfriendly
@@ -40,11 +40,11 @@ reset:
 	$(MAKE) install
 
 check: install
-	@pip install --quiet --constraint=constraints.txt --requirement=requirements-checks.txt
+	@pip install --quiet --requirement=requirements-checks.txt
 	@flake8
 
 test: install
-	@pip install --quiet --constraint=constraints.txt --requirement=requirements-tests.txt
+	@pip install --quiet --requirement=requirements-tests.txt
 	@py.test --cov
 	@coverage combine || true
 	@coverage html
