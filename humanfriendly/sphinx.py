@@ -18,10 +18,12 @@ and :func:`enable_usage_formatting()`.
 """
 
 # Standard library modules.
-import docutils.nodes
-import docutils.utils
 import logging
 import types
+
+# External dependencies (if Sphinx is installed docutils will be installed).
+import docutils.nodes
+import docutils.utils
 
 # Modules included in our package.
 from humanfriendly.usage import USAGE_MARKER, render_usage
