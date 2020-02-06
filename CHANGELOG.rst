@@ -11,6 +11,29 @@ Changelog`_ . This project adheres to `semantic versioning`_.
 .. _Keep a Changelog: http://keepachangelog.com/
 .. _semantic versioning: http://semver.org/
 
+`Release 5.0`_ (2020-02-06)
+---------------------------
+
+- Added custom ``:man:\`…\``` role for easy linking to Linux manual pages to
+  the ``humanfriendly.sphinx`` module.
+
+- Changed rendering of pretty tables to expand tab characters to spaces:
+
+  Until now pretty tables did not take the variable width of tab characters
+  into account which resulted in tables whose "line drawing characters" were
+  visually misaligned. Tabs are now expanded to spaces using
+  ``str.expandtabs()``.
+
+- Stop testing on Python 2.6 and drop official support. The world (including
+  Travis CI) has moved on and preserving Python 2.6 compatibility was clearly
+  starting to drag the project down...
+
+I decided to bump the major version number because each of these changes can be
+considered backwards incompatible in one way or another and version numbers are
+cheap anyway so there 😛.
+
+.. _Release 5.0: https://github.com/xolox/python-humanfriendly/compare/4.18...5.0
+
 `Release 4.18`_ (2019-02-21)
 ----------------------------
 

@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: February 21, 2019
+# Last Change: February 6, 2020
 # URL: https://humanfriendly.readthedocs.io
 
 """The main module of the `humanfriendly` package."""
@@ -40,7 +40,7 @@ from humanfriendly.prompts import prompt_for_choice  # NOQA
 from humanfriendly.compat import is_string, monotonic
 
 # Semi-standard module versioning.
-__version__ = '4.18'
+__version__ = '5.0'
 
 # Spinners are redrawn at most this many seconds.
 minimum_spinner_interval = 0.2
