@@ -36,9 +36,9 @@ install:
 	@pip install --quiet --no-deps --ignore-installed .
 
 reset:
-	$(MAKE) clean
-	rm -Rf "$(VIRTUAL_ENV)"
-	$(MAKE) install
+	@$(MAKE) clean
+	@rm -Rf "$(VIRTUAL_ENV)"
+	@$(MAKE) install
 
 check: install
 	@pip install --upgrade --quiet --requirement=requirements-checks.txt
@@ -63,12 +63,12 @@ docs: readme
 	@cd docs && sphinx-build -nb html -d build/doctrees . build/html
 
 publish: install
-	git push origin && git push --tags origin
-	$(MAKE) clean
-	pip install --quiet twine wheel
-	python setup.py sdist bdist_wheel
-	twine upload dist/*
-	$(MAKE) clean
+	@git push origin && git push --tags origin
+	@$(MAKE) clean
+	@pip install --quiet twine wheel
+	@python setup.py sdist bdist_wheel
+	@twine upload dist/*
+	@$(MAKE) clean
 
 clean:
 	@rm -Rf *.egg .cache .coverage .tox build dist docs/build htmlcov
