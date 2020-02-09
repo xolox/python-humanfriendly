@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: February 21, 2019
+# Last Change: February 9, 2020
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -34,6 +34,7 @@ __all__ = (
     'concatenate',
     'dedent',
     'format',
+    'generate_slug',
     'is_empty_line',
     'join_lines',
     'pluralize',
