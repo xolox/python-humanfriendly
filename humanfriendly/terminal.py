@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: February 6, 2020
+# Last Change: February 9, 2020
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -41,6 +41,42 @@ except ImportError:
 from humanfriendly.compat import HTMLParser, StringIO, coerce_string, name2codepoint, is_unicode, unichr
 from humanfriendly.text import compact_empty_lines, concatenate, format
 from humanfriendly.usage import find_meta_variables, format_usage  # NOQA
+
+# Public identifiers that require documentation.
+__all__ = (
+    'ANSI_COLOR_CODES',
+    'ANSI_CSI',
+    'ANSI_ERASE_LINE',
+    'ANSI_RESET',
+    'ANSI_SGR',
+    'ANSI_TEXT_STYLES',
+    'CLEAN_OUTPUT_PATTERN',
+    'DEFAULT_COLUMNS',
+    'DEFAULT_ENCODING',
+    'DEFAULT_LINES',
+    'HIGHLIGHT_COLOR',
+    'HTMLConverter',
+    'ansi_strip',
+    'ansi_style',
+    'ansi_width',
+    'ansi_wrap',
+    'auto_encode',
+    'clean_terminal_output',
+    'connected_to_terminal',
+    'find_terminal_size',
+    'find_terminal_size_using_ioctl',
+    'find_terminal_size_using_stty',
+    'get_pager_command',
+    'html_to_ansi',
+    'message',
+    'output',
+    'readline_strip',
+    'readline_wrap',
+    'show_pager',
+    'terminal_supports_colors',
+    'usage',
+    'warning',
+)
 
 ANSI_CSI = '\x1b['
 """The ANSI "Control Sequence Introducer" (a string)."""
