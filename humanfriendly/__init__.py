@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: February 6, 2020
+# Last Change: February 9, 2020
 # URL: https://humanfriendly.readthedocs.io
 
 """The main module of the `humanfriendly` package."""
@@ -22,22 +22,75 @@ import time
 # using characters like dashes and vertical bars to emulate borders. Since then
 # support for other tables has been added and the name of format_table() has
 # changed. The following import statement preserves backwards compatibility.
-from humanfriendly.tables import format_pretty_table as format_table  # NOQA
+from humanfriendly.tables import format_pretty_table as format_table
 
 # In humanfriendly 1.30 the following text manipulation functions were moved
 # out into a separate module to enable their usage in other modules of the
 # humanfriendly package (without causing circular imports).
-from humanfriendly.text import (  # NOQA
-    compact, concatenate, dedent, format, is_empty_line,
-    pluralize, tokenize, trim_empty_lines,
+from humanfriendly.text import (
+    compact,
+    concatenate,
+    dedent,
+    format,
+    is_empty_line,
+    pluralize,
+    tokenize,
+    trim_empty_lines,
 )
 
 # In humanfriendly 1.38 the prompt_for_choice() function was moved out into a
 # separate module because several variants of interactive prompts were added.
-from humanfriendly.prompts import prompt_for_choice  # NOQA
+from humanfriendly.prompts import prompt_for_choice
 
 # Compatibility with Python 2 and 3.
 from humanfriendly.compat import is_string, monotonic
+
+# Public identifiers that require documentation.
+__all__ = (
+    # Variables imported from other modules.
+    'compact',
+    'concatenate',
+    'dedent',
+    'format',
+    'format_table',
+    'is_empty_line',
+    'pluralize',
+    'prompt_for_choice',
+    'tokenize',
+    'trim_empty_lines',
+    # Variables defined in this module.
+    'AutomaticSpinner',
+    'CombinedUnit',
+    'InvalidDate',
+    'InvalidLength',
+    'InvalidSize',
+    'InvalidTimespan',
+    'SizeUnit',
+    'Spinner',
+    'Timer',
+    '__version__',
+    'coerce_boolean',
+    'coerce_pattern',
+    'coerce_seconds',
+    'disk_size_units',
+    'erase_line_code',
+    'format_length',
+    'format_number',
+    'format_path',
+    'format_size',
+    'format_timespan',
+    'hide_cursor_code',
+    'length_size_units',
+    'minimum_spinner_interval',
+    'parse_date',
+    'parse_length',
+    'parse_path',
+    'parse_size',
+    'parse_timespan',
+    'round_number',
+    'show_cursor_code',
+    'time_units',
+)
 
 # Semi-standard module versioning.
 __version__ = '5.0'
