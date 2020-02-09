@@ -28,68 +28,68 @@ the major version number will be bumped. So if you're using the `humanfriendly`
 package in your project, make sure to at least pin the major version number in
 order to avoid unexpected surprises.
 
-The :mod:`humanfriendly` module
--------------------------------
+:mod:`humanfriendly`
+--------------------
 
 .. automodule:: humanfriendly
    :members:
 
-The :mod:`humanfriendly.cli` module
------------------------------------
+:mod:`humanfriendly.cli`
+------------------------
 
 .. automodule:: humanfriendly.cli
    :members:
 
-The :mod:`humanfriendly.compat` module
---------------------------------------
+:mod:`humanfriendly.compat`
+---------------------------
 
 .. automodule:: humanfriendly.compat
    :members:
 
-The :mod:`humanfriendly.decorators` module
-------------------------------------------
+:mod:`humanfriendly.decorators`
+-------------------------------
 
 .. automodule:: humanfriendly.decorators
    :members:
 
-The :mod:`humanfriendly.prompts` module
----------------------------------------
+:mod:`humanfriendly.prompts`
+----------------------------
 
 .. automodule:: humanfriendly.prompts
    :members:
 
-The :mod:`humanfriendly.sphinx` module
---------------------------------------
+:mod:`humanfriendly.sphinx`
+---------------------------
 
 .. automodule:: humanfriendly.sphinx
    :members:
 
-The :mod:`humanfriendly.tables` module
---------------------------------------
+:mod:`humanfriendly.tables`
+---------------------------
 
 .. automodule:: humanfriendly.tables
    :members:
 
-The :mod:`humanfriendly.terminal` module
-----------------------------------------
+:mod:`humanfriendly.terminal`
+-----------------------------
 
 .. automodule:: humanfriendly.terminal
    :members:
 
-The :mod:`humanfriendly.testing` module
----------------------------------------
+:mod:`humanfriendly.testing`
+----------------------------
 
 .. automodule:: humanfriendly.testing
    :members:
 
-The :mod:`humanfriendly.text` module
-------------------------------------
+:mod:`humanfriendly.text`
+-------------------------
 
 .. automodule:: humanfriendly.text
    :members:
 
-The :mod:`humanfriendly.usage` module
--------------------------------------
+:mod:`humanfriendly.usage`
+--------------------------
 
 .. automodule:: humanfriendly.usage
    :members:
