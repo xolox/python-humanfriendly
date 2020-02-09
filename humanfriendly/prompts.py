@@ -3,7 +3,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: June 24, 2017
+# Last Change: February 9, 2020
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -30,6 +30,19 @@ from humanfriendly.terminal import (
     warning,
 )
 from humanfriendly.text import format, concatenate
+
+# Public identifiers that require documentation.
+__all__ = (
+    'MAX_ATTEMPTS',
+    'TooManyInvalidReplies',
+    'logger',
+    'prepare_friendly_prompts',
+    'prepare_prompt_text',
+    'prompt_for_choice',
+    'prompt_for_confirmation',
+    'prompt_for_input',
+    'retry_limit',
+)
 
 MAX_ATTEMPTS = 10
 """The number of times an interactive prompt is shown on invalid input (an integer)."""
