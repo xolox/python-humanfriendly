@@ -11,11 +11,59 @@ Changelog`_ . This project adheres to `semantic versioning`_.
 .. _Keep a Changelog: http://keepachangelog.com/
 .. _semantic versioning: http://semver.org/
 
+`Release 6.0`_ (2020-02-09)
+---------------------------
+
+**Noteworthy changes:**
+
+- Enable :class:`~humanfriendly.testing.MockedProgram` to customize the shell
+  script code of mocked programs. This was added to make it easy to mock a
+  program that is expected to generate specific output (I'm planning to use
+  this in the linux-utils_ test suite).
+
+- Defined ``__all__`` for all public modules that previously lacked "export
+  control" and decided to bump the major version number as a precaution:
+
+  - These changes should not have any impact on backwards compatibility,
+    unless I forgot entries, in which case callers can get
+    :exc:`~exceptions.ImportError` exceptions...
+
+  - Imports of public modules were previously exported (implicitly) and this
+    pollutes code completion suggestions which in turn can encourage bad
+    practices (not importing things using their "canonical" name).
+
+  - I started developing the ``humanfriendly`` package years before I learned
+    about the value of defining ``__all__`` and so some modules lacked a
+    definition until now. I decided that now was as good a time as any
+    to add those definitions 😇.
+
+**Miscellaneous changes:**
+
+- Simplified the headings in ``docs/api.rst`` so that only the module names
+  remain. This was done because Sphinx doesn't support nested links in HTML
+  output and thus generated really weird "Table of Contents" listings.
+
+- Fixed the reStructuredText references in the documentation of
+  :func:`~humanfriendly.prompts.prompt_for_choice()`. This function is imported
+  from :mod:`humanfriendly.prompts` to :mod:`humanfriendly` (for backwards
+  compatibility) where it can't use relative references to refer to the other
+  functions in the :mod:`humanfriendly.prompts` module.
+
+- Changed the ``Makefile`` to default to Python 3 for development, make sure
+  ``flake8`` is always up-to-date and silence the few targets whose commands
+  were not already silenced.
+
+- Embedded quite a few Python API references into recent changelog entries,
+  just because I could (I ❤️  what hyperlinks can do for the usability of
+  technical documentation, it gives a lot more context).
+
+.. _Release 6.0: https://github.com/xolox/python-humanfriendly/compare/5.0...6.0
+
 `Release 5.0`_ (2020-02-06)
 ---------------------------
 
-- Added custom ``:man:\`…\``` role for easy linking to Linux manual pages to
-  the ``humanfriendly.sphinx`` module.
+- Added custom ``:man:`…``` role for easy linking to Linux manual pages to
+  the :mod:`humanfriendly.sphinx` module.
 
 - Changed rendering of pretty tables to expand tab characters to spaces:
 
@@ -37,7 +85,7 @@ cheap anyway so there 😛.
 `Release 4.18`_ (2019-02-21)
 ----------------------------
 
-- Added ``humanfriendly.text.generate_slug()`` function.
+- Added :func:`humanfriendly.text.generate_slug()` function.
 
 - Fixed "invalid escape sequence" DeprecationWarning (pointed out by Python >= 3.6).
 
@@ -79,17 +127,19 @@ don't inappropriately "leak through" to the text that follows.
 
 More HTML to ANSI improvements:
 
-- Added ``humanfriendly.text.compact_empty_lines()`` function.
-- Enable optional ``html_to_ansi(data[, callback])`` argument.
-- Added a code sample and screenshot to the ``HTMLConverter`` documentation.
+- Added :func:`humanfriendly.text.compact_empty_lines()` function.
+- Enable optional ``callback`` argument to
+  :func:`humanfriendly.terminal.html_to_ansi()`.
+- Added a code sample and screenshot to the
+  :class:`humanfriendly.terminal.HTMLConverter` documentation.
 - Emit vertical whitespace for block tags like ``<div>``, ``<p>`` and ``<pre>``
   and post-process the generated output in ``__call__()`` to compact empty lines.
 - Don't pre-process preformatted text using the user defined text callback.
 - Improve robustness against malformed HTML (previously an ``IndexError`` would
   be raised when a closing ``</a>`` tag was encountered without a corresponding
   opening ``<a>`` tag).
-- Emit an ANSI reset code when ``HTMLConverter.close()`` is called and a style
-  is still active (improves robustness against malformed HTML).
+- Emit an ANSI reset code when :func:`humanfriendly.terminal.HTMLConverter.close()`
+  is called and a style is still active (improves robustness against malformed HTML).
 
 .. _Release 4.16: https://github.com/xolox/python-humanfriendly/compare/4.15.1...4.16
 
@@ -108,8 +158,9 @@ definitions are so conveniently given in the documentation of the
 `Release 4.15`_ (2018-07-14)
 ----------------------------
 
-Added the ``ansi_to_html()`` function which is a shortcut for the
-``HTMLConverter`` class that's based on ``html.parser.HTMLParser``.
+Added the :func:`humanfriendly.terminal.ansi_to_html()` function which is a
+shortcut for the :class:`humanfriendly.terminal.HTMLConverter` class that's
+based on ``html.parser.HTMLParser``.
 
 This new functionality converts HTML with simple text formatting tags like
 ``<b>`` for bold, ``<i>`` for italic, ``<u>`` for underline, ``<span>`` for
@@ -159,7 +210,9 @@ build <https://travis-ci.org/xolox/python-humanfriendly/builds/377203446>`_).
 `Release 4.12`_ (2018-04-26)
 ----------------------------
 
-- Make ``format_timespan()`` accept ``datetime.timedelta`` objects (fixes `#27`_).
+- Make :func:`humanfriendly.format_timespan()` accept
+  :class:`datetime.timedelta` objects (fixes `#27`_).
+
 - Add ``license`` key to ``setup.py`` script (pointed out to me in `coloredlogs
   pull request #53 <https://github.com/xolox/python-coloredlogs/pull/53>`_).
 
@@ -191,23 +244,25 @@ sidetracked even further :-).
 `Release 4.10`_ (2018-03-31)
 ----------------------------
 
-Added the ``Timer.sleep()`` method to sleep "no more than" the given number of seconds.
+Added the :func:`humanfriendly.Timer.sleep()` method to sleep "no more than"
+the given number of seconds.
 
 .. _Release 4.10: https://github.com/xolox/python-humanfriendly/compare/4.9...4.10
 
 `Release 4.9`_ (2018-03-28)
 ---------------------------
 
-Added the ``format_rst_table()`` function to render RST (reStructuredText) tables.
+Added the :func:`humanfriendly.tables.format_rst_table()` function to render
+RST (reStructuredText) tables.
 
 .. _Release 4.9: https://github.com/xolox/python-humanfriendly/compare/4.8...4.9
 
 `Release 4.8`_ (2018-01-20)
 ---------------------------
 
-Added the ``coerce_pattern()`` function. I previously created this for
-vcs-repo-mgr_ and now need the same thing in qpass_ so I'm putting it in
-humanfriendly :-) because it kind of fits with the other coercion functions.
+Added the :func:`humanfriendly.coerce_pattern()` function. I previously created
+this for vcs-repo-mgr_ and now need the same thing in qpass_ so I'm putting it
+in humanfriendly :-) because it kind of fits with the other coercion functions.
 
 .. _Release 4.8: https://github.com/xolox/python-humanfriendly/compare/4.7...4.8
 .. _vcs-repo-mgr: https://vcs-repo-mgr.readthedocs.io/
@@ -216,8 +271,12 @@ humanfriendly :-) because it kind of fits with the other coercion functions.
 `Release 4.7`_ (2018-01-14)
 ---------------------------
 
-- Added support for background colors and 256 color mode (related to `issue 35 on the coloredlogs issue tracker <https://github.com/xolox/python-coloredlogs/issues/35>`_).
-- Added tests for ``output()``, ``message()`` and ``warning()``.
+- Added support for background colors and 256 color mode (related to `issue 35
+  on the coloredlogs issue tracker <https://github.com/xolox/python-coloredlogs/issues/35>`_).
+
+- Added tests for :func:`~humanfriendly.terminal.output()`,
+  :func:`~humanfriendly.terminal.message()` and
+  :func:`~humanfriendly.terminal.warning()`.
 
 .. _Release 4.7: https://github.com/xolox/python-humanfriendly/compare/4.6...4.7
 
@@ -266,35 +325,37 @@ for the similar change made to 'coloredlogs' and 'verboselogs').
 `Release 4.4`_ (2017-07-16)
 ---------------------------
 
-Added the ``make_dirs()`` and ``touch()`` functions to the ``humanfriendly.testing`` module.
+Added the :func:`~humanfriendly.testing.make_dirs()` and
+:func:`~humanfriendly.testing.touch()` functions.
 
 .. _Release 4.4: https://github.com/xolox/python-humanfriendly/compare/4.3...4.4
 
 `Release 4.3`_ (2017-07-10)
 ---------------------------
 
-Don't log duplicate output in ``run_cli()``.
+Don't log duplicate output in :func:`~humanfriendly.testing.run_cli()`.
 
 .. _Release 4.3: https://github.com/xolox/python-humanfriendly/compare/4.2...4.3
 
 `Release 4.2`_ (2017-07-10)
 ---------------------------
 
-Automatically reconfigure logging in ``run_cli()``.
+Automatically reconfigure logging in :func:`~humanfriendly.testing.run_cli()`.
 
 .. _Release 4.2: https://github.com/xolox/python-humanfriendly/compare/4.1...4.2
 
 `Release 4.1`_ (2017-07-10)
 ---------------------------
 
-Improve ``run_cli()`` to always log standard error as well.
+Improve :func:`~humanfriendly.testing.run_cli()` to always log standard error
+as well.
 
 .. _Release 4.1: https://github.com/xolox/python-humanfriendly/compare/4.0...4.1
 
 `Release 4.0`_ (2017-07-10)
 ---------------------------
 
-Backwards incompatible improvements to ``humanfriendly.testing.run_cli()``.
+Backwards incompatible improvements to :func:`~humanfriendly.testing.run_cli()`.
 
 I just wasted quite a bit of time debugging a Python 3.6 incompatibility in
 deb-pkg-tools (see build 251688788_) which was obscured by my naive
@@ -322,7 +383,8 @@ Enable customizable skipping of tests.
 `Release 3.6.1`_ (2017-06-24)
 -----------------------------
 
-Improved the robustness of the ``PatchedAttribute`` and ``PatchedItem`` classes.
+Improved the robustness of the :class:`~humanfriendly.testing.PatchedAttribute`
+and :class:`~humanfriendly.testing.PatchedItem` classes.
 
 .. _Release 3.6.1: https://github.com/xolox/python-humanfriendly/compare/3.6...3.6.1
 
@@ -337,7 +399,7 @@ Improved the robustness of the ``PatchedAttribute`` and ``PatchedItem`` classes.
 `Release 3.5`_ (2017-06-24)
 ---------------------------
 
-Added ``TestCase.assertRaises()`` enhancements.
+Added :func:`~humanfriendly.testing.TestCase.assertRaises()` enhancements.
 
 .. _Release 3.5: https://github.com/xolox/python-humanfriendly/compare/3.4.1...3.5
 
@@ -358,9 +420,9 @@ Promote the command line testing function to the public API.
 `Release 3.3`_ (2017-06-24)
 ---------------------------
 
-- Added the ``humanfriendly.text.random_string()`` function.
-- Added the ``humanfriendly.testing`` module with unittest helpers.
-- Define ``humanfriendly.text.__all__``.
+- Added the :func:`humanfriendly.text.random_string()` function.
+- Added the :mod:`humanfriendly.testing` module with unittest helpers.
+- Define :data:`humanfriendly.text.__all__`.
 
 .. _Release 3.3: https://github.com/xolox/python-humanfriendly/compare/3.2...3.3
 
