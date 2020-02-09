@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: February 6, 2020
+# Last Change: February 9, 2020
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -464,17 +464,21 @@ class MockedProgram(CustomSearchPath):
     This class extends the functionality of :class:`CustomSearchPath`.
     """
 
-    def __init__(self, name, returncode=0):
+    def __init__(self, name, returncode=0, script=None):
         """
         Initialize a :class:`MockedProgram` object.
 
         :param name: The name of the program (a string).
         :param returncode: The return code that the program should emit (a
                            number, defaults to zero).
+        :param script: Shell script code to include in the mocked program (a
+                       string or :data:`None`). This can be used to mock a
+                       program that is expected to generate specific output.
         """
         # Initialize our own instance variables.
         self.program_name = name
         self.program_returncode = returncode
+        self.program_script = script
         self.program_signal_file = None
         # Initialize our superclasses.
         super(MockedProgram, self).__init__()
@@ -492,6 +496,8 @@ class MockedProgram(CustomSearchPath):
         with open(pathname, 'w') as handle:
             handle.write('#!/bin/sh\n')
             handle.write('echo > %s\n' % pipes.quote(self.program_signal_file))
+            if self.program_script:
+                handle.write('%s\n' % self.program_script.strip())
             handle.write('exit %i\n' % self.program_returncode)
         os.chmod(pathname, 0o755)
         return directory

@@ -4,7 +4,7 @@
 # Tests for the `humanfriendly' package.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: February 6, 2020
+# Last Change: February 9, 2020
 # URL: https://humanfriendly.readthedocs.io
 
 """Test suite for the `humanfriendly` package."""
@@ -137,10 +137,20 @@ class HumanFriendlyTestCase(TestCase):
     def test_mocked_program(self):
         """Test :class:`humanfriendly.testing.MockedProgram`."""
         name = random_string()
-        with MockedProgram(name=name, returncode=42) as directory:
+        script = dedent('''
+            # This goes to stdout.
+            tr a-z A-Z
+            # This goes to stderr.
+            echo Fake warning >&2
+        ''')
+        with MockedProgram(name=name, returncode=42, script=script) as directory:
             assert os.path.isdir(directory)
             assert os.path.isfile(os.path.join(directory, name))
-            assert subprocess.call(name) == 42
+            program = subprocess.Popen(name, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            stdout, stderr = program.communicate(input=b'hello world\n')
+            assert program.returncode == 42
+            assert stdout == b'HELLO WORLD\n'
+            assert stderr == b'Fake warning\n'
 
     def test_temporary_directory(self):
         """Test :class:`humanfriendly.testing.TemporaryDirectory`."""
