@@ -124,11 +124,14 @@ def prompt_for_choice(choices, default=None, padding=True):
     :param choices: A sequence of strings with available options.
     :param default: The default choice if the user simply presses Enter
                     (expected to be a string, defaults to :data:`None`).
-    :param padding: Refer to the documentation of :func:`prompt_for_input()`.
+    :param padding: Refer to the documentation of
+                    :func:`~humanfriendly.prompts.prompt_for_input()`.
     :returns: The string corresponding to the user's choice.
     :raises: - :exc:`~exceptions.ValueError` if `choices` is an empty sequence.
-             - Any exceptions raised by :func:`retry_limit()`.
-             - Any exceptions raised by :func:`prompt_for_input()`.
+             - Any exceptions raised by
+               :func:`~humanfriendly.prompts.retry_limit()`.
+             - Any exceptions raised by
+               :func:`~humanfriendly.prompts.prompt_for_input()`.
 
     When no options are given an exception is raised:
 
@@ -146,12 +149,12 @@ def prompt_for_choice(choices, default=None, padding=True):
     Here's what the actual prompt looks like by default:
 
     >>> prompt_for_choice(['first option', 'second option'])
-     <BLANKLINE>
+    <BLANKLINE>
       1. first option
       2. second option
-     <BLANKLINE>
+    <BLANKLINE>
      Enter your choice as a number or unique substring (Control-C aborts): second
-     <BLANKLINE>
+    <BLANKLINE>
     'second option'
 
     If you don't like the whitespace (empty lines and indentation):
