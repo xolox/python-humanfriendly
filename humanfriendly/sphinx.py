@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: February 6, 2020
+# Last Change: February 9, 2020
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -27,6 +27,18 @@ import docutils.utils
 
 # Modules included in our package.
 from humanfriendly.usage import USAGE_MARKER, render_usage
+
+# Public identifiers that require documentation.
+__all__ = (
+    'enable_man_role',
+    'enable_special_methods',
+    'enable_usage_formatting',
+    'logger',
+    'man_role',
+    'setup',
+    'special_methods_callback',
+    'usage_message_callback',
+)
 
 # Initialize a logger for this module.
 logger = logging.getLogger(__name__)
