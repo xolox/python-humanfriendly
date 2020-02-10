@@ -16,19 +16,30 @@
 # [2] https://github.com/travis-ci/travis-ci/issues/2312
 # [3] https://travis-ci.org/xolox/python-humanfriendly/jobs/411396506
 
-if [ "$TRAVIS_OS_NAME" = osx ]; then
-  VIRTUAL_ENV="$HOME/virtualenv/python2.7"
-  if [ ! -x "$VIRTUAL_ENV/bin/python" ]; then
-    if ! which virtualenv &>/dev/null; then
-      # Install `virtualenv' in ~/.local (doesn't require `sudo' privileges).
-      pip install --user virtualenv
-      # Make sure ~/.local/bin is in the $PATH.
-      LOCAL_BINARIES=$(python -c 'import os, site; print(os.path.join(site.USER_BASE, "bin"))')
-      export PATH="$PATH:$LOCAL_BINARIES"
+main () {
+  if [ "$TRAVIS_OS_NAME" = osx ]; then
+    VIRTUAL_ENV="$HOME/virtualenv/python2.7"
+    if [ ! -x "$VIRTUAL_ENV/bin/python" ]; then
+      if ! which virtualenv &>/dev/null; then
+        msg "Installing 'virtualenv' in per-user site-packages .."
+        pip install --user virtualenv
+        msg "Figuring out 'bin' directory of per-user site-packages .."
+        LOCAL_BINARIES=$(python -c 'import os, site; print(os.path.join(site.USER_BASE, "bin"))')
+        msg "Adding '$LOCAL_BINARIES' to PATH .."
+        export PATH="$PATH:$LOCAL_BINARIES"
+      fi
+      msg "Creating virtual environment ($VIRTUAL_ENV) .."
+      virtualenv "$VIRTUAL_ENV"
     fi
-    virtualenv "$VIRTUAL_ENV"
+    msg "Activating virtual environment ($VIRTUAL_ENV) .."
+    source "$VIRTUAL_ENV/bin/activate"
   fi
-  source "$VIRTUAL_ENV/bin/activate"
-fi
+  msg "Running command: $*"
+  eval "$@"
+}
 
-eval "$@"
+msg () {
+  echo "[travis.sh] $*" >&2
+}
+
+main "$@"
