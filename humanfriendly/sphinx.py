@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: February 9, 2020
+# Last Change: February 10, 2020
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -31,10 +31,12 @@ from humanfriendly.usage import USAGE_MARKER, render_usage
 # Public identifiers that require documentation.
 __all__ = (
     'enable_man_role',
+    'enable_pypi_role',
     'enable_special_methods',
     'enable_usage_formatting',
     'logger',
     'man_role',
+    'pypi_role',
     'setup',
     'special_methods_callback',
     'usage_message_callback',
@@ -54,6 +56,18 @@ def enable_man_role(app):
     ``:man:`` role.
     """
     app.add_role("man", man_role)
+
+
+def enable_pypi_role(app):
+    """
+    Enable the ``:pypi:`` role for linking to the Python Package Index.
+
+    :param app: The Sphinx application object.
+
+    This function registers the :func:`pypi_role()` function to handle the
+    ``:pypi:`` role.
+    """
+    app.add_role("pypi", pypi_role)
 
 
 def enable_special_methods(app):
@@ -107,6 +121,29 @@ def man_role(role, rawtext, text, lineno, inliner, options={}, content=[]):
     return [reference], []
 
 
+def pypi_role(role, rawtext, text, lineno, inliner, options={}, content=[]):
+    """
+    Generate hyperlinks to the Python Package Index.
+
+    Using the ``:pypi:`` role is very simple, here's an example:
+
+    .. code-block:: rst
+
+        See the :pypi:`humanfriendly` package.
+
+    This results in the following:
+
+      See the :pypi:`humanfriendly` package.
+
+    As the example shows you can use the role inline, embedded in sentences of
+    text. In the generated documentation the ``:pypi:`` text is omitted and a
+    hyperlink pointing to the Python Package Index is emitted.
+    """
+    pypi_url = "https://pypi.org/project/%s/" % text
+    reference = docutils.nodes.reference(rawtext, docutils.utils.unescape(text), refuri=pypi_url, **options)
+    return [reference], []
+
+
 def setup(app):
     """
     Enable all of the provided Sphinx_ customizations.
@@ -133,6 +170,7 @@ def setup(app):
     the following:
 
     - :func:`enable_man_role()`
+    - :func:`enable_pypi_role()`
     - :func:`enable_special_methods()`
     - :func:`enable_usage_formatting()`
 
@@ -141,6 +179,7 @@ def setup(app):
     your own ``setup()`` function.
     """
     enable_man_role(app)
+    enable_pypi_role(app)
     enable_special_methods(app)
     enable_usage_formatting(app)
 
