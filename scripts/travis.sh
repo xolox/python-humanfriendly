@@ -19,7 +19,10 @@
 main () {
   if [ "$TRAVIS_OS_NAME" = osx ]; then
     local environment="$HOME/virtualenv/python2.7"
-    if [ ! -x "$environment/bin/python" ]; then
+    if [ -x "$environment/bin/python" ]; then
+      msg "Activating virtual environment ($environment) .."
+      source "$environment/bin/activate"
+    else
       if ! which virtualenv &>/dev/null; then
         msg "Installing 'virtualenv' in per-user site-packages .."
         pip install --user virtualenv
@@ -30,9 +33,14 @@ main () {
       fi
       msg "Creating virtual environment ($environment) .."
       virtualenv "$environment"
+      msg "Activating virtual environment ($environment) .."
+      source "$environment/bin/activate"
+      msg "Checking if 'pip' executable works .."
+      if ! pip --version; then
+        msg "Bootstrapping working 'pip' installation using get-pip.py .."
+        curl -s https://bootstrap.pypa.io/get-pip.py | python -
+      fi
     fi
-    msg "Activating virtual environment ($environment) .."
-    source "$environment/bin/activate"
   fi
   msg "Running command: $*"
   eval "$@"
