@@ -18,8 +18,8 @@
 
 main () {
   if [ "$TRAVIS_OS_NAME" = osx ]; then
-    VIRTUAL_ENV="$HOME/virtualenv/python2.7"
-    if [ ! -x "$VIRTUAL_ENV/bin/python" ]; then
+    local environment="$HOME/virtualenv/python2.7"
+    if [ ! -x "$environment/bin/python" ]; then
       if ! which virtualenv &>/dev/null; then
         msg "Installing 'virtualenv' in per-user site-packages .."
         pip install --user virtualenv
@@ -28,11 +28,11 @@ main () {
         msg "Prefixing '$LOCAL_BINARIES' to PATH .."
         export PATH="$LOCAL_BINARIES:$PATH"
       fi
-      msg "Creating virtual environment ($VIRTUAL_ENV) .."
-      virtualenv "$VIRTUAL_ENV"
+      msg "Creating virtual environment ($environment) .."
+      virtualenv "$environment"
     fi
-    msg "Activating virtual environment ($VIRTUAL_ENV) .."
-    source "$VIRTUAL_ENV/bin/activate"
+    msg "Activating virtual environment ($environment) .."
+    source "$environment/bin/activate"
   fi
   msg "Running command: $*"
   eval "$@"
