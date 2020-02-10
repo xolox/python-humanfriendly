@@ -11,6 +11,18 @@ Changelog`_ . This project adheres to `semantic versioning`_.
 .. _Keep a Changelog: http://keepachangelog.com/
 .. _semantic versioning: http://semver.org/
 
+`Release 6.1`_ (2020-02-10)
+---------------------------
+
+- Added a ``:pypy:`…``` role for easy linking to packages on the Python Package
+  Index, for details refer to :func:`humanfriendly.sphinx.pypi_role()`.
+
+- Wasted quite a bit of time debugging a MacOS failure on Travis CI caused by a
+  broken :man:`pip` installation, fixed by using ``get-pip.py`` to bootstrap an
+  installation that actually works 😉.
+
+.. _Release 6.1: https://github.com/xolox/python-humanfriendly/compare/6.0...6.1
+
 `Release 6.0`_ (2020-02-09)
 ---------------------------
 
@@ -19,7 +31,7 @@ Changelog`_ . This project adheres to `semantic versioning`_.
 - Enable :class:`~humanfriendly.testing.MockedProgram` to customize the shell
   script code of mocked programs. This was added to make it easy to mock a
   program that is expected to generate specific output (I'm planning to use
-  this in the linux-utils_ test suite).
+  this in the :pypi:`linux-utils` test suite).
 
 - Defined ``__all__`` for all public modules that previously lacked "export
   control" and decided to bump the major version number as a precaution:

@@ -7,11 +7,11 @@
 """
 Customizations for and integration with the Sphinx_ documentation generator.
 
-The :mod:`humanfriendly.sphinx` module uses the `Sphinx extension API`_ to
-customize the process of generating Sphinx based Python documentation. The
-most relevant functions to take a look at for users of this module are
-:func:`setup()`, :func:`enable_man_role()`, :func:`enable_special_methods()`
-and :func:`enable_usage_formatting()`.
+The :mod:`humanfriendly.sphinx` module uses the `Sphinx extension API`_
+to customize the process of generating Sphinx based Python documentation.
+The most relevant functions to take a look at for users of this module are
+:func:`setup()`, :func:`enable_man_role()`, :func:`enable_pypi_role()`,
+:func:`enable_special_methods()` and :func:`enable_usage_formatting()`.
 
 .. _Sphinx: http://www.sphinx-doc.org/
 .. _Sphinx extension API: http://sphinx-doc.org/extdev/appapi.html
