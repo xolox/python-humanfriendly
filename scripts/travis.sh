@@ -25,8 +25,8 @@ main () {
         pip install --user virtualenv
         msg "Figuring out 'bin' directory of per-user site-packages .."
         LOCAL_BINARIES=$(python -c 'import os, site; print(os.path.join(site.USER_BASE, "bin"))')
-        msg "Adding '$LOCAL_BINARIES' to PATH .."
-        export PATH="$PATH:$LOCAL_BINARIES"
+        msg "Prefixing '$LOCAL_BINARIES' to PATH .."
+        export PATH="$LOCAL_BINARIES:$PATH"
       fi
       msg "Creating virtual environment ($VIRTUAL_ENV) .."
       virtualenv "$VIRTUAL_ENV"
