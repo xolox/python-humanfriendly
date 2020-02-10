@@ -4,7 +4,7 @@
 # Tests for the `humanfriendly' package.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: February 9, 2020
+# Last Change: February 10, 2020
 # URL: https://humanfriendly.readthedocs.io
 
 """Test suite for the `humanfriendly` package."""
@@ -34,6 +34,7 @@ from humanfriendly.prompts import (
 )
 from humanfriendly.sphinx import (
     man_role,
+    pypi_role,
     setup,
     special_methods_callback,
     usage_message_callback,
@@ -1272,6 +1273,7 @@ class HumanFriendlyTestCase(TestCase):
         fake_app = FakeApp()
         setup(fake_app)
         assert man_role == fake_app.roles['man']
+        assert pypi_role == fake_app.roles['pypi']
         assert special_methods_callback in fake_app.callbacks['autodoc-skip-member']
         assert usage_message_callback in fake_app.callbacks['autodoc-process-docstring']
         # Test that `special methods' which are documented aren't skipped.
