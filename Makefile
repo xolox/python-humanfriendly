@@ -1,7 +1,7 @@
 # Makefile for the 'humanfriendly' package.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: February 9, 2020
+# Last Change: February 16, 2020
 # URL: https://humanfriendly.readthedocs.io
 
 PACKAGE_NAME = humanfriendly
@@ -31,7 +31,6 @@ default:
 install:
 	@test -d "$(VIRTUAL_ENV)" || mkdir -p "$(VIRTUAL_ENV)"
 	@test -x "$(VIRTUAL_ENV)/bin/python" || virtualenv --python=$(PYTHON) --quiet "$(VIRTUAL_ENV)"
-	@test -x "$(VIRTUAL_ENV)/bin/pip" || easy_install pip
 	@pip uninstall --yes $(PACKAGE_NAME) &>/dev/null || true
 	@pip install --quiet --no-deps --ignore-installed .
 
