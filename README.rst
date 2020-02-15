@@ -4,7 +4,7 @@ humanfriendly: Human friendly input/output in Python
 .. image:: https://travis-ci.org/xolox/python-humanfriendly.svg?branch=master
    :target: https://travis-ci.org/xolox/python-humanfriendly
 
-.. image:: https://coveralls.io/repos/xolox/python-humanfriendly/badge.png?branch=master
+.. image:: https://coveralls.io/repos/xolox/python-humanfriendly/badge.svg?branch=master
    :target: https://coveralls.io/r/xolox/python-humanfriendly?branch=master
 
 The functions and classes in the `humanfriendly` package can be used to make
