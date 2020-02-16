@@ -123,6 +123,14 @@ the new default became decimal multiples of bytes (powers of ten):
 The option to use binary multiples of bytes remains by passing the keyword
 argument `binary=True` to the `format_size()`_ and `parse_size()`_ functions.
 
+Windows support
+---------------
+
+Windows 10 gained native support for ANSI escape sequences which means commands
+like ``humanfriendly --demo`` should work out of the box (if your system is
+up-to-date enough). If this doesn't work then you can install the colorama_
+package, it will be used automatically once installed.
+
 Contact
 -------
 
@@ -143,6 +151,7 @@ This software is licensed under the `MIT license`_.
 .. _#8: https://github.com/xolox/python-humanfriendly/pull/8
 .. _#9: https://github.com/xolox/python-humanfriendly/pull/9
 .. _changelog: https://humanfriendly.readthedocs.io/en/latest/changelog.html
+.. _colorama: https://pypi.org/project/colorama
 .. _format_size(): https://humanfriendly.readthedocs.io/en/latest/#humanfriendly.format_size
 .. _GitHub: https://github.com/xolox/python-humanfriendly
 .. _MIT license: https://en.wikipedia.org/wiki/MIT_License

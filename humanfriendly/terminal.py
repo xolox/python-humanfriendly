@@ -5,13 +5,18 @@
 # URL: https://humanfriendly.readthedocs.io
 
 """
-Interaction with UNIX terminals.
+Interaction with interactive text terminals.
 
-The :mod:`~humanfriendly.terminal` module makes it easy to interact with UNIX
-terminals and format text for rendering on UNIX terminals. If the terms used in
-the documentation of this module don't make sense to you then please refer to
-the `Wikipedia article on ANSI escape sequences`_ for details about how ANSI
-escape sequences work.
+The :mod:`~humanfriendly.terminal` module makes it easy to interact with
+interactive text terminals and format text for rendering on such terminals. If
+the terms used in the documentation of this module don't make sense to you then
+please refer to the `Wikipedia article on ANSI escape sequences`_ for details
+about how ANSI escape sequences work.
+
+This module was originally developed for use on UNIX systems, but since then
+Windows 10 gained native support for ANSI escape sequences and this module was
+enhanced to recognize and support this. For details please refer to the
+:func:`enable_ansi_support()` function.
 
 .. _Wikipedia article on ANSI escape sequences: http://en.wikipedia.org/wiki/ANSI_escape_code#Sequence_elements
 """
