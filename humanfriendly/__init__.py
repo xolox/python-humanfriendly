@@ -93,7 +93,7 @@ __all__ = (
 )
 
 # Semi-standard module versioning.
-__version__ = '6.1'
+__version__ = '7.0'
 
 # Spinners are redrawn at most this many seconds.
 minimum_spinner_interval = 0.2

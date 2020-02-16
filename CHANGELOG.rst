@@ -11,6 +11,29 @@ Changelog`_ . This project adheres to `semantic versioning`_.
 .. _Keep a Changelog: http://keepachangelog.com/
 .. _semantic versioning: http://semver.org/
 
+`Release 7.0`_ (2020-02-16)
+---------------------------
+
+After an unplanned but extended hiatus from the development and maintenance of
+my open source projects I'm now finally starting to pick up some momentum, so
+I'm trying to make the best of it:
+
+- Merge pull request `#24`_: Fix bug in :func:`~humanfriendly.parse_length()` that rounded floats.
+- Merge pull request `#32`_: Update hyperlinks in readme.
+- Merge pull request `#33`_: Drop support for Python 2.6 and 3.0-3.4
+- Merge pull request `#35`_: SVG badge in readme.
+- Merge pull request `#36`_: Add support for nanoseconds and microseconds time units
+- Fixed :func:`~humanfriendly.tables.format_rst_table()` omission from
+  ``humanfriendly.tables.__all__``.
+- Start testing on Python 3.8 and 3.9-dev.
+
+.. _Release 7.0: https://github.com/xolox/python-humanfriendly/compare/6.1...7.0
+.. _#24: https://github.com/xolox/python-humanfriendly/pull/24
+.. _#32: https://github.com/xolox/python-humanfriendly/pull/32
+.. _#33: https://github.com/xolox/python-humanfriendly/pull/33
+.. _#35: https://github.com/xolox/python-humanfriendly/pull/35
+.. _#36: https://github.com/xolox/python-humanfriendly/pull/36
+
 `Release 6.1`_ (2020-02-10)
 ---------------------------
 
@@ -170,7 +193,7 @@ definitions are so conveniently given in the documentation of the
 `Release 4.15`_ (2018-07-14)
 ----------------------------
 
-Added the :func:`humanfriendly.terminal.ansi_to_html()` function which is a
+Added the :func:`humanfriendly.terminal.html_to_ansi()` function which is a
 shortcut for the :class:`humanfriendly.terminal.HTMLConverter` class that's
 based on ``html.parser.HTMLParser``.
 
@@ -434,7 +457,7 @@ Promote the command line testing function to the public API.
 
 - Added the :func:`humanfriendly.text.random_string()` function.
 - Added the :mod:`humanfriendly.testing` module with unittest helpers.
-- Define :data:`humanfriendly.text.__all__`.
+- Define ``humanfriendly.text.__all__``.
 
 .. _Release 3.3: https://github.com/xolox/python-humanfriendly/compare/3.2...3.3
 
