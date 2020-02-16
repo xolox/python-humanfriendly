@@ -354,8 +354,8 @@ def clean_terminal_output(text):
       contain only the closing end of the ANSI escape sequence pair. Tracking
       this kind of complexity requires a state machine and proper parsing.
 
-    .. _capturer: https://pypi.python.org/pypi/capturer
-    .. _coloredlogs: https://pypi.python.org/pypi/coloredlogs
+    .. _capturer: https://pypi.org/project/capturer
+    .. _coloredlogs: https://pypi.org/project/coloredlogs
     """
     cleaned_lines = []
     current_line = ''

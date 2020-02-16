@@ -39,7 +39,7 @@ code that is compatible with Python 2 and Python 3.
 
    Alias for :func:`python3:time.monotonic()` (in Python 3.3 and higher) or
    `monotonic.monotonic()` (a `conditional dependency
-   <https://pypi.python.org/pypi/monotonic/>`_ on older Python versions).
+   <https://pypi.org/project/monotonic/>`_ on older Python versions).
 """
 
 __all__ = (
@@ -90,7 +90,7 @@ try:
     from time import monotonic
 except ImportError:
     # A replacement for older Python versions:
-    # https://pypi.python.org/pypi/monotonic/
+    # https://pypi.org/project/monotonic/
     try:
         from monotonic import monotonic
     except (ImportError, RuntimeError):

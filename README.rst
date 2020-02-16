@@ -148,5 +148,5 @@ This software is licensed under the `MIT license`_.
 .. _MIT license: https://en.wikipedia.org/wiki/MIT_License
 .. _parse_size(): https://humanfriendly.readthedocs.io/en/latest/#humanfriendly.parse_size
 .. _peter@peterodding.com: peter@peterodding.com
-.. _PyPI: https://pypi.python.org/pypi/humanfriendly
+.. _PyPI: https://pypi.org/project/humanfriendly
 .. _Read the Docs: https://humanfriendly.readthedocs.io
