@@ -52,6 +52,7 @@ __all__ = (
     'is_unicode',
     'monotonic',
     'name2codepoint',
+    'on_windows',
     'unichr',
     'unicode',
     # This export remains here so as not to break my dozen or so other Python
@@ -61,6 +62,7 @@ __all__ = (
 )
 
 # Standard library modules.
+import sys
 import unittest
 
 # Differences between Python 2 and 3.
@@ -125,3 +127,12 @@ def is_unicode(value):
     :returns: :data:`True` if the value is a Unicode string, :data:`False` otherwise.
     """
     return isinstance(value, unicode)
+
+
+def on_windows():
+    """
+    Check if we're running on the Microsoft Windows OS.
+
+    :returns: :data:`True` if running Windows, :data:`False` otherwise.
+    """
+    return sys.platform.startswith('win')

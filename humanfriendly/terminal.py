@@ -21,6 +21,7 @@ import codecs
 import distutils.spawn
 import numbers
 import os
+import platform
 import re
 import subprocess
 import sys
@@ -39,7 +40,8 @@ except ImportError:
 # Modules included in our package. We import find_meta_variables() here to
 # preserve backwards compatibility with older versions of humanfriendly where
 # that function was defined in this module.
-from humanfriendly.compat import HTMLParser, StringIO, coerce_string, name2codepoint, is_unicode, unichr
+from humanfriendly.compat import HTMLParser, StringIO, coerce_string, name2codepoint, on_windows, is_unicode, unichr
+from humanfriendly.decorators import cached
 from humanfriendly.text import compact_empty_lines, concatenate, format
 from humanfriendly.usage import find_meta_variables, format_usage  # NOQA
 
@@ -64,10 +66,12 @@ __all__ = (
     'auto_encode',
     'clean_terminal_output',
     'connected_to_terminal',
+    'enable_ansi_support',
     'find_terminal_size',
     'find_terminal_size_using_ioctl',
     'find_terminal_size_using_stty',
     'get_pager_command',
+    'have_windows_native_ansi_support',
     'html_to_ansi',
     'message',
     'output',
@@ -404,6 +408,58 @@ def connected_to_terminal(stream=None):
         return False
 
 
+@cached
+def enable_ansi_support():
+    """
+    Try to enable support for ANSI escape sequences (required on Windows).
+
+    :returns: :data:`True` if ANSI is supported, :data:`False` otherwise.
+
+    This functions checks for the following supported configurations, in the
+    given order:
+
+    1. On Windows, if :func:`have_windows_native_ansi_support()` confirms
+       native support for ANSI escape sequences :mod:`ctypes` will be used to
+       enable this support.
+
+    2. On Windows, if the environment variable ``$ANSICON`` is set nothing is
+       done because it is assumed that support for ANSI escape sequences has
+       already been enabled via `ansicon <https://github.com/adoxa/ansicon>`_.
+
+    3. On Windows, an attempt is made to import and initialize the Python
+       package :pypi:`colorama` instead (of course for this to work
+       :pypi:`colorama` has to be installed).
+
+    4. On other platforms this function calls :func:`connected_to_terminal()`
+       to determine whether ANSI escape sequences are supported (that is to
+       say all platforms that are not Windows are assumed to support ANSI
+       escape sequences natively, without weird contortions like above).
+
+       This makes it possible to call :func:`enable_ansi_support()`
+       unconditionally without checking the current platform.
+
+    The :func:`~humanfriendly.decorators.cached` decorator is used to ensure
+    that this function is only executed once, but its return value remains
+    available on later calls.
+    """
+    if have_windows_native_ansi_support():
+        import ctypes
+        ctypes.windll.kernel32.SetConsoleMode(ctypes.windll.kernel32.GetStdHandle(-11), 7)
+        ctypes.windll.kernel32.SetConsoleMode(ctypes.windll.kernel32.GetStdHandle(-12), 7)
+        return True
+    elif on_windows():
+        if 'ANSICON' in os.environ:
+            return True
+        try:
+            import colorama
+            colorama.init()
+            return True
+        except ImportError:
+            return False
+    else:
+        return connected_to_terminal()
+
+
 def find_terminal_size():
     """
     Determine the number of lines and columns visible in the terminal.
@@ -529,6 +585,30 @@ def get_pager_command(text=None):
     return command_line
 
 
+@cached
+def have_windows_native_ansi_support():
+    """
+    Check if we're running on a Windows 10 release with native support for ANSI escape sequences.
+
+    :returns: :data:`True` if so, :data:`False` otherwise.
+
+    The :func:`~humanfriendly.decorators.cached` decorator is used as a minor
+    performance optimization. Semantically this should have zero impact because
+    the answer doesn't change in the lifetime of a computer process.
+    """
+    if on_windows():
+        try:
+            # I can't be 100% sure this will never break and I'm not in a
+            # position to test it thoroughly either, so I decided that paying
+            # the price of one additional try / except statement is worth the
+            # additional peace of mind :-).
+            components = tuple(int(c) for c in platform.version().split('.'))
+            return components >= (10, 0, 14393)
+        except Exception:
+            pass
+    return False
+
+
 def html_to_ansi(data, callback=None):
     """
     Convert HTML with simple text formatting to text with ANSI escape sequences.
@@ -635,13 +715,19 @@ def terminal_supports_colors(stream=None):
     :returns: :data:`True` if the terminal supports ANSI escape sequences,
               :data:`False` otherwise.
 
-    This function is inspired by the implementation of
+    This function was originally inspired by the implementation of
     `django.core.management.color.supports_color()
-    <https://github.com/django/django/blob/master/django/core/management/color.py>`_.
+    <https://github.com/django/django/blob/master/django/core/management/color.py>`_
+    but has since evolved significantly.
     """
-    return (sys.platform != 'Pocket PC' and
-            (sys.platform != 'win32' or 'ANSICON' in os.environ) and
-            connected_to_terminal(stream))
+    if on_windows():
+        # On Windows support for ANSI escape sequences is not a given.
+        have_ansicon = 'ANSICON' in os.environ
+        have_colorama = 'colorama' in sys.modules
+        have_native_support = have_windows_native_ansi_support()
+        if not (have_ansicon or have_colorama or have_native_support):
+            return False
+    return connected_to_terminal(stream)
 
 
 def usage(usage_text):

@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: February 9, 2020
+# Last Change: February 16, 2020
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -102,6 +102,7 @@ from humanfriendly.terminal import (
     HIGHLIGHT_COLOR,
     ansi_strip,
     ansi_wrap,
+    enable_ansi_support,
     find_terminal_size,
     output,
     usage,
@@ -126,6 +127,7 @@ __all__ = (
 
 def main():
     """Command line interface for the ``humanfriendly`` program."""
+    enable_ansi_support()
     try:
         options, arguments = getopt.getopt(sys.argv[1:], 'cd:l:n:s:bt:h', [
             'run-command', 'format-table', 'delimiter=', 'format-length=',
