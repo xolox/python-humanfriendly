@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: February 6, 2020
+# Last Change: February 16, 2020
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -42,6 +42,7 @@ from humanfriendly.terminal import (
 __all__ = (
     'format_pretty_table',
     'format_robust_table',
+    'format_rst_table',
     'format_smart_table',
 )
 
