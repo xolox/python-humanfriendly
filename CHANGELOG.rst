@@ -3,7 +3,7 @@ Changelog
 
 The purpose of this document is to list all of the notable changes to this
 project. The format was inspired by (but doesn't strictly adhere to) `Keep a
-Changelog`_ . This project adheres to `semantic versioning`_.
+Changelog`_. This project adheres to `semantic versioning`_.
 
 .. contents::
    :local:
