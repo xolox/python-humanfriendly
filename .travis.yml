@@ -1,14 +1,16 @@
 language: python
+cache: pip
 matrix:
   include:
+  - os: osx
+    language: generic
+  - python: pypy
   - python: 2.7
   - python: 3.5
   - python: 3.6
   - python: 3.7
-    dist: xenial
-  - python: pypy
-  - os: osx
-    language: generic
+  - python: 3.8
+  - python: 3.9-dev
 install:
   - scripts/travis.sh pip install --upgrade setuptools
   - scripts/travis.sh pip install --upgrade --requirement=requirements-travis.txt
