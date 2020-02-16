@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: July 14, 2018
+# Last Change: February 16, 2020
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -54,8 +54,16 @@ __all__ = (
     'name2codepoint',
     'unichr',
     'unicode',
+    # This export remains here so as not to break my dozen or so other Python
+    # projects using 'from humanfriendly.compat import unittest' from good old
+    # times (when Python 2.6 was still a thing). It will eventually be removed.
+    'unittest',
 )
 
+# Standard library modules.
+import unittest
+
+# Differences between Python 2 and 3.
 try:
     # Python 2.
     unicode = unicode
