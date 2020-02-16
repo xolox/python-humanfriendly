@@ -101,7 +101,7 @@ def coerce_string(value):
 
 def is_string(value):
     """
-    Check if a value is a :func:`python2:basestring` (in Python 2) or :class:`python2:str` (in Python 3) object.
+    Check if a value is a :func:`python2:basestring` (in Python 2) or :class:`python3:str` (in Python 3) object.
 
     :param value: The value to check.
     :returns: :data:`True` if the value is a string, :data:`False` otherwise.
