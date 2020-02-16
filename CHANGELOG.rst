@@ -11,6 +11,34 @@ Changelog`_. This project adheres to `semantic versioning`_.
 .. _Keep a Changelog: http://keepachangelog.com/
 .. _semantic versioning: http://semver.org/
 
+`Release 7.1`_ (2020-02-16)
+---------------------------
+
+**Enhancements:**
+
+- Enable Windows native support for ANSI escape sequences. This was brought to
+  my attention in `coloredlogs issue #71`_ and `coloredlogs pull request #72`_.
+  My experiences with ANSI escape sequences started out as part of the
+  :pypi:`coloredlogs` package but eventually I moved the support for ANSI
+  escape sequences to the :pypi:`humanfriendly` package. This explains how it
+  now makes sense to integrate the Windows native ANSI escape sequence support
+  in :pypi:`humanfriendly` as well.
+
+**Bug fixes:**
+
+- Accept pluralized disk size units (`#26`_). I'm not claiming this is a full
+  solution to the problem, far from it. It does lessen the pain a bit (IMHO).
+
+- Make sure the selected pager is available before trying to run it. While
+  testing :pypi:`humanfriendly` on Windows 10 I noticed that ``humanfriendly
+  --help`` resulted in nothing but a traceback, because :man:`less` wasn't
+  available. That's not human friendly at all 😕 (even if it is Windows 😈).
+
+.. _Release 7.1: https://github.com/xolox/python-humanfriendly/compare/7.0...7.1
+.. _coloredlogs issue #71: https://github.com/xolox/python-coloredlogs/issues/71
+.. _coloredlogs pull request #72: https://github.com/xolox/python-coloredlogs/pull/72
+.. _#26: https://github.com/xolox/python-humanfriendly/issues/26
+
 `Release 7.0`_ (2020-02-16)
 ---------------------------
 
