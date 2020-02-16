@@ -18,6 +18,7 @@ escape sequences work.
 
 # Standard library modules.
 import codecs
+import distutils.spawn
 import numbers
 import os
 import re
@@ -614,13 +615,15 @@ def show_pager(formatted_text, encoding=DEFAULT_ENCODING):
     that's used to invoke the pager.
     """
     if connected_to_terminal():
+        # Make sure the selected pager command is available.
         command_line = get_pager_command(formatted_text)
-        pager = subprocess.Popen(command_line, stdin=subprocess.PIPE)
-        if is_unicode(formatted_text):
-            formatted_text = formatted_text.encode(encoding)
-        pager.communicate(input=formatted_text)
-    else:
-        output(formatted_text)
+        if distutils.spawn.find_executable(command_line[0]):
+            pager = subprocess.Popen(command_line, stdin=subprocess.PIPE)
+            if is_unicode(formatted_text):
+                formatted_text = formatted_text.encode(encoding)
+            pager.communicate(input=formatted_text)
+            return
+    output(formatted_text)
 
 
 def terminal_supports_colors(stream=None):
