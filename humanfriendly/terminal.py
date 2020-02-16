@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: February 9, 2020
+# Last Change: February 16, 2020
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -130,80 +130,6 @@ message of the ``humanfriendly`` program). If the environment variable
 ``$HUMANFRIENDLY_HIGHLIGHT_COLOR`` is set it determines the value of
 :data:`HIGHLIGHT_COLOR`.
 """
-
-
-def output(text, *args, **kw):
-    """
-    Print a formatted message to the standard output stream.
-
-    For details about argument handling please refer to
-    :func:`~humanfriendly.text.format()`.
-
-    Renders the message using :func:`~humanfriendly.text.format()` and writes
-    the resulting string (followed by a newline) to :data:`sys.stdout` using
-    :func:`auto_encode()`.
-    """
-    auto_encode(sys.stdout, coerce_string(text) + '\n', *args, **kw)
-
-
-def message(text, *args, **kw):
-    """
-    Print a formatted message to the standard error stream.
-
-    For details about argument handling please refer to
-    :func:`~humanfriendly.text.format()`.
-
-    Renders the message using :func:`~humanfriendly.text.format()` and writes
-    the resulting string (followed by a newline) to :data:`sys.stderr` using
-    :func:`auto_encode()`.
-    """
-    auto_encode(sys.stderr, coerce_string(text) + '\n', *args, **kw)
-
-
-def warning(text, *args, **kw):
-    """
-    Show a warning message on the terminal.
-
-    For details about argument handling please refer to
-    :func:`~humanfriendly.text.format()`.
-
-    Renders the message using :func:`~humanfriendly.text.format()` and writes
-    the resulting string (followed by a newline) to :data:`sys.stderr` using
-    :func:`auto_encode()`.
-
-    If :data:`sys.stderr` is connected to a terminal that supports colors,
-    :func:`ansi_wrap()` is used to color the message in a red font (to make
-    the warning stand out from surrounding text).
-    """
-    text = coerce_string(text)
-    if terminal_supports_colors(sys.stderr):
-        text = ansi_wrap(text, color='red')
-    auto_encode(sys.stderr, text + '\n', *args, **kw)
-
-
-def auto_encode(stream, text, *args, **kw):
-    """
-    Reliably write Unicode strings to the terminal.
-
-    :param stream: The file-like object to write to (a value like
-                   :data:`sys.stdout` or :data:`sys.stderr`).
-    :param text: The text to write to the stream (a string).
-    :param args: Refer to :func:`~humanfriendly.text.format()`.
-    :param kw: Refer to :func:`~humanfriendly.text.format()`.
-
-    Renders the text using :func:`~humanfriendly.text.format()` and writes it
-    to the given stream. If an :exc:`~exceptions.UnicodeEncodeError` is
-    encountered in doing so, the text is encoded using :data:`DEFAULT_ENCODING`
-    and the write is retried. The reasoning behind this rather blunt approach
-    is that it's preferable to get output on the command line in the wrong
-    encoding then to have the Python program blow up with a
-    :exc:`~exceptions.UnicodeEncodeError` exception.
-    """
-    text = format(text, *args, **kw)
-    try:
-        stream.write(text)
-    except UnicodeEncodeError:
-        stream.write(codecs.encode(text, DEFAULT_ENCODING))
 
 
 def ansi_strip(text, readline_hints=True):
@@ -360,26 +286,29 @@ def ansi_wrap(text, **kw):
         return text
 
 
-def readline_wrap(expr):
+def auto_encode(stream, text, *args, **kw):
     """
-    Wrap an ANSI escape sequence in `readline hints`_.
+    Reliably write Unicode strings to the terminal.
 
-    :param text: The text with the escape sequence to wrap (a string).
-    :returns: The wrapped text.
+    :param stream: The file-like object to write to (a value like
+                   :data:`sys.stdout` or :data:`sys.stderr`).
+    :param text: The text to write to the stream (a string).
+    :param args: Refer to :func:`~humanfriendly.text.format()`.
+    :param kw: Refer to :func:`~humanfriendly.text.format()`.
 
-    .. _readline hints: http://superuser.com/a/301355
+    Renders the text using :func:`~humanfriendly.text.format()` and writes it
+    to the given stream. If an :exc:`~exceptions.UnicodeEncodeError` is
+    encountered in doing so, the text is encoded using :data:`DEFAULT_ENCODING`
+    and the write is retried. The reasoning behind this rather blunt approach
+    is that it's preferable to get output on the command line in the wrong
+    encoding then to have the Python program blow up with a
+    :exc:`~exceptions.UnicodeEncodeError` exception.
     """
-    return '\001' + expr + '\002'
-
-
-def readline_strip(expr):
-    """
-    Remove `readline hints`_ from a string.
-
-    :param text: The text to strip (a string).
-    :returns: The stripped text.
-    """
-    return expr.replace('\001', '').replace('\002', '')
+    text = format(text, *args, **kw)
+    try:
+        stream.write(text)
+    except UnicodeEncodeError:
+        stream.write(codecs.encode(text, DEFAULT_ENCODING))
 
 
 def clean_terminal_output(text):
@@ -474,40 +403,6 @@ def connected_to_terminal(stream=None):
         return False
 
 
-def html_to_ansi(data, callback=None):
-    """
-    Convert HTML with simple text formatting to text with ANSI escape sequences.
-
-    :param data: The HTML to convert (a string).
-    :param callback: Optional callback to pass to :class:`HTMLConverter`.
-    :returns: Text with ANSI escape sequences (a string).
-
-    Please refer to the documentation of the :class:`HTMLConverter` class for
-    details about the conversion process (like which tags are supported) and an
-    example with a screenshot.
-    """
-    converter = HTMLConverter(callback=callback)
-    return converter(data)
-
-
-def terminal_supports_colors(stream=None):
-    """
-    Check if a stream is connected to a terminal that supports ANSI escape sequences.
-
-    :param stream: The stream to check (a file-like object,
-                   defaults to :data:`sys.stdout`).
-    :returns: :data:`True` if the terminal supports ANSI escape sequences,
-              :data:`False` otherwise.
-
-    This function is inspired by the implementation of
-    `django.core.management.color.supports_color()
-    <https://github.com/django/django/blob/master/django/core/management/color.py>`_.
-    """
-    return (sys.platform != 'Pocket PC' and
-            (sys.platform != 'win32' or 'ANSICON' in os.environ) and
-            connected_to_terminal(stream))
-
-
 def find_terminal_size():
     """
     Determine the number of lines and columns visible in the terminal.
@@ -593,53 +488,6 @@ def find_terminal_size_using_stty():
     return tuple(map(int, tokens))
 
 
-def usage(usage_text):
-    """
-    Print a human friendly usage message to the terminal.
-
-    :param text: The usage message to print (a string).
-
-    This function does two things:
-
-    1. If :data:`sys.stdout` is connected to a terminal (see
-       :func:`connected_to_terminal()`) then the usage message is formatted
-       using :func:`.format_usage()`.
-    2. The usage message is shown using a pager (see :func:`show_pager()`).
-    """
-    if terminal_supports_colors(sys.stdout):
-        usage_text = format_usage(usage_text)
-    show_pager(usage_text)
-
-
-def show_pager(formatted_text, encoding=DEFAULT_ENCODING):
-    """
-    Print a large text to the terminal using a pager.
-
-    :param formatted_text: The text to print to the terminal (a string).
-    :param encoding: The name of the text encoding used to encode the formatted
-                     text if the formatted text is a Unicode string (a string,
-                     defaults to :data:`DEFAULT_ENCODING`).
-
-    When :func:`connected_to_terminal()` returns :data:`True` a pager is used
-    to show the text on the terminal, otherwise the text is printed directly
-    without invoking a pager.
-
-    The use of a pager helps to avoid the wall of text effect where the user
-    has to scroll up to see where the output began (not very user friendly).
-
-    Refer to :func:`get_pager_command()` for details about the command line
-    that's used to invoke the pager.
-    """
-    if connected_to_terminal():
-        command_line = get_pager_command(formatted_text)
-        pager = subprocess.Popen(command_line, stdin=subprocess.PIPE)
-        if is_unicode(formatted_text):
-            formatted_text = formatted_text.encode(encoding)
-        pager.communicate(input=formatted_text)
-    else:
-        output(formatted_text)
-
-
 def get_pager_command(text=None):
     """
     Get the command to show a text on the terminal using a pager.
@@ -678,6 +526,158 @@ def get_pager_command(text=None):
         command_line.append('--no-init')
         command_line.append('--quit-if-one-screen')
     return command_line
+
+
+def html_to_ansi(data, callback=None):
+    """
+    Convert HTML with simple text formatting to text with ANSI escape sequences.
+
+    :param data: The HTML to convert (a string).
+    :param callback: Optional callback to pass to :class:`HTMLConverter`.
+    :returns: Text with ANSI escape sequences (a string).
+
+    Please refer to the documentation of the :class:`HTMLConverter` class for
+    details about the conversion process (like which tags are supported) and an
+    example with a screenshot.
+    """
+    converter = HTMLConverter(callback=callback)
+    return converter(data)
+
+
+def message(text, *args, **kw):
+    """
+    Print a formatted message to the standard error stream.
+
+    For details about argument handling please refer to
+    :func:`~humanfriendly.text.format()`.
+
+    Renders the message using :func:`~humanfriendly.text.format()` and writes
+    the resulting string (followed by a newline) to :data:`sys.stderr` using
+    :func:`auto_encode()`.
+    """
+    auto_encode(sys.stderr, coerce_string(text) + '\n', *args, **kw)
+
+
+def output(text, *args, **kw):
+    """
+    Print a formatted message to the standard output stream.
+
+    For details about argument handling please refer to
+    :func:`~humanfriendly.text.format()`.
+
+    Renders the message using :func:`~humanfriendly.text.format()` and writes
+    the resulting string (followed by a newline) to :data:`sys.stdout` using
+    :func:`auto_encode()`.
+    """
+    auto_encode(sys.stdout, coerce_string(text) + '\n', *args, **kw)
+
+
+def readline_strip(expr):
+    """
+    Remove `readline hints`_ from a string.
+
+    :param text: The text to strip (a string).
+    :returns: The stripped text.
+    """
+    return expr.replace('\001', '').replace('\002', '')
+
+
+def readline_wrap(expr):
+    """
+    Wrap an ANSI escape sequence in `readline hints`_.
+
+    :param text: The text with the escape sequence to wrap (a string).
+    :returns: The wrapped text.
+
+    .. _readline hints: http://superuser.com/a/301355
+    """
+    return '\001' + expr + '\002'
+
+
+def show_pager(formatted_text, encoding=DEFAULT_ENCODING):
+    """
+    Print a large text to the terminal using a pager.
+
+    :param formatted_text: The text to print to the terminal (a string).
+    :param encoding: The name of the text encoding used to encode the formatted
+                     text if the formatted text is a Unicode string (a string,
+                     defaults to :data:`DEFAULT_ENCODING`).
+
+    When :func:`connected_to_terminal()` returns :data:`True` a pager is used
+    to show the text on the terminal, otherwise the text is printed directly
+    without invoking a pager.
+
+    The use of a pager helps to avoid the wall of text effect where the user
+    has to scroll up to see where the output began (not very user friendly).
+
+    Refer to :func:`get_pager_command()` for details about the command line
+    that's used to invoke the pager.
+    """
+    if connected_to_terminal():
+        command_line = get_pager_command(formatted_text)
+        pager = subprocess.Popen(command_line, stdin=subprocess.PIPE)
+        if is_unicode(formatted_text):
+            formatted_text = formatted_text.encode(encoding)
+        pager.communicate(input=formatted_text)
+    else:
+        output(formatted_text)
+
+
+def terminal_supports_colors(stream=None):
+    """
+    Check if a stream is connected to a terminal that supports ANSI escape sequences.
+
+    :param stream: The stream to check (a file-like object,
+                   defaults to :data:`sys.stdout`).
+    :returns: :data:`True` if the terminal supports ANSI escape sequences,
+              :data:`False` otherwise.
+
+    This function is inspired by the implementation of
+    `django.core.management.color.supports_color()
+    <https://github.com/django/django/blob/master/django/core/management/color.py>`_.
+    """
+    return (sys.platform != 'Pocket PC' and
+            (sys.platform != 'win32' or 'ANSICON' in os.environ) and
+            connected_to_terminal(stream))
+
+
+def usage(usage_text):
+    """
+    Print a human friendly usage message to the terminal.
+
+    :param text: The usage message to print (a string).
+
+    This function does two things:
+
+    1. If :data:`sys.stdout` is connected to a terminal (see
+       :func:`connected_to_terminal()`) then the usage message is formatted
+       using :func:`.format_usage()`.
+    2. The usage message is shown using a pager (see :func:`show_pager()`).
+    """
+    if terminal_supports_colors(sys.stdout):
+        usage_text = format_usage(usage_text)
+    show_pager(usage_text)
+
+
+def warning(text, *args, **kw):
+    """
+    Show a warning message on the terminal.
+
+    For details about argument handling please refer to
+    :func:`~humanfriendly.text.format()`.
+
+    Renders the message using :func:`~humanfriendly.text.format()` and writes
+    the resulting string (followed by a newline) to :data:`sys.stderr` using
+    :func:`auto_encode()`.
+
+    If :data:`sys.stderr` is connected to a terminal that supports colors,
+    :func:`ansi_wrap()` is used to color the message in a red font (to make
+    the warning stand out from surrounding text).
+    """
+    text = coerce_string(text)
+    if terminal_supports_colors(sys.stderr):
+        text = ansi_wrap(text, color='red')
+    auto_encode(sys.stderr, text + '\n', *args, **kw)
 
 
 class HTMLConverter(HTMLParser):
