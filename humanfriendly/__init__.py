@@ -292,6 +292,9 @@ def parse_size(size, binary=False):
             return int(tokens[0])
         # Otherwise we expect two tokens: A number and a unit.
         if normalized_unit:
+            # Convert plural units to singular units, for details:
+            # https://github.com/xolox/python-humanfriendly/issues/26
+            normalized_unit = normalized_unit.rstrip('s')
             for unit in disk_size_units:
                 # First we check for unambiguous symbols (KiB, MiB, GiB, etc)
                 # and names (kibibyte, mebibyte, gibibyte, etc) because their
