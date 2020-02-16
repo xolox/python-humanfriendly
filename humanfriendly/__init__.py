@@ -130,7 +130,9 @@ length_size_units = (dict(prefix='nm', divider=1e-09, singular='nm', plural='nm'
                      dict(prefix='km', divider=1000, singular='km', plural='km'))
 
 # Common time units, used for formatting of time spans.
-time_units = (dict(divider=1e-3, singular='millisecond', plural='milliseconds', abbreviations=['ms']),
+time_units = (dict(divider=1e-9, singular='nanosecond', plural='nanoseconds', abbreviations=['ns']),
+              dict(divider=1e-6, singular='microsecond', plural='microseconds', abbreviations=['us']),
+              dict(divider=1e-3, singular='millisecond', plural='milliseconds', abbreviations=['ms']),
               dict(divider=1, singular='second', plural='seconds', abbreviations=['s', 'sec', 'secs']),
               dict(divider=60, singular='minute', plural='minutes', abbreviations=['m', 'min', 'mins']),
               dict(divider=60 * 60, singular='hour', plural='hours', abbreviations=['h']),
@@ -481,7 +483,7 @@ def format_timespan(num_seconds, detailed=False, max_units=3):
         # Slow path.
         result = []
         num_seconds = decimal.Decimal(str(num_seconds))
-        relevant_units = list(reversed(time_units[0 if detailed else 1:]))
+        relevant_units = list(reversed(time_units[0 if detailed else 3:]))
         for unit in relevant_units:
             # Extract the unit count from the remaining time.
             divider = decimal.Decimal(str(unit['divider']))
