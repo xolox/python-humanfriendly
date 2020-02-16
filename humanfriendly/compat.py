@@ -54,7 +54,6 @@ __all__ = (
     'name2codepoint',
     'unichr',
     'unicode',
-    'unittest',
 )
 
 try:
@@ -88,14 +87,6 @@ except ImportError:
         # We fall back to the old behavior of using time.time() instead of
         # failing when {time,monotonic}.monotonic() are both missing.
         from time import time as monotonic
-
-try:
-    # A replacement for Python 2.6:
-    # https://pypi.python.org/pypi/unittest2/
-    import unittest2 as unittest
-except ImportError:
-    # The standard library module (on other Python versions).
-    import unittest
 
 
 def coerce_string(value):
