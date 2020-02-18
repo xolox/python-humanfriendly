@@ -11,6 +11,54 @@ Changelog`_. This project adheres to `semantic versioning`_.
 .. _Keep a Changelog: http://keepachangelog.com/
 .. _semantic versioning: http://semver.org/
 
+`Release 7.1.1`_ (2020-02-18)
+-----------------------------
+
+Fix Python 3 incompatibility (``distutils.spawn``).
+
+Much to my dismay this morning I ran into the following traceback on a Python
+3.6 installation that is based on native Ubuntu (Debian) packages::
+
+  Traceback (most recent call last):
+    File "...", line 1, in <module>
+      from coloredlogs.syslog import enable_system_logging
+    File ".../coloredlogs/__init__.py", line 138, in <module>
+      from humanfriendly import coerce_boolean
+    File ".../humanfriendly/__init__.py", line 25, in <module>
+      from humanfriendly.tables import format_pretty_table as format_table
+    File ".../humanfriendly/tables.py", line 32, in <module>
+      from humanfriendly.terminal import (
+    File ".../humanfriendly/terminal.py", line 26, in <module>
+      import distutils.spawn
+  ModuleNotFoundError: No module named 'distutils.spawn'
+
+To enable local development and testing against lots of Python releases I use
+deadsnakes_ to install Python 2.7, 3.4, 3.5, 3.6, 3.7 and 3.8 at the same time.
+Before committing 335a69bae5_ I did check the availability of the
+``distutils.spawn`` module against my locally installed interpreters:
+
+.. code-block:: console
+
+   $ ls -l /usr/lib/python*/distutils/spawn.py
+   -rw-r--r-- 1 root root 8.5K Nov  7 11:07 /usr/lib/python2.7/distutils/spawn.py
+   -rw-r--r-- 1 root root 7.4K Mar 29  2019 /usr/lib/python3.4/distutils/spawn.py
+   -rw-r--r-- 1 root root 7.3K Nov 24 02:35 /usr/lib/python3.5/distutils/spawn.py
+   -rw-r--r-- 1 root root 7.3K Oct 28 17:30 /usr/lib/python3.6/distutils/spawn.py
+   -rw-r--r-- 1 root root 7.7K Oct 28 17:30 /usr/lib/python3.7/distutils/spawn.py
+   -rw-r--r-- 1 root root 7.7K Oct 28 17:30 /usr/lib/python3.8/distutils/spawn.py
+
+I took this to mean it would be available on all these versions. Furthermore
+the tests on Travis CI passed as well. I think this is because deadsnakes_ as
+well as Travis CI are closer to upstream (the official Python releases) whereas
+Debian and Ubuntu make significant customizations...
+
+In any case this new commit should fix the issue by using
+:func:`shutil.which()` on Python 3 instead.
+
+.. _Release 7.1.1: https://github.com/xolox/python-humanfriendly/compare/7.1...7.1.1
+.. _deadsnakes: https://launchpad.net/~deadsnakes/+archive/ubuntu/ppa
+.. _335a69bae5: https://github.com/xolox/python-humanfriendly/commit/335a69bae5
+
 `Release 7.1`_ (2020-02-16)
 ---------------------------
 
