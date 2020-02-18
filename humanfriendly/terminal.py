@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: February 16, 2020
+# Last Change: February 18, 2020
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -23,7 +23,6 @@ enhanced to recognize and support this. For details please refer to the
 
 # Standard library modules.
 import codecs
-import distutils.spawn
 import numbers
 import os
 import platform
@@ -45,7 +44,16 @@ except ImportError:
 # Modules included in our package. We import find_meta_variables() here to
 # preserve backwards compatibility with older versions of humanfriendly where
 # that function was defined in this module.
-from humanfriendly.compat import HTMLParser, StringIO, coerce_string, name2codepoint, on_windows, is_unicode, unichr
+from humanfriendly.compat import (
+    HTMLParser,
+    StringIO,
+    coerce_string,
+    is_unicode,
+    name2codepoint,
+    on_windows,
+    unichr,
+    which,
+)
 from humanfriendly.decorators import cached
 from humanfriendly.text import compact_empty_lines, concatenate, format
 from humanfriendly.usage import find_meta_variables, format_usage  # NOQA
@@ -702,7 +710,7 @@ def show_pager(formatted_text, encoding=DEFAULT_ENCODING):
     if connected_to_terminal():
         # Make sure the selected pager command is available.
         command_line = get_pager_command(formatted_text)
-        if distutils.spawn.find_executable(command_line[0]):
+        if which(command_line[0]):
             pager = subprocess.Popen(command_line, stdin=subprocess.PIPE)
             if is_unicode(formatted_text):
                 formatted_text = formatted_text.encode(encoding)

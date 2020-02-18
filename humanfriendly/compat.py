@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: February 16, 2020
+# Last Change: February 18, 2020
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -59,6 +59,7 @@ __all__ = (
     # projects using 'from humanfriendly.compat import unittest' from good old
     # times (when Python 2.6 was still a thing). It will eventually be removed.
     'unittest',
+    'which',
 )
 
 # Standard library modules.
@@ -72,6 +73,7 @@ try:
     unichr = unichr
     basestring = basestring
     interactive_prompt = raw_input
+    from distutils.spawn import find_executable as which
     from HTMLParser import HTMLParser
     from StringIO import StringIO
     from htmlentitydefs import name2codepoint
@@ -81,6 +83,7 @@ except (ImportError, NameError):
     unichr = chr
     basestring = str
     interactive_prompt = input
+    from shutil import which
     from html.parser import HTMLParser
     from io import StringIO
     from html.entities import name2codepoint
