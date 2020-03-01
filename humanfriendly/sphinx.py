@@ -1,17 +1,16 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: February 10, 2020
+# Last Change: March 1, 2020
 # URL: https://humanfriendly.readthedocs.io
 
 """
 Customizations for and integration with the Sphinx_ documentation generator.
 
-The :mod:`humanfriendly.sphinx` module uses the `Sphinx extension API`_
-to customize the process of generating Sphinx based Python documentation.
-The most relevant functions to take a look at for users of this module are
-:func:`setup()`, :func:`enable_man_role()`, :func:`enable_pypi_role()`,
-:func:`enable_special_methods()` and :func:`enable_usage_formatting()`.
+The :mod:`humanfriendly.sphinx` module uses the `Sphinx extension API`_ to
+customize the process of generating Sphinx based Python documentation. To
+explore the functionality this module offers its best to start reading
+from the :func:`setup()` function.
 
 .. _Sphinx: http://www.sphinx-doc.org/
 .. _Sphinx extension API: http://sphinx-doc.org/extdev/appapi.html
@@ -26,24 +25,91 @@ import docutils.nodes
 import docutils.utils
 
 # Modules included in our package.
+from humanfriendly.deprecation import get_aliases
+from humanfriendly.text import compact, dedent, format
 from humanfriendly.usage import USAGE_MARKER, render_usage
 
 # Public identifiers that require documentation.
 __all__ = (
-    'enable_man_role',
-    'enable_pypi_role',
-    'enable_special_methods',
-    'enable_usage_formatting',
-    'logger',
-    'man_role',
-    'pypi_role',
-    'setup',
-    'special_methods_callback',
-    'usage_message_callback',
+    "deprecation_note_callback",
+    "enable_deprecation_notes",
+    "enable_man_role",
+    "enable_pypi_role",
+    "enable_special_methods",
+    "enable_usage_formatting",
+    "logger",
+    "man_role",
+    "pypi_role",
+    "setup",
+    "special_methods_callback",
+    "usage_message_callback",
 )
 
 # Initialize a logger for this module.
 logger = logging.getLogger(__name__)
+
+
+def deprecation_note_callback(app, what, name, obj, options, lines):
+    """
+    Automatically document aliases defined using :func:`~humanfriendly.deprecation.define_aliases()`.
+
+    Refer to :func:`enable_deprecation_notes()` to enable the use of this
+    function (you probably don't want to call :func:`deprecation_note_callback()`
+    directly).
+
+    This function implements a callback for ``autodoc-process-docstring`` that
+    reformats module docstrings to append an overview of aliases defined by the
+    module.
+
+    The parameters expected by this function are those defined for Sphinx event
+    callback functions (i.e. I'm not going to document them here :-).
+    """
+    if isinstance(obj, types.ModuleType) and lines:
+        aliases = get_aliases(obj.__name__)
+        if aliases:
+            # Convert the existing docstring to a string and remove leading
+            # indentation from that string, otherwise our generated content
+            # would have to match the existing indentation in order not to
+            # break docstring parsing (because indentation is significant
+            # in the reStructuredText format).
+            blocks = [dedent("\n".join(lines))]
+            # Use an admonition to group the deprecated aliases together and
+            # to distinguish them from the autodoc entries that follow.
+            blocks.append(".. note:: Deprecated names")
+            indent = " " * 3
+            if len(aliases) == 1:
+                explanation = """
+                    The following alias exists to preserve backwards compatibility,
+                    however a :exc:`~exceptions.DeprecationWarning` is triggered
+                    when it is accessed, because this alias will be removed
+                    in a future release.
+                """
+            else:
+                explanation = """
+                    The following aliases exist to preserve backwards compatibility,
+                    however a :exc:`~exceptions.DeprecationWarning` is triggered
+                    when they are accessed, because these aliases will be
+                    removed in a future release.
+                """
+            blocks.append(indent + compact(explanation))
+            for name, target in aliases.items():
+                blocks.append(format("%s.. data:: %s", indent, name))
+                blocks.append(format("%sAlias for :obj:`%s`.", indent * 2, target))
+            update_lines(lines, "\n\n".join(blocks))
+
+
+def enable_deprecation_notes(app):
+    """
+    Enable documenting backwards compatibility aliases using the autodoc_ extension.
+
+    :param app: The Sphinx application object.
+
+    This function connects the :func:`deprecation_note_callback()` function to
+    ``autodoc-process-docstring`` events.
+
+    .. _autodoc: http://www.sphinx-doc.org/en/stable/ext/autodoc.html
+    """
+    app.connect("autodoc-process-docstring", deprecation_note_callback)
 
 
 def enable_man_role(app):
@@ -169,6 +235,7 @@ def setup(app):
     module and call its :func:`setup()` function. This function will then call
     the following:
 
+    - :func:`enable_deprecation_notes()`
     - :func:`enable_man_role()`
     - :func:`enable_pypi_role()`
     - :func:`enable_special_methods()`
@@ -178,6 +245,7 @@ def setup(app):
     like that idea you may be better of calling the individual functions from
     your own ``setup()`` function.
     """
+    enable_deprecation_notes(app)
     enable_man_role(app)
     enable_pypi_role(app)
     enable_special_methods(app)
@@ -209,6 +277,13 @@ def special_methods_callback(app, what, name, obj, skip, options):
         return skip
 
 
+def update_lines(lines, text):
+    """Private helper for ``autodoc-process-docstring`` callbacks."""
+    while lines:
+        lines.pop()
+    lines.extend(text.splitlines())
+
+
 def usage_message_callback(app, what, name, obj, options, lines):
     """
     Reformat human friendly usage messages to reStructuredText_.
@@ -232,8 +307,5 @@ def usage_message_callback(app, what, name, obj, options, lines):
         if lines[0].startswith(USAGE_MARKER):
             # Convert the usage message to reStructuredText.
             text = render_usage("\n".join(lines))
-            # Clear the existing line buffer.
-            while lines:
-                lines.pop()
             # Fill up the buffer with our modified docstring.
-            lines.extend(text.splitlines())
+            update_lines(lines, text)

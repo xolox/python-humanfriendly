@@ -18,6 +18,8 @@ import re
 import subprocess
 import sys
 import time
+import types
+import warnings
 
 # Modules included in our package.
 import humanfriendly
@@ -26,6 +28,7 @@ from humanfriendly import coerce_pattern, compact, dedent, trim_empty_lines
 from humanfriendly.cli import main
 from humanfriendly.compat import StringIO
 from humanfriendly.decorators import cached
+from humanfriendly.deprecation import DeprecationProxy, define_aliases, get_aliases
 from humanfriendly.prompts import (
     TooManyInvalidReplies,
     prompt_for_confirmation,
@@ -33,6 +36,7 @@ from humanfriendly.prompts import (
     prompt_for_input,
 )
 from humanfriendly.sphinx import (
+    deprecation_note_callback,
     man_role,
     pypi_role,
     setup,
@@ -85,6 +89,7 @@ from humanfriendly.usage import (
 
 # Test dependencies.
 from capturer import CaptureOutput
+from mock import MagicMock
 
 
 class HumanFriendlyTestCase(TestCase):
@@ -1253,6 +1258,32 @@ class HumanFriendlyTestCase(TestCase):
                 Don't change anything.
         """)) for token in ('`-n`', '`--dry-run`'))
 
+    def test_alias_proxy_deprecation_warning(self):
+        """Test that the DeprecationProxy class emits deprecation warnings."""
+        fake_fn = MagicMock()
+        with PatchedAttribute(warnings, 'warn', fake_fn):
+            module = sys.modules[__name__]
+            aliases = dict(concatenate='humanfriendly.text.concatenate')
+            proxy = DeprecationProxy(module, aliases)
+            assert proxy.concatenate == humanfriendly.concatenate
+        assert fake_fn.was_called
+
+    def test_alias_proxy_sphinx_compensation(self):
+        """Test that the DeprecationProxy class emits deprecation warnings."""
+        with PatchedItem(sys.modules, 'sphinx', types.ModuleType('sphinx')):
+            define_aliases(__name__, concatenate='humanfriendly.text.concatenate')
+            assert "concatenate" in dir(sys.modules[__name__])
+            assert "concatenate" in get_aliases(__name__)
+
+    def test_alias_proxy_sphinx_integration(self):
+        """Test that aliases can be injected into generated documentation."""
+        module = sys.modules[__name__]
+        define_aliases(__name__, concatenate='humanfriendly.text.concatenate')
+        lines = module.__doc__.splitlines()
+        deprecation_note_callback(app=None, what=None, name=None, obj=module, options=None, lines=lines)
+        # Check that something was injected.
+        assert "\n".join(lines) != module.__doc__
+
     def test_sphinx_customizations(self):
         """Test the :mod:`humanfriendly.sphinx` module."""
         class FakeApp(object):
@@ -1284,6 +1315,7 @@ class HumanFriendlyTestCase(TestCase):
         setup(fake_app)
         assert man_role == fake_app.roles['man']
         assert pypi_role == fake_app.roles['pypi']
+        assert deprecation_note_callback in fake_app.callbacks['autodoc-process-docstring']
         assert special_methods_callback in fake_app.callbacks['autodoc-skip-member']
         assert usage_message_callback in fake_app.callbacks['autodoc-process-docstring']
         # Test that `special methods' which are documented aren't skipped.

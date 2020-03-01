@@ -52,6 +52,12 @@ order to avoid unexpected surprises.
 .. automodule:: humanfriendly.decorators
    :members:
 
+:mod:`humanfriendly.deprecation`
+--------------------------------
+
+.. automodule:: humanfriendly.deprecation
+   :members:
+
 :mod:`humanfriendly.prompts`
 ----------------------------
 
