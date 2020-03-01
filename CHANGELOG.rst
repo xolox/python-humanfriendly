@@ -16,7 +16,7 @@ Changelog`_. This project adheres to `semantic versioning`_.
 
 **Enhancements:**
 
-Added the :func:`humanfriendly.deprecation.deprecate_args()` decorator function
+Added the :func:`humanfriendly.deprecation.deprecated_args()` decorator function
 which makes it easy to switch from positional arguments to keyword arguments
 without dropping backwards compatibility.
 
