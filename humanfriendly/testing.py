@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: March 1, 2020
+# Last Change: March 2, 2020
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -22,6 +22,7 @@ its much better error reporting) but I've yet to publish a test suite that
 """
 
 # Standard library module
+import functools
 import logging
 import os
 import pipes
@@ -212,6 +213,7 @@ def skip_on_raise(*exc_types):
     :returns: A decorator function specialized to `exc_types`.
     """
     def decorator(function):
+        @functools.wraps(function)
         def wrapper(*args, **kw):
             try:
                 return function(*args, **kw)

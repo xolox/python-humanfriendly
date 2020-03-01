@@ -26,6 +26,7 @@ override attribute access of the module.
 
 # Standard library modules.
 import collections
+import functools
 import importlib
 import inspect
 import sys
@@ -167,6 +168,7 @@ def deprecated_args(*names):
             for name, value in zip(names, args):
                 kw[name] = value
         if is_method(function):
+            @functools.wraps(function)
             def wrapper(*args, **kw):
                 """Wrapper for instance methods."""
                 args = list(args)
@@ -174,6 +176,7 @@ def deprecated_args(*names):
                 translate(args, kw)
                 return function(self, **kw)
         else:
+            @functools.wraps(function)
             def wrapper(*args, **kw):
                 """Wrapper for module level functions."""
                 translate(args, kw)

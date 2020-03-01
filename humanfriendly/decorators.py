@@ -1,10 +1,13 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: October 20, 2018
+# Last Change: March 2, 2020
 # URL: https://humanfriendly.readthedocs.io
 
 """Simple function decorators to make Python programming easier."""
+
+# Standard library modules.
+import functools
 
 # Public identifiers that require documentation.
 __all__ = ('RESULTS_ATTRIBUTE', 'cached')
@@ -29,6 +32,7 @@ def cached(function):
               arguments at all would imply that the cache is parametrized on
               function arguments, which is not currently the case.
     """
+    @functools.wraps(function)
     def wrapper():
         try:
             return getattr(wrapper, RESULTS_ATTRIBUTE)
@@ -36,5 +40,4 @@ def cached(function):
             result = function()
             setattr(wrapper, RESULTS_ATTRIBUTE, result)
             return result
-    wrapper.__doc__ = function.__doc__
     return wrapper
