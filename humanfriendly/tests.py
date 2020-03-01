@@ -4,7 +4,7 @@
 # Tests for the `humanfriendly' package.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: March 1, 2020
+# Last Change: March 2, 2020
 # URL: https://humanfriendly.readthedocs.io
 
 """Test suite for the `humanfriendly` package."""
@@ -1268,8 +1268,7 @@ class HumanFriendlyTestCase(TestCase):
         fake_fn = MagicMock()
         with PatchedAttribute(warnings, 'warn', fake_fn):
             assert test_function('foo', 'bar') == 42
-            with self.assertRaises(TypeError):
-                test_function('foo', 'bar', 'baz')
+            self.assertRaises(TypeError, test_function, 'foo', 'bar', 'baz')
         assert fake_fn.was_called
 
     def test_alias_proxy_deprecation_warning(self):
