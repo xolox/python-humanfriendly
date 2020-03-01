@@ -53,8 +53,10 @@ __all__ = (
     'ANSI_COLOR_CODES',
     'ANSI_CSI',
     'ANSI_ERASE_LINE',
+    'ANSI_HIDE_CURSOR',
     'ANSI_RESET',
     'ANSI_SGR',
+    'ANSI_SHOW_CURSOR',
     'ANSI_TEXT_STYLES',
     'CLEAN_OUTPUT_PATTERN',
     'DEFAULT_COLUMNS',
@@ -95,6 +97,12 @@ ANSI_ERASE_LINE = '%sK' % ANSI_CSI
 
 ANSI_RESET = '%s0%s' % (ANSI_CSI, ANSI_SGR)
 """The ANSI escape sequence to reset styling (a string)."""
+
+ANSI_HIDE_CURSOR = '%s?25l' % ANSI_CSI
+"""The ANSI escape sequence to hide the text cursor (a string)."""
+
+ANSI_SHOW_CURSOR = '%s?25h' % ANSI_CSI
+"""The ANSI escape sequence to show the text cursor (a string)."""
 
 ANSI_COLOR_CODES = dict(black=0, red=1, green=2, yellow=3, blue=4, magenta=5, cyan=6, white=7)
 """

@@ -10,12 +10,10 @@
 import collections
 import datetime
 import decimal
-import multiprocessing
 import numbers
 import os
 import os.path
 import re
-import sys
 import time
 
 # Modules included in our package.
@@ -25,52 +23,35 @@ from humanfriendly.text import concatenate, format, pluralize, tokenize
 
 # Public identifiers that require documentation.
 __all__ = (
-    'AutomaticSpinner',
     'CombinedUnit',
     'InvalidDate',
     'InvalidLength',
     'InvalidSize',
     'InvalidTimespan',
     'SizeUnit',
-    'Spinner',
     'Timer',
     '__version__',
     'coerce_boolean',
     'coerce_pattern',
     'coerce_seconds',
     'disk_size_units',
-    'erase_line_code',
     'format_length',
     'format_number',
     'format_path',
     'format_size',
     'format_timespan',
-    'hide_cursor_code',
     'length_size_units',
-    'minimum_spinner_interval',
     'parse_date',
     'parse_length',
     'parse_path',
     'parse_size',
     'parse_timespan',
     'round_number',
-    'show_cursor_code',
     'time_units',
 )
 
 # Semi-standard module versioning.
 __version__ = '7.3'
-
-# Spinners are redrawn at most this many seconds.
-minimum_spinner_interval = 0.2
-
-# The following ANSI escape sequence can be used to clear a line and move the
-# cursor back to the start of the line.
-erase_line_code = '\r\x1b[K'
-
-# ANSI escape sequences to hide and show the text cursor.
-hide_cursor_code = '\x1b[?25l'
-show_cursor_code = '\x1b[?25h'
 
 # Named tuples to define units of size.
 SizeUnit = collections.namedtuple('SizeUnit', 'divider, symbol, name')
@@ -756,270 +737,6 @@ class Timer(object):
         return format_timespan(self.elapsed_time)
 
 
-class Spinner(object):
-
-    """
-    Show a spinner on the terminal as a simple means of feedback to the user.
-
-    The :class:`Spinner` class shows a "spinner" on the terminal to let the
-    user know that something is happening during long running operations that
-    would otherwise be silent (leaving the user to wonder what they're waiting
-    for). Below are some visual examples that should illustrate the point.
-
-    **Simple spinners:**
-
-     Here's a screen capture that shows the simplest form of spinner:
-
-      .. image:: images/spinner-basic.gif
-         :alt: Animated screen capture of a simple spinner.
-
-     The following code was used to create the spinner above:
-
-     .. code-block:: python
-
-        import itertools
-        import time
-        from humanfriendly import Spinner
-
-        with Spinner(label="Downloading") as spinner:
-            for i in itertools.count():
-                # Do something useful here.
-                time.sleep(0.1)
-                # Advance the spinner.
-                spinner.step()
-
-    **Spinners that show elapsed time:**
-
-     Here's a spinner that shows the elapsed time since it started:
-
-      .. image:: images/spinner-with-timer.gif
-         :alt: Animated screen capture of a spinner showing elapsed time.
-
-     The following code was used to create the spinner above:
-
-     .. code-block:: python
-
-        import itertools
-        import time
-        from humanfriendly import Spinner, Timer
-
-        with Spinner(label="Downloading", timer=Timer()) as spinner:
-            for i in itertools.count():
-                # Do something useful here.
-                time.sleep(0.1)
-                # Advance the spinner.
-                spinner.step()
-
-    **Spinners that show progress:**
-
-     Here's a spinner that shows a progress percentage:
-
-      .. image:: images/spinner-with-progress.gif
-         :alt: Animated screen capture of spinner showing progress.
-
-     The following code was used to create the spinner above:
-
-     .. code-block:: python
-
-        import itertools
-        import random
-        import time
-        from humanfriendly import Spinner, Timer
-
-        with Spinner(label="Downloading", total=100) as spinner:
-            progress = 0
-            while progress < 100:
-                # Do something useful here.
-                time.sleep(0.1)
-                # Advance the spinner.
-                spinner.step(progress)
-                # Determine the new progress value.
-                progress += random.random() * 5
-
-    If you want to provide user feedback during a long running operation but
-    it's not practical to periodically call the :func:`~Spinner.step()`
-    method consider using :class:`AutomaticSpinner` instead.
-
-    As you may already have noticed in the examples above, :class:`Spinner`
-    objects can be used as context managers to automatically call
-    :func:`clear()` when the spinner ends. This helps to make sure that if the
-    text cursor is hidden its visibility is restored before the spinner ends
-    (even if an exception interrupts the spinner).
-    """
-
-    def __init__(self, label=None, total=0, stream=sys.stderr, interactive=None, timer=None, hide_cursor=True):
-        """
-        Initialize a spinner.
-
-        :param label: The label for the spinner (a string, defaults to :data:`None`).
-        :param total: The expected number of steps (an integer).
-        :param stream: The output stream to show the spinner on (defaults to
-                       :data:`sys.stderr`).
-        :param interactive: If this is :data:`False` then the spinner doesn't write
-                            to the output stream at all. It defaults to the
-                            return value of ``stream.isatty()``.
-        :param timer: A :class:`Timer` object (optional). If this is given
-                      the spinner will show the elapsed time according to the
-                      timer.
-        :param hide_cursor: If :data:`True` (the default) the text cursor is hidden
-                            as long as the spinner is active.
-        """
-        self.label = label
-        self.total = total
-        self.stream = stream
-        self.states = ['-', '\\', '|', '/']
-        self.counter = 0
-        self.last_update = 0
-        if interactive is None:
-            # Try to automatically discover whether the stream is connected to
-            # a terminal, but don't fail if no isatty() method is available.
-            try:
-                interactive = stream.isatty()
-            except Exception:
-                interactive = False
-        self.interactive = interactive
-        self.timer = timer
-        self.hide_cursor = hide_cursor
-        if self.interactive and self.hide_cursor:
-            self.stream.write(hide_cursor_code)
-
-    def step(self, progress=0, label=None):
-        """
-        Advance the spinner by one step and redraw it.
-
-        :param progress: The number of the current step, relative to the total
-                         given to the :class:`Spinner` constructor (an integer,
-                         optional). If not provided the spinner will not show
-                         progress.
-        :param label: The label to use while redrawing (a string, optional). If
-                      not provided the label given to the :class:`Spinner`
-                      constructor is used instead.
-
-        This method advances the spinner by one step without starting a new
-        line, causing an animated effect which is very simple but much nicer
-        than waiting for a prompt which is completely silent for a long time.
-
-        .. note:: This method uses time based rate limiting to avoid redrawing
-                  the spinner too frequently. If you know you're dealing with
-                  code that will call :func:`step()` at a high frequency,
-                  consider using :func:`sleep()` to avoid creating the
-                  equivalent of a busy loop that's rate limiting the spinner
-                  99% of the time.
-        """
-        if self.interactive:
-            time_now = time.time()
-            if time_now - self.last_update >= minimum_spinner_interval:
-                self.last_update = time_now
-                state = self.states[self.counter % len(self.states)]
-                label = label or self.label
-                if not label:
-                    raise Exception("No label set for spinner!")
-                elif self.total and progress:
-                    label = "%s: %.2f%%" % (label, progress / (self.total / 100.0))
-                elif self.timer and self.timer.elapsed_time > 2:
-                    label = "%s (%s)" % (label, self.timer.rounded)
-                self.stream.write("%s %s %s ..\r" % (erase_line_code, state, label))
-                self.counter += 1
-
-    def sleep(self):
-        """
-        Sleep for a short period before redrawing the spinner.
-
-        This method is useful when you know you're dealing with code that will
-        call :func:`step()` at a high frequency. It will sleep for the interval
-        with which the spinner is redrawn (less than a second). This avoids
-        creating the equivalent of a busy loop that's rate limiting the
-        spinner 99% of the time.
-
-        This method doesn't redraw the spinner, you still have to call
-        :func:`step()` in order to do that.
-        """
-        time.sleep(minimum_spinner_interval)
-
-    def clear(self):
-        """
-        Clear the spinner.
-
-        The next line which is shown on the standard output or error stream
-        after calling this method will overwrite the line that used to show the
-        spinner. Also the visibility of the text cursor is restored.
-        """
-        if self.interactive:
-            if self.hide_cursor:
-                self.stream.write(show_cursor_code)
-            self.stream.write(erase_line_code)
-
-    def __enter__(self):
-        """
-        Enable the use of spinners as context managers.
-
-        :returns: The :class:`Spinner` object.
-        """
-        return self
-
-    def __exit__(self, exc_type=None, exc_value=None, traceback=None):
-        """Clear the spinner when leaving the context."""
-        self.clear()
-
-
-class AutomaticSpinner(object):
-
-    """
-    Show a spinner on the terminal that automatically starts animating.
-
-    This class shows a spinner on the terminal (just like :class:`Spinner`
-    does) that automatically starts animating. This class should be used as a
-    context manager using the :keyword:`with` statement. The animation
-    continues for as long as the context is active.
-
-    :class:`AutomaticSpinner` provides an alternative to :class:`Spinner`
-    for situations where it is not practical for the caller to periodically
-    call :func:`~Spinner.step()` to advance the animation, e.g. because
-    you're performing a blocking call and don't fancy implementing threading or
-    subprocess handling just to provide some user feedback.
-
-    This works using the :mod:`multiprocessing` module by spawning a
-    subprocess to render the spinner while the main process is busy doing
-    something more useful. By using the :keyword:`with` statement you're
-    guaranteed that the subprocess is properly terminated at the appropriate
-    time.
-    """
-
-    def __init__(self, label, show_time=True):
-        """
-        Initialize an automatic spinner.
-
-        :param label: The label for the spinner (a string).
-        :param show_time: If this is :data:`True` (the default) then the spinner
-                          shows elapsed time.
-        """
-        self.label = label
-        self.show_time = show_time
-        self.shutdown_event = multiprocessing.Event()
-        self.subprocess = multiprocessing.Process(target=self._target)
-
-    def __enter__(self):
-        """Enable the use of automatic spinners as context managers."""
-        self.subprocess.start()
-
-    def __exit__(self, exc_type=None, exc_value=None, traceback=None):
-        """Enable the use of automatic spinners as context managers."""
-        self.shutdown_event.set()
-        self.subprocess.join()
-
-    def _target(self):
-        try:
-            timer = Timer() if self.show_time else None
-            with Spinner(label=self.label, timer=timer) as spinner:
-                while not self.shutdown_event.is_set():
-                    spinner.step()
-                    spinner.sleep()
-        except KeyboardInterrupt:
-            # Swallow Control-C signals without producing a nasty traceback that
-            # won't make any sense to the average user.
-            pass
-
-
 class InvalidDate(Exception):
 
     """
@@ -1106,4 +823,13 @@ define_aliases(
     # In humanfriendly 1.38 the prompt_for_choice() function was moved out into a
     # separate module because several variants of interactive prompts were added.
     prompt_for_choice='humanfriendly.prompts.prompt_for_choice',
+    # In humanfriendly 8.0 the Spinner class and minimum_spinner_interval
+    # variable were extracted to a new module and the erase_line_code,
+    # hide_cursor_code and show_cursor_code variables were moved.
+    AutomaticSpinner='humanfriendly.terminal.spinners.AutomaticSpinner',
+    Spinner='humanfriendly.terminal.spinners.Spinner',
+    erase_line_code='humanfriendly.terminal.ANSI_ERASE_LINE',
+    hide_cursor_code='humanfriendly.terminal.ANSI_SHOW_CURSOR',
+    minimum_spinner_interval='humanfriendly.terminal.spinners.MINIMUM_INTERVAL',
+    show_cursor_code='humanfriendly.terminal.ANSI_HIDE_CURSOR',
 )

@@ -50,8 +50,11 @@ from humanfriendly.tables import (
 )
 from humanfriendly.terminal import (
     ANSI_CSI,
+    ANSI_ERASE_LINE,
+    ANSI_HIDE_CURSOR,
     ANSI_RESET,
     ANSI_SGR,
+    ANSI_SHOW_CURSOR,
     ansi_strip,
     ansi_style,
     ansi_width,
@@ -67,6 +70,7 @@ from humanfriendly.terminal import (
     warning,
 )
 from humanfriendly.terminal.html import html_to_ansi
+from humanfriendly.terminal.spinners import AutomaticSpinner, Spinner
 from humanfriendly.testing import (
     CallableTimedOut,
     MockedProgram,
@@ -680,15 +684,15 @@ class HumanFriendlyTestCase(TestCase):
     def test_spinner(self):
         """Test :func:`humanfriendly.Spinner`."""
         stream = StringIO()
-        spinner = humanfriendly.Spinner('test spinner', total=4, stream=stream, interactive=True)
+        spinner = Spinner('test spinner', total=4, stream=stream, interactive=True)
         for progress in [1, 2, 3, 4]:
             spinner.step(progress=progress)
             time.sleep(0.2)
         spinner.clear()
         output = stream.getvalue()
-        output = (output.replace(humanfriendly.show_cursor_code, '')
-                        .replace(humanfriendly.hide_cursor_code, ''))
-        lines = [line for line in output.split(humanfriendly.erase_line_code) if line]
+        output = (output.replace(ANSI_SHOW_CURSOR, '')
+                        .replace(ANSI_HIDE_CURSOR, ''))
+        lines = [line for line in output.split(ANSI_ERASE_LINE) if line]
         self.assertTrue(len(lines) > 0)
         self.assertTrue(all('test spinner' in l for l in lines))
         self.assertTrue(all('%' in l for l in lines))
@@ -704,7 +708,7 @@ class HumanFriendlyTestCase(TestCase):
         on top of the :class:`.Spinner` class so at least we also have the
         tests for the :class:`.Spinner` class to back us up.
         """
-        with humanfriendly.AutomaticSpinner('test spinner'):
+        with AutomaticSpinner('test spinner'):
             time.sleep(1)
 
     def test_prompt_for_choice(self):

@@ -88,6 +88,12 @@ order to avoid unexpected surprises.
 .. automodule:: humanfriendly.terminal.html
    :members:
 
+:mod:`humanfriendly.terminal.spinners`
+--------------------------------------
+
+.. automodule:: humanfriendly.terminal.spinners
+   :members:
+
 :mod:`humanfriendly.testing`
 ----------------------------
 

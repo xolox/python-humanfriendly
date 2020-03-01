@@ -85,7 +85,6 @@ import sys
 
 # Modules included in our package.
 from humanfriendly import (
-    Spinner,
     Timer,
     format_length,
     format_number,
@@ -107,6 +106,7 @@ from humanfriendly.terminal import (
     usage,
     warning,
 )
+from humanfriendly.terminal.spinners import Spinner
 
 # Public identifiers that require documentation.
 __all__ = (
