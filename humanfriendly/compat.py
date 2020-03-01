@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: February 18, 2020
+# Last Change: March 1, 2020
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -17,8 +17,8 @@ code that is compatible with Python 2 and Python 3.
 
 .. data:: HTMLParser
 
-   Alias for :func:`python2:HTMLParser.HTMLParser` (in Python 2) or
-   :func:`python3:html.parser.HTMLParser` (in Python 3).
+   Alias for :class:`python2:HTMLParser.HTMLParser` (in Python 2) or
+   :class:`python3:html.parser.HTMLParser` (in Python 3).
 
 .. data:: interactive_prompt
 

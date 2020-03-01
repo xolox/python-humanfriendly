@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: February 9, 2020
+# Last Change: March 1, 2020
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -67,8 +67,8 @@ def configure_logging(log_level=logging.DEBUG):
     """configure_logging(log_level=logging.DEBUG)
     Automatically configure logging to the terminal.
 
-    :param log_level: The log verbosity (a number, defaults to
-                      :data:`logging.DEBUG`).
+    :param log_level: The log verbosity (a number, defaults
+                      to :mod:`logging.DEBUG <logging>`).
 
     When :mod:`coloredlogs` is installed :func:`coloredlogs.install()` will be
     used to configure logging to the terminal. When this fails with an
@@ -279,7 +279,7 @@ class PatchedAttribute(ContextManager):
 
 class PatchedItem(ContextManager):
 
-    """Context manager that temporary replaces an object item using :func:`~object.__setitem__()`."""
+    """Context manager that temporary replaces an object item using :meth:`~object.__setitem__()`."""
 
     def __init__(self, obj, item, value):
         """
@@ -587,9 +587,9 @@ class TestCase(unittest.TestCase):
 
     def assertRaises(self, exception, callable, *args, **kwds):
         """
-        Replacement for :func:`unittest.TestCase.assertRaises()` that returns the exception.
+        Replacement for :meth:`unittest.TestCase.assertRaises()` that returns the exception.
 
-        Refer to the :func:`unittest.TestCase.assertRaises()` documentation for
+        Refer to the :meth:`unittest.TestCase.assertRaises()` documentation for
         details on argument handling. The return value is the caught exception.
 
         .. warning:: This method does not support use as a context manager.

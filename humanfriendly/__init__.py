@@ -151,7 +151,7 @@ def coerce_boolean(value):
                   - The strings '0', 'no', 'false' and 'off' are coerced to :data:`False`.
                   - Other strings raise an exception.
 
-                  Other Python values are coerced using :func:`bool()`.
+                  Other Python values are coerced using :class:`bool`.
     :returns: A proper boolean value.
     :raises: :exc:`exceptions.ValueError` when the value is a string but
              cannot be coerced with certainty.
@@ -200,7 +200,7 @@ def coerce_seconds(value):
     :returns: An :class:`int` or :class:`float` value.
 
     When `value` is a :class:`datetime.timedelta` object the
-    :func:`~datetime.timedelta.total_seconds()` method is called.
+    :meth:`~datetime.timedelta.total_seconds()` method is called.
     """
     if isinstance(value, datetime.timedelta):
         return value.total_seconds()

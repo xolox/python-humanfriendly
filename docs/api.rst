@@ -44,7 +44,7 @@ order to avoid unexpected surprises.
 ---------------------------
 
 .. automodule:: humanfriendly.compat
-   :members:
+   :members: coerce_string, is_string, is_unicode, on_windows
 
 :mod:`humanfriendly.decorators`
 -------------------------------

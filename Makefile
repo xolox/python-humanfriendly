@@ -1,7 +1,7 @@
 # Makefile for the 'humanfriendly' package.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: February 16, 2020
+# Last Change: March 1, 2020
 # URL: https://humanfriendly.readthedocs.io
 
 PACKAGE_NAME = humanfriendly
@@ -59,7 +59,7 @@ readme: install
 
 docs: readme
 	@pip install --quiet sphinx
-	@cd docs && sphinx-build -nb html -d build/doctrees . build/html
+	@cd docs && sphinx-build -nWb html -d build/doctrees . build/html
 
 publish: install
 	@git push origin && git push --tags origin

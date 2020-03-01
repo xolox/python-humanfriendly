@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: February 18, 2020
+# Last Change: March 1, 2020
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -492,8 +492,8 @@ def find_terminal_size():
               the result of :func:`find_terminal_size()` should be correct.
 
               `Pre-emptive snarky comment`_: It's possible to cache the result
-              of this function and use :data:`signal.SIGWINCH` to refresh the
-              cached values!
+              of this function and use :mod:`signal.SIGWINCH <signal>` to
+              refresh the cached values!
 
               Response: As a library I don't consider it the role of the
               :mod:`humanfriendly.terminal` module to install a process wide
@@ -879,7 +879,7 @@ class HTMLConverter(HTMLParser):
                          this callback.
         :param output: Optional keyword argument to redirect the output to the
                        given file-like object. If this is not given a new
-                       :class:`python3:~io.StringIO` object is created.
+                       :class:`~python3:io.StringIO` object is created.
         """
         # Hide our optional keyword arguments from the superclass.
         self.callback = kw.pop("callback", None)

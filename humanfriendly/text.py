@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: February 9, 2020
+# Last Change: March 1, 2020
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -142,14 +142,14 @@ def dedent(text, *args, **kw):
 
 def format(text, *args, **kw):
     """
-    Format a string using the string formatting operator and/or :func:`str.format()`.
+    Format a string using the string formatting operator and/or :meth:`str.format()`.
 
     :param text: The text to format (a string).
     :param args: Any positional arguments are interpolated into the text using
                  the string formatting operator (``%``). If no positional
                  arguments are given no interpolation is done.
     :param kw: Any keyword arguments are interpolated into the text using the
-               :func:`str.format()` function. If no keyword arguments are given
+               :meth:`str.format()` function. If no keyword arguments are given
                no interpolation is done.
     :returns: The text with any positional and/or keyword arguments
               interpolated (a string).
@@ -198,7 +198,7 @@ def format(text, *args, **kw):
 
     **Why format() instead of the str.format() method?**
 
-    When you're doing complex string interpolation the :func:`str.format()`
+    When you're doing complex string interpolation the :meth:`str.format()`
     function results in more readable code, however I frequently find myself
     adding parentheses to force evaluation order. The :func:`format()` function
     avoids this because of the relative priority between the comma and dot
@@ -319,7 +319,7 @@ def split(text, delimiter=','):
     :param delimiter: The delimiter to split on (a string).
     :returns: A list of zero or more nonempty strings.
 
-    Here's the default behavior of Python's built in :func:`str.split()`
+    Here's the default behavior of Python's built in :meth:`str.split()`
     function:
 
     >>> 'foo,bar, baz,'.split(',')
