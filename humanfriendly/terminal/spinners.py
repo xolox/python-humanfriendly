@@ -13,7 +13,7 @@ import time
 
 # Modules included in our package.
 from humanfriendly import Timer
-from humanfriendly.terminal import ANSI_ERASE_LINE, ANSI_HIDE_CURSOR, ANSI_SHOW_CURSOR
+from humanfriendly.terminal import ANSI_ERASE_LINE
 
 # Public identifiers that require documentation.
 __all__ = ("AutomaticSpinner", "MINIMUM_INTERVAL", "Spinner")
@@ -113,7 +113,7 @@ class Spinner(object):
     (even if an exception interrupts the spinner).
     """
 
-    def __init__(self, label=None, total=0, stream=sys.stderr, interactive=None, timer=None, hide_cursor=True):
+    def __init__(self, label=None, total=0, stream=sys.stderr, interactive=None, timer=None):
         """
         Initialize a spinner.
 
@@ -127,8 +127,6 @@ class Spinner(object):
         :param timer: A :class:`.Timer` object (optional). If this is given
                       the spinner will show the elapsed time according to the
                       timer.
-        :param hide_cursor: If :data:`True` (the default) the text cursor is hidden
-                            as long as the spinner is active.
         """
         self.label = label
         self.total = total
@@ -145,9 +143,6 @@ class Spinner(object):
                 interactive = False
         self.interactive = interactive
         self.timer = timer
-        self.hide_cursor = hide_cursor
-        if self.interactive and self.hide_cursor:
-            self.stream.write(ANSI_HIDE_CURSOR)
 
     def step(self, progress=0, label=None):
         """
@@ -208,11 +203,9 @@ class Spinner(object):
 
         The next line which is shown on the standard output or error stream
         after calling this method will overwrite the line that used to show the
-        spinner. Also the visibility of the text cursor is restored.
+        spinner.
         """
         if self.interactive:
-            if self.hide_cursor:
-                self.stream.write(ANSI_SHOW_CURSOR)
             self.stream.write(ANSI_ERASE_LINE)
 
     def __enter__(self):
