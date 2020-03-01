@@ -41,9 +41,7 @@ try:
 except ImportError:
     HAVE_IOCTL = False
 
-# Modules included in our package. We import find_meta_variables() here to
-# preserve backwards compatibility with older versions of humanfriendly where
-# that function was defined in this module.
+# Modules included in our package.
 from humanfriendly.compat import (
     HTMLParser,
     StringIO,
@@ -55,8 +53,9 @@ from humanfriendly.compat import (
     which,
 )
 from humanfriendly.decorators import cached
+from humanfriendly.deprecation import define_aliases
 from humanfriendly.text import compact_empty_lines, concatenate, format
-from humanfriendly.usage import find_meta_variables, format_usage  # NOQA
+from humanfriendly.usage import format_usage
 
 # Public identifiers that require documentation.
 __all__ = (
@@ -1169,3 +1168,13 @@ class HTMLConverter(HTMLParser):
         hyperlink (``<a href="...">``) when the link text is that same URL.
         """
         return self.normalize_url(a) == self.normalize_url(b)
+
+
+# Define aliases for backwards compatibility.
+define_aliases(
+    module_name=__name__,
+    # In humanfriendly 1.31 the find_meta_variables() and format_usage()
+    # functions were extracted to the new module humanfriendly.usage.
+    find_meta_variables='humanfriendly.usage.find_meta_variables',
+    format_usage='humanfriendly.usage.format_usage',
+)

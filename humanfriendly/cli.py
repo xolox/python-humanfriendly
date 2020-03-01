@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: February 16, 2020
+# Last Change: March 1, 2020
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -90,12 +90,11 @@ from humanfriendly import (
     format_length,
     format_number,
     format_size,
-    format_table,
     format_timespan,
     parse_length,
     parse_size,
 )
-from humanfriendly.tables import format_smart_table
+from humanfriendly.tables import format_pretty_table, format_smart_table
 from humanfriendly.terminal import (
     ANSI_COLOR_CODES,
     ANSI_TEXT_STYLES,
@@ -212,7 +211,7 @@ def print_formatted_table(delimiter):
     for line in sys.stdin:
         line = line.rstrip()
         data.append(line.split(delimiter))
-    output(format_table(data))
+    output(format_pretty_table(data))
 
 
 def print_formatted_timespan(value):

@@ -23,8 +23,7 @@ import warnings
 
 # Modules included in our package.
 import humanfriendly
-from humanfriendly import prompts
-from humanfriendly import coerce_pattern, compact, dedent, trim_empty_lines
+from humanfriendly import coerce_pattern, prompts
 from humanfriendly.cli import main
 from humanfriendly.compat import StringIO
 from humanfriendly.decorators import cached
@@ -79,7 +78,16 @@ from humanfriendly.testing import (
     run_cli,
     touch,
 )
-from humanfriendly.text import compact_empty_lines, generate_slug, random_string
+from humanfriendly.text import (
+    compact,
+    compact_empty_lines,
+    concatenate,
+    dedent,
+    generate_slug,
+    pluralize,
+    random_string,
+    trim_empty_lines,
+)
 from humanfriendly.usage import (
     find_meta_variables,
     format_usage,
@@ -269,11 +277,11 @@ class HumanFriendlyTestCase(TestCase):
         ''', op='formatted') == 'Dedented, formatted text\n'
 
     def test_pluralization(self):
-        """Test :func:`humanfriendly.pluralize()`."""
-        self.assertEqual('1 word', humanfriendly.pluralize(1, 'word'))
-        self.assertEqual('2 words', humanfriendly.pluralize(2, 'word'))
-        self.assertEqual('1 box', humanfriendly.pluralize(1, 'box', 'boxes'))
-        self.assertEqual('2 boxes', humanfriendly.pluralize(2, 'box', 'boxes'))
+        """Test :func:`humanfriendly.text.pluralize()`."""
+        assert pluralize(1, 'word') == '1 word'
+        assert pluralize(2, 'word') == '2 words'
+        assert pluralize(1, 'box', 'boxes') == '1 box'
+        assert pluralize(2, 'box', 'boxes') == '2 boxes'
 
     def test_generate_slug(self):
         """Test :func:`humanfriendly.text.generate_slug()`."""
@@ -618,11 +626,11 @@ class HumanFriendlyTestCase(TestCase):
         )
 
     def test_concatenate(self):
-        """Test :func:`humanfriendly.concatenate()`."""
-        self.assertEqual(humanfriendly.concatenate([]), '')
-        self.assertEqual(humanfriendly.concatenate(['one']), 'one')
-        self.assertEqual(humanfriendly.concatenate(['one', 'two']), 'one and two')
-        self.assertEqual(humanfriendly.concatenate(['one', 'two', 'three']), 'one, two and three')
+        """Test :func:`humanfriendly.text.concatenate()`."""
+        assert concatenate([]) == ''
+        assert concatenate(['one']) == 'one'
+        assert concatenate(['one', 'two']) == 'one and two'
+        assert concatenate(['one', 'two', 'three']) == 'one, two and three'
 
     def test_split(self):
         """Test :func:`humanfriendly.text.split()`."""

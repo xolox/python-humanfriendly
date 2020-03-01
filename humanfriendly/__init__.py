@@ -18,47 +18,13 @@ import re
 import sys
 import time
 
-# In humanfriendly 1.23 the format_table() function was added to render a table
-# using characters like dashes and vertical bars to emulate borders. Since then
-# support for other tables has been added and the name of format_table() has
-# changed. The following import statement preserves backwards compatibility.
-from humanfriendly.tables import format_pretty_table as format_table
-
-# In humanfriendly 1.30 the following text manipulation functions were moved
-# out into a separate module to enable their usage in other modules of the
-# humanfriendly package (without causing circular imports).
-from humanfriendly.text import (
-    compact,
-    concatenate,
-    dedent,
-    format,
-    is_empty_line,
-    pluralize,
-    tokenize,
-    trim_empty_lines,
-)
-
-# In humanfriendly 1.38 the prompt_for_choice() function was moved out into a
-# separate module because several variants of interactive prompts were added.
-from humanfriendly.prompts import prompt_for_choice
-
-# Compatibility with Python 2 and 3.
+# Modules included in our package.
 from humanfriendly.compat import is_string, monotonic
+from humanfriendly.deprecation import define_aliases
+from humanfriendly.text import concatenate, format, pluralize, tokenize
 
 # Public identifiers that require documentation.
 __all__ = (
-    # Variables imported from other modules.
-    'compact',
-    'concatenate',
-    'dedent',
-    'format',
-    'format_table',
-    'is_empty_line',
-    'pluralize',
-    'prompt_for_choice',
-    'tokenize',
-    'trim_empty_lines',
-    # Variables defined in this module.
     'AutomaticSpinner',
     'CombinedUnit',
     'InvalidDate',
@@ -1116,3 +1082,28 @@ class InvalidTimespan(Exception):
         raise InvalidTimespan(format(msg, timespan, tokens))
     humanfriendly.InvalidTimespan: Failed to parse timespan! (input '1 age' was tokenized as [1, 'age'])
     """
+
+
+# Define aliases for backwards compatibility.
+define_aliases(
+    module_name=__name__,
+    # In humanfriendly 1.23 the format_table() function was added to render a
+    # table using characters like dashes and vertical bars to emulate borders.
+    # Since then support for other tables has been added and the name of
+    # format_table() has changed.
+    format_table='humanfriendly.tables.format_pretty_table',
+    # In humanfriendly 1.30 the following text manipulation functions were
+    # moved out into a separate module to enable their usage in other modules
+    # of the humanfriendly package (without causing circular imports).
+    compact='humanfriendly.text.compact',
+    concatenate='humanfriendly.text.concatenate',
+    dedent='humanfriendly.text.dedent',
+    format='humanfriendly.text.format',
+    is_empty_line='humanfriendly.text.is_empty_line',
+    pluralize='humanfriendly.text.pluralize',
+    tokenize='humanfriendly.text.tokenize',
+    trim_empty_lines='humanfriendly.text.trim_empty_lines',
+    # In humanfriendly 1.38 the prompt_for_choice() function was moved out into a
+    # separate module because several variants of interactive prompts were added.
+    prompt_for_choice='humanfriendly.prompts.prompt_for_choice',
+)
