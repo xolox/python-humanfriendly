@@ -82,6 +82,12 @@ order to avoid unexpected surprises.
 .. automodule:: humanfriendly.terminal
    :members:
 
+:mod:`humanfriendly.terminal.html`
+----------------------------------
+
+.. automodule:: humanfriendly.terminal.html
+   :members:
+
 :mod:`humanfriendly.testing`
 ----------------------------
 

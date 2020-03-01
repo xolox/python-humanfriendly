@@ -60,13 +60,13 @@ from humanfriendly.terminal import (
     connected_to_terminal,
     find_terminal_size,
     get_pager_command,
-    html_to_ansi,
     message,
     output,
     show_pager,
     terminal_supports_colors,
     warning,
 )
+from humanfriendly.terminal.html import html_to_ansi
 from humanfriendly.testing import (
     CallableTimedOut,
     MockedProgram,

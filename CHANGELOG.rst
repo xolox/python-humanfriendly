@@ -305,7 +305,7 @@ More HTML to ANSI improvements:
 - Improve robustness against malformed HTML (previously an ``IndexError`` would
   be raised when a closing ``</a>`` tag was encountered without a corresponding
   opening ``<a>`` tag).
-- Emit an ANSI reset code when :func:`humanfriendly.terminal.HTMLConverter.close()`
+- Emit an ANSI reset code when :func:`humanfriendly.terminal.html.HTMLConverter.close()`
   is called and a style is still active (improves robustness against malformed HTML).
 
 .. _Release 4.16: https://github.com/xolox/python-humanfriendly/compare/4.15.1...4.16
