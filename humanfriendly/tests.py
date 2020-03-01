@@ -28,7 +28,7 @@ from humanfriendly import coerce_pattern, compact, dedent, trim_empty_lines
 from humanfriendly.cli import main
 from humanfriendly.compat import StringIO
 from humanfriendly.decorators import cached
-from humanfriendly.deprecation import DeprecationProxy, define_aliases, get_aliases
+from humanfriendly.deprecation import DeprecationProxy, define_aliases, deprecated_args, get_aliases
 from humanfriendly.prompts import (
     TooManyInvalidReplies,
     prompt_for_confirmation,
@@ -1257,6 +1257,20 @@ class HumanFriendlyTestCase(TestCase):
 
                 Don't change anything.
         """)) for token in ('`-n`', '`--dry-run`'))
+
+    def test_deprecated_args(self):
+        """Test the deprecated_args() decorator function."""
+        @deprecated_args('foo', 'bar')
+        def test_function(**options):
+            assert options['foo'] == 'foo'
+            assert options.get('bar') in (None, 'bar')
+            return 42
+        fake_fn = MagicMock()
+        with PatchedAttribute(warnings, 'warn', fake_fn):
+            assert test_function('foo', 'bar') == 42
+            with self.assertRaises(TypeError):
+                test_function('foo', 'bar', 'baz')
+        assert fake_fn.was_called
 
     def test_alias_proxy_deprecation_warning(self):
         """Test that the DeprecationProxy class emits deprecation warnings."""

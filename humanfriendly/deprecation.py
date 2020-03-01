@@ -27,6 +27,7 @@ override attribute access of the module.
 # Standard library modules.
 import collections
 import importlib
+import inspect
 import sys
 import types
 import warnings
@@ -38,7 +39,7 @@ from humanfriendly.text import format
 REGISTRY = collections.defaultdict(dict)
 
 # Public identifiers that require documentation.
-__all__ = ("DeprecationProxy", "define_aliases", "get_aliases")
+__all__ = ("DeprecationProxy", "define_aliases", "deprecated_args", "get_aliases", "is_method")
 
 
 def define_aliases(module_name, **aliases):
@@ -93,6 +94,104 @@ def get_aliases(module_name):
               don't define any backwards compatible aliases.
     """
     return REGISTRY.get(module_name, {})
+
+
+def deprecated_args(*names):
+    """
+    Deprecate positional arguments without dropping backwards compatibility.
+
+    :param names:
+
+      The positional arguments to :func:`deprecated_args()` give the names of
+      the positional arguments that the to-be-decorated function should warn
+      about being deprecated and translate to keyword arguments.
+
+    :returns: A decorator function specialized to `names`.
+
+    The :func:`deprecated_args()` decorator function was created to make it
+    easy to switch from positional arguments to keyword arguments [#]_ while
+    preserving backwards compatibility [#]_ and informing call sites
+    about the change.
+
+    .. [#] Increased flexibility is the main reason why I find myself switching
+           from positional arguments to (optional) keyword arguments as my code
+           evolves to support more use cases.
+
+    .. [#] In my experience positional argument order implicitly becomes part
+           of API compatibility whether intended or not. While this makes sense
+           for functions that over time adopt more and more optional arguments,
+           at a certain point it becomes an inconvenience to code maintenance.
+
+    Here's an example of how to use the decorator::
+
+      @deprecated_args('text')
+      def report_choice(**options):
+          print(options['text'])
+
+    When the decorated function is called with positional arguments
+    a deprecation warning is given::
+
+      >>> report_choice('this will give a deprecation warning')
+      DeprecationWarning: report_choice has deprecated positional arguments, please switch to keyword arguments
+      this will give a deprecation warning
+
+    But when the function is called with keyword arguments no deprecation
+    warning is emitted::
+
+      >>> report_choice(text='this will not give a deprecation warning')
+      this will not give a deprecation warning
+    """
+    def decorator(function):
+        def translate(args, kw):
+            # Raise TypeError when too many positional arguments are passed to the decorated function.
+            if len(args) > len(names):
+                raise TypeError(
+                    format(
+                        "{name} expected at most {limit} arguments, got {count}",
+                        name=function.__name__,
+                        limit=len(names),
+                        count=len(args),
+                    )
+                )
+            # Emit a deprecation warning when positional arguments are used.
+            if args:
+                warnings.warn(
+                    format(
+                        "{name} has deprecated positional arguments, please switch to keyword arguments",
+                        name=function.__name__,
+                    ),
+                    category=DeprecationWarning,
+                    stacklevel=3,
+                )
+            # Translate positional arguments to keyword arguments.
+            for name, value in zip(names, args):
+                kw[name] = value
+        if is_method(function):
+            def wrapper(*args, **kw):
+                """Wrapper for instance methods."""
+                args = list(args)
+                self = args.pop(0)
+                translate(args, kw)
+                return function(self, **kw)
+        else:
+            def wrapper(*args, **kw):
+                """Wrapper for module level functions."""
+                translate(args, kw)
+                return function(**kw)
+        return wrapper
+    return decorator
+
+
+def is_method(function):
+    """Check if the expected usage of the given function is as an instance method."""
+    try:
+        # Python 3.3 and newer.
+        signature = inspect.signature(function)
+        return "self" in signature.parameters
+    except ImportError:
+        # Python 3.2 and older.
+        metadata = inspect.getargspec(function)
+        return "self" in metadata.args
 
 
 class DeprecationProxy(types.ModuleType):
