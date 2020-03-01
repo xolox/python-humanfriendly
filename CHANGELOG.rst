@@ -11,6 +11,21 @@ Changelog`_. This project adheres to `semantic versioning`_.
 .. _Keep a Changelog: http://keepachangelog.com/
 .. _semantic versioning: http://semver.org/
 
+`Release 7.3`_ (2020-03-02)
+---------------------------
+
+**Enhancements:**
+
+Added the :func:`humanfriendly.deprecation.deprecate_args()` decorator function
+which makes it easy to switch from positional arguments to keyword arguments
+without dropping backwards compatibility.
+
+.. note:: I'm still working on the humanfriendly 8.0 release which was going to
+          break backwards compatibility in several ways if it wasn't for the
+          tools provided by the new :mod:`humanfriendly.deprecation` module.
+
+.. _Release 7.3: https://github.com/xolox/python-humanfriendly/compare/7.2...7.3
+
 `Release 7.2`_ (2020-03-01)
 ---------------------------
 
@@ -19,14 +34,15 @@ Changelog`_. This project adheres to `semantic versioning`_.
 Support for backwards compatible aliases that emit deprecation warnings
 (:mod:`humanfriendly.deprecation`).
 
-I'm currently working on several large refactorings that involve moving things
-around between modules and dreaded having to extend the existing maze of
-(almost but not quite) cyclic import dependencies between modules. This new
-functionality will be adopted to untangle the existing maze in the coming
-release, which will bump the major version number due to this very large change
-in how backwards compatibility is implemented. It is my hope that this new
-functionality will prove to be robust enough to unburden me from the less
-elegant aspects of preserving backwards compatibility 😁.
+.. note:: I'm currently working on several large refactorings that involve
+          moving things around between modules and dreaded having to extend the
+          existing maze of (almost but not quite) cyclic import dependencies
+          between modules. This new functionality will be adopted to untangle
+          the existing maze in the upcoming humanfriendly 8.0 release, which
+          bumps the major version number due to this very large change in how
+          backwards compatibility is implemented. It is my hope that this new
+          functionality will prove to be robust enough to unburden me from the
+          less elegant aspects of preserving backwards compatibility 😁.
 
 **Documentation:**
 
