@@ -695,7 +695,7 @@ class HumanFriendlyTestCase(TestCase):
     def test_spinner(self):
         """Test :func:`humanfriendly.Spinner`."""
         stream = StringIO()
-        spinner = Spinner('test spinner', total=4, stream=stream, interactive=True)
+        spinner = Spinner(label='test spinner', total=4, stream=stream, interactive=True)
         for progress in [1, 2, 3, 4]:
             spinner.step(progress=progress)
             time.sleep(0.2)
@@ -719,7 +719,7 @@ class HumanFriendlyTestCase(TestCase):
         on top of the :class:`.Spinner` class so at least we also have the
         tests for the :class:`.Spinner` class to back us up.
         """
-        with AutomaticSpinner('test spinner'):
+        with AutomaticSpinner(label='test spinner'):
             time.sleep(1)
 
     def test_prompt_for_choice(self):

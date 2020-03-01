@@ -4,7 +4,92 @@
 # Last Change: March 1, 2020
 # URL: https://humanfriendly.readthedocs.io
 
-"""Support for spinners that represent progress on interactive terminals."""
+"""
+Support for spinners that represent progress on interactive terminals.
+
+The :class:`Spinner` class shows a "spinner" on the terminal to let the user
+know that something is happening during long running operations that would
+otherwise be silent (leaving the user to wonder what they're waiting for).
+Below are some visual examples that should illustrate the point.
+
+**Simple spinners:**
+
+ Here's a screen capture that shows the simplest form of spinner:
+
+  .. image:: images/spinner-basic.gif
+     :alt: Animated screen capture of a simple spinner.
+
+ The following code was used to create the spinner above:
+
+ .. code-block:: python
+
+    import itertools
+    import time
+    from humanfriendly import Spinner
+
+    with Spinner(label="Downloading") as spinner:
+        for i in itertools.count():
+            # Do something useful here.
+            time.sleep(0.1)
+            # Advance the spinner.
+            spinner.step()
+
+**Spinners that show elapsed time:**
+
+ Here's a spinner that shows the elapsed time since it started:
+
+  .. image:: images/spinner-with-timer.gif
+     :alt: Animated screen capture of a spinner showing elapsed time.
+
+ The following code was used to create the spinner above:
+
+ .. code-block:: python
+
+    import itertools
+    import time
+    from humanfriendly import Spinner, Timer
+
+    with Spinner(label="Downloading", timer=Timer()) as spinner:
+        for i in itertools.count():
+            # Do something useful here.
+            time.sleep(0.1)
+            # Advance the spinner.
+            spinner.step()
+
+**Spinners that show progress:**
+
+ Here's a spinner that shows a progress percentage:
+
+  .. image:: images/spinner-with-progress.gif
+     :alt: Animated screen capture of spinner showing progress.
+
+ The following code was used to create the spinner above:
+
+ .. code-block:: python
+
+    import itertools
+    import random
+    import time
+    from humanfriendly import Spinner, Timer
+
+    with Spinner(label="Downloading", total=100) as spinner:
+        progress = 0
+        while progress < 100:
+            # Do something useful here.
+            time.sleep(0.1)
+            # Advance the spinner.
+            spinner.step(progress)
+            # Determine the new progress value.
+            progress += random.random() * 5
+
+If you want to provide user feedback during a long running operation but it's
+not practical to periodically call the :func:`~Spinner.step()` method consider
+using :class:`AutomaticSpinner` instead.
+
+As you may already have noticed in the examples above, :class:`Spinner` objects
+can be used as context managers to automatically call :func:`Spinner.clear()`
+when the spinner ends.
+"""
 
 # Standard library modules.
 import multiprocessing
@@ -13,10 +98,14 @@ import time
 
 # Modules included in our package.
 from humanfriendly import Timer
+from humanfriendly.deprecation import deprecated_args
 from humanfriendly.terminal import ANSI_ERASE_LINE
 
 # Public identifiers that require documentation.
-__all__ = ("AutomaticSpinner", "MINIMUM_INTERVAL", "Spinner")
+__all__ = ("AutomaticSpinner", "GLYPHS", "MINIMUM_INTERVAL", "Spinner")
+
+GLYPHS = ["-", "\\", "|", "/"]
+"""A list of strings with characters that together form a crude animation :-)."""
 
 MINIMUM_INTERVAL = 0.2
 """Spinners are redrawn with a frequency no higher than this number (a floating point number of seconds)."""
@@ -24,125 +113,67 @@ MINIMUM_INTERVAL = 0.2
 
 class Spinner(object):
 
-    """
-    Show a spinner on the terminal as a simple means of feedback to the user.
+    """Show a spinner on the terminal as a simple means of feedback to the user."""
 
-    The :class:`Spinner` class shows a "spinner" on the terminal to let the
-    user know that something is happening during long running operations that
-    would otherwise be silent (leaving the user to wonder what they're waiting
-    for). Below are some visual examples that should illustrate the point.
-
-    **Simple spinners:**
-
-     Here's a screen capture that shows the simplest form of spinner:
-
-      .. image:: images/spinner-basic.gif
-         :alt: Animated screen capture of a simple spinner.
-
-     The following code was used to create the spinner above:
-
-     .. code-block:: python
-
-        import itertools
-        import time
-        from humanfriendly import Spinner
-
-        with Spinner(label="Downloading") as spinner:
-            for i in itertools.count():
-                # Do something useful here.
-                time.sleep(0.1)
-                # Advance the spinner.
-                spinner.step()
-
-    **Spinners that show elapsed time:**
-
-     Here's a spinner that shows the elapsed time since it started:
-
-      .. image:: images/spinner-with-timer.gif
-         :alt: Animated screen capture of a spinner showing elapsed time.
-
-     The following code was used to create the spinner above:
-
-     .. code-block:: python
-
-        import itertools
-        import time
-        from humanfriendly import Spinner, Timer
-
-        with Spinner(label="Downloading", timer=Timer()) as spinner:
-            for i in itertools.count():
-                # Do something useful here.
-                time.sleep(0.1)
-                # Advance the spinner.
-                spinner.step()
-
-    **Spinners that show progress:**
-
-     Here's a spinner that shows a progress percentage:
-
-      .. image:: images/spinner-with-progress.gif
-         :alt: Animated screen capture of spinner showing progress.
-
-     The following code was used to create the spinner above:
-
-     .. code-block:: python
-
-        import itertools
-        import random
-        import time
-        from humanfriendly import Spinner, Timer
-
-        with Spinner(label="Downloading", total=100) as spinner:
-            progress = 0
-            while progress < 100:
-                # Do something useful here.
-                time.sleep(0.1)
-                # Advance the spinner.
-                spinner.step(progress)
-                # Determine the new progress value.
-                progress += random.random() * 5
-
-    If you want to provide user feedback during a long running operation but
-    it's not practical to periodically call the :func:`~Spinner.step()`
-    method consider using :class:`AutomaticSpinner` instead.
-
-    As you may already have noticed in the examples above, :class:`Spinner`
-    objects can be used as context managers to automatically call
-    :func:`clear()` when the spinner ends. This helps to make sure that if the
-    text cursor is hidden its visibility is restored before the spinner ends
-    (even if an exception interrupts the spinner).
-    """
-
-    def __init__(self, label=None, total=0, stream=sys.stderr, interactive=None, timer=None):
+    @deprecated_args('label', 'total', 'stream', 'interactive', 'timer')
+    def __init__(self, **options):
         """
-        Initialize a spinner.
+        Initialize a :class:`Spinner` object.
 
-        :param label: The label for the spinner (a string, defaults to :data:`None`).
-        :param total: The expected number of steps (an integer).
-        :param stream: The output stream to show the spinner on (defaults to
-                       :data:`sys.stderr`).
-        :param interactive: If this is :data:`False` then the spinner doesn't write
-                            to the output stream at all. It defaults to the
-                            return value of ``stream.isatty()``.
-        :param timer: A :class:`.Timer` object (optional). If this is given
-                      the spinner will show the elapsed time according to the
-                      timer.
+        :param label:
+
+          The label for the spinner (a string or :data:`None`, defaults to
+          :data:`None`).
+
+        :param total:
+
+          The expected number of steps (an integer or :data:`None`). If this is
+          provided the spinner will show a progress percentage.
+
+        :param stream:
+
+          The output stream to show the spinner on (a file-like object,
+          defaults to :data:`sys.stderr`).
+
+        :param interactive:
+
+          :data:`True` to enable rendering of the spinner, :data:`False` to
+          disable (defaults to the result of ``stream.isatty()``).
+
+        :param timer:
+
+          A :class:`.Timer` object (optional). If this is given the spinner
+          will show the elapsed time according to the timer.
+
+        :param interval:
+
+          The spinner will be updated at most once every this many seconds
+          (a floating point number, defaults to :data:`MINIMUM_INTERVAL`).
+
+        :param glyphs:
+
+          A list of strings with single characters that are drawn in the same
+          place in succession to implement a simple animated effect (defaults
+          to :data:`GLYPHS`).
         """
-        self.label = label
-        self.total = total
-        self.stream = stream
-        self.states = ["-", "\\", "|", "/"]
+        # Store initializer arguments.
+        self.interactive = options.get('interactive')
+        self.interval = options.get('interval', MINIMUM_INTERVAL)
+        self.label = options.get('label')
+        self.states = options.get('glyphs', GLYPHS)
+        self.stream = options.get('stream', sys.stderr)
+        self.timer = options.get('timer')
+        self.total = options.get('total')
+        # Define instance variables.
         self.counter = 0
         self.last_update = 0
-        if interactive is None:
-            # Try to automatically discover whether the stream is connected to
-            # a terminal, but don't fail if no isatty() method is available.
+        # Try to automatically discover whether the stream is connected to
+        # a terminal, but don't fail if no isatty() method is available.
+        if self.interactive is None:
             try:
-                interactive = stream.isatty()
+                self.interactive = self.stream.isatty()
             except Exception:
-                interactive = False
-        self.interactive = interactive
-        self.timer = timer
+                self.interactive = False
 
     def step(self, progress=0, label=None):
         """
@@ -169,7 +200,7 @@ class Spinner(object):
         """
         if self.interactive:
             time_now = time.time()
-            if time_now - self.last_update >= MINIMUM_INTERVAL:
+            if time_now - self.last_update >= self.interval:
                 self.last_update = time_now
                 state = self.states[self.counter % len(self.states)]
                 label = label or self.label
