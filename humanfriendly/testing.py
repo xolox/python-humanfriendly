@@ -9,22 +9,19 @@ Utility classes and functions that make it easy to write :mod:`unittest` compati
 
 Over the years I've developed the habit of writing test suites for Python
 projects using the :mod:`unittest` module. During those years I've come to know
-pytest_ and in fact I use pytest to run my test suites (due to its much better
-error reporting) but I've yet to publish a test suite that *requires* pytest.
-I have several reasons for doing so:
+:pypi:`pytest` and in fact I use :pypi:`pytest` to run my test suites (due to
+its much better error reporting) but I've yet to publish a test suite that
+*requires* :pypi:`pytest`. I have several reasons for doing so:
 
 - It's nice to keep my test suites as simple and accessible as possible and
   not requiring a specific test runner is part of that attitude.
 
-- Whereas :mod:`unittest` is quite explicit, pytest contains a lot of magic,
-  which kind of contradicts the Python mantra "explicit is better than
+- Whereas :mod:`unittest` is quite explicit, :pypi:`pytest` contains a lot of
+  magic, which kind of contradicts the Python mantra "explicit is better than
   implicit" (IMHO).
-
-.. _pytest: https://docs.pytest.org
 """
 
 # Standard library module
-import functools
 import logging
 import os
 import pipes
@@ -35,7 +32,7 @@ import time
 import unittest
 
 # Modules included in our package.
-from humanfriendly.compat import StringIO, unicode
+from humanfriendly.compat import StringIO
 from humanfriendly.text import random_string
 
 # Initialize a logger for this module.
@@ -59,6 +56,7 @@ __all__ = (
     'make_dirs',
     'retry',
     'run_cli',
+    'skip_on_raise',
     'touch',
 )
 
@@ -203,6 +201,25 @@ def run_cli(entry_point, *arguments, **options):
         else:
             logger.debug("No output on %s.", name)
     return returncode, stdout
+
+
+def skip_on_raise(*exc_types):
+    """
+    Decorate a test function to translation specific exception types to :exc:`unittest.SkipTest`.
+
+    :param exc_types: One or more positional arguments give the exception
+                      types to be translated to :exc:`unittest.SkipTest`.
+    :returns: A decorator function specialized to `exc_types`.
+    """
+    def decorator(function):
+        def wrapper(*args, **kw):
+            try:
+                return function(*args, **kw)
+            except exc_types as e:
+                logger.debug("Translating exception to unittest.SkipTest ..", exc_info=True)
+                raise unittest.SkipTest("skipping test because %s was raised" % type(e))
+        return wrapper
+    return decorator
 
 
 def touch(filename):
@@ -569,39 +586,14 @@ class TestCase(unittest.TestCase):
 
     """Subclass of :class:`unittest.TestCase` with automatic logging and other miscellaneous features."""
 
-    exceptionsToSkip = []
-    """A list of exception types that are translated into skipped tests."""
-
     def __init__(self, *args, **kw):
-        """Wrap test methods using :func:`skipTestWrapper()`."""
-        # Initialize our superclass.
+        """
+        Initialize a :class:`TestCase` object.
+
+        Any positional and/or keyword arguments are passed on to the
+        initializer of the superclass.
+        """
         super(TestCase, self).__init__(*args, **kw)
-        # Wrap all of the test methods so that we can customize the
-        # skipping of tests based on the exceptions they raise.
-        for name in dir(self.__class__):
-            if name.startswith('test_'):
-                setattr(self, name, functools.partial(
-                    self.skipTestWrapper,
-                    getattr(self, name),
-                ))
-
-    def assertRaises(self, exception, callable, *args, **kwds):
-        """
-        Replacement for :meth:`unittest.TestCase.assertRaises()` that returns the exception.
-
-        Refer to the :meth:`unittest.TestCase.assertRaises()` documentation for
-        details on argument handling. The return value is the caught exception.
-
-        .. warning:: This method does not support use as a context manager.
-        """
-        try:
-            callable(*args, **kwds)
-        except exception as e:
-            # Return the expected exception as a regular return value.
-            return e
-        else:
-            # Raise an exception when no exception was raised :-).
-            assert False, "Expected an exception to be raised!"
 
     def setUp(self, log_level=logging.DEBUG):
         """setUp(log_level=logging.DEBUG)
@@ -618,8 +610,8 @@ class TestCase(unittest.TestCase):
 
         - Before the test method starts a newline is emitted, to separate the
           name of the test method (which will be printed to the terminal by
-          :mod:`unittest` and/or pytest_) from the first line of logging output
-          that the test method is likely going to generate.
+          :mod:`unittest` or :pypi:`pytest`) from the first line of logging
+          output that the test method is likely going to generate.
         """
         # Configure logging to the terminal.
         configure_logging(log_level)
@@ -627,52 +619,3 @@ class TestCase(unittest.TestCase):
         # and/or py.test without a newline at the end) from the first line of
         # logging output that the test method is likely going to generate.
         sys.stderr.write("\n")
-
-    def shouldSkipTest(self, exception):
-        """
-        Decide whether a test that raised an exception should be skipped.
-
-        :param exception: The exception that was raised by the test.
-        :returns: :data:`True` to translate the exception into a skipped test,
-                  :data:`False` to propagate the exception as usual.
-
-        The :func:`shouldSkipTest()` method skips exceptions listed in the
-        :attr:`exceptionsToSkip` attribute. This enables subclasses of
-        :class:`TestCase` to customize the default behavior with a one liner.
-        """
-        return isinstance(exception, tuple(self.exceptionsToSkip))
-
-    def skipTestWrapper(self, test_method, *args, **kw):
-        """
-        Wrap test methods to translate exceptions into skipped tests.
-
-        :param test_method: The test method to wrap.
-        :param args: The positional arguments to the test method.
-        :param kw: The keyword arguments to the test method.
-        :returns: The return value of the test method.
-
-        When a :class:`TestCase` object is initialized, :func:`__init__()`
-        wraps all of the ``test_*`` methods with :func:`skipTestWrapper()`.
-
-        When a test method raises an exception, :func:`skipTestWrapper()` will
-        catch the exception and call :func:`shouldSkipTest()` to decide whether
-        to translate the exception into a skipped test.
-
-        When :func:`shouldSkipTest()` returns :data:`True` the exception is
-        swallowed and :exc:`unittest.SkipTest` is raised instead of the
-        original exception.
-        """
-        try:
-            return test_method(*args, **kw)
-        except BaseException as e:
-            if self.shouldSkipTest(e):
-                if isinstance(e, unittest.SkipTest):
-                    # We prefer to preserve the original
-                    # exception and stack trace.
-                    raise
-                else:
-                    # If the original exception wasn't a unittest.SkipTest
-                    # exception then we will translate it into one.
-                    raise unittest.SkipTest(unicode(e))
-            else:
-                raise

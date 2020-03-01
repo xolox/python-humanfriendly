@@ -19,6 +19,7 @@ import subprocess
 import sys
 import time
 import types
+import unittest
 import warnings
 
 # Modules included in our package.
@@ -80,6 +81,7 @@ from humanfriendly.testing import (
     TestCase,
     retry,
     run_cli,
+    skip_on_raise,
     touch,
 )
 from humanfriendly.text import (
@@ -108,17 +110,14 @@ class HumanFriendlyTestCase(TestCase):
 
     """Container for the `humanfriendly` test suite."""
 
-    exceptionsToSkip = [NotImplementedError]
-    """Translate NotImplementedError into skipped tests."""
-
-    def test_skipping(self):
-        """Make sure custom exception types can be skipped."""
-        raise NotImplementedError()
-
-    def test_assert_raises(self):
-        """Test :func:`~humanfriendly.testing.TestCase.assertRaises()`."""
-        e = self.assertRaises(ValueError, humanfriendly.coerce_boolean, 'not a boolean')
-        assert isinstance(e, ValueError)
+    def test_skip_on_raise(self):
+        """Test the skip_on_raise() decorator."""
+        def test_fn():
+            raise NotImplementedError()
+        decorator_fn = skip_on_raise(NotImplementedError)
+        decorated_fn = decorator_fn(test_fn)
+        self.assertRaises(NotImplementedError, test_fn)
+        self.assertRaises(unittest.SkipTest, decorated_fn)
 
     def test_retry_raise(self):
         """Test :func:`~humanfriendly.testing.retry()` based on assertion errors."""
@@ -135,7 +134,8 @@ class HumanFriendlyTestCase(TestCase):
         # Define a helper function that always raises an assertion error.
         def failure_helper():
             assert False
-        self.assertRaises(AssertionError, retry, failure_helper, timeout=1)
+        with self.assertRaises(AssertionError):
+            retry(failure_helper, timeout=1)
 
     def test_retry_return(self):
         """Test :func:`~humanfriendly.testing.retry()` based on return values."""
@@ -150,7 +150,8 @@ class HumanFriendlyTestCase(TestCase):
                 # On the second call we return a number.
                 return 42
         assert retry(success_helper) == 42
-        self.assertRaises(CallableTimedOut, retry, lambda: False, timeout=1)
+        with self.assertRaises(CallableTimedOut):
+            retry(lambda: False, timeout=1)
 
     def test_mocked_program(self):
         """Test :class:`humanfriendly.testing.MockedProgram`."""
@@ -294,8 +295,10 @@ class HumanFriendlyTestCase(TestCase):
         # Test that previous output doesn't change.
         self.assertEqual('some-random-text', generate_slug('some-random-text'))
         # Test that inputs which can't be converted to a slug raise an exception.
-        self.assertRaises(ValueError, generate_slug, ' ')
-        self.assertRaises(ValueError, generate_slug, '-')
+        with self.assertRaises(ValueError):
+            generate_slug(' ')
+        with self.assertRaises(ValueError):
+            generate_slug('-')
 
     def test_boolean_coercion(self):
         """Test :func:`humanfriendly.coerce_boolean()`."""
@@ -303,7 +306,8 @@ class HumanFriendlyTestCase(TestCase):
             self.assertEqual(True, humanfriendly.coerce_boolean(value))
         for value in [False, 'FALSE', 'False', 'false', 'off', 'no', '0']:
             self.assertEqual(False, humanfriendly.coerce_boolean(value))
-        self.assertRaises(ValueError, humanfriendly.coerce_boolean, 'not a boolean')
+        with self.assertRaises(ValueError):
+            humanfriendly.coerce_boolean('not a boolean')
 
     def test_pattern_coercion(self):
         """Test :func:`humanfriendly.coerce_pattern()`."""
@@ -316,7 +320,8 @@ class HumanFriendlyTestCase(TestCase):
         pattern = coerce_pattern('foobar', re.IGNORECASE)
         assert pattern.match('FOOBAR')
         # Make sure invalid values raise the expected exception.
-        self.assertRaises(ValueError, coerce_pattern, [])
+        with self.assertRaises(ValueError):
+            coerce_pattern([])
 
     def test_format_timespan(self):
         """Test :func:`humanfriendly.format_timespan()`."""
@@ -392,14 +397,16 @@ class HumanFriendlyTestCase(TestCase):
         self.assertEqual(60 * 60 * 24 * 4, humanfriendly.parse_timespan('4 days'))
         self.assertEqual(60 * 60 * 24 * 7 * 5, humanfriendly.parse_timespan('5 w'))
         self.assertEqual(60 * 60 * 24 * 7 * 5, humanfriendly.parse_timespan('5 weeks'))
-        self.assertRaises(humanfriendly.InvalidTimespan, humanfriendly.parse_timespan, '1z')
+        with self.assertRaises(humanfriendly.InvalidTimespan):
+            humanfriendly.parse_timespan('1z')
 
     def test_parse_date(self):
         """Test :func:`humanfriendly.parse_date()`."""
         self.assertEqual((2013, 6, 17, 0, 0, 0), humanfriendly.parse_date('2013-06-17'))
         self.assertEqual((2013, 6, 17, 2, 47, 42), humanfriendly.parse_date('2013-06-17 02:47:42'))
         self.assertEqual((2016, 11, 30, 0, 47, 17), humanfriendly.parse_date(u'2016-11-30 00:47:17'))
-        self.assertRaises(humanfriendly.InvalidDate, humanfriendly.parse_date, '2013-06-XY')
+        with self.assertRaises(humanfriendly.InvalidDate):
+            humanfriendly.parse_date('2013-06-XY')
 
     def test_format_size(self):
         """Test :func:`humanfriendly.format_size()`."""
@@ -444,8 +451,10 @@ class HumanFriendlyTestCase(TestCase):
         self.assertEqual(1000 ** 8, humanfriendly.parse_size('1 YB'))
         self.assertEqual(1000 ** 3 * 1.5, humanfriendly.parse_size('1.5 GB'))
         self.assertEqual(1024 ** 8 * 1.5, humanfriendly.parse_size('1.5 YiB'))
-        self.assertRaises(humanfriendly.InvalidSize, humanfriendly.parse_size, '1q')
-        self.assertRaises(humanfriendly.InvalidSize, humanfriendly.parse_size, 'a')
+        with self.assertRaises(humanfriendly.InvalidSize):
+            humanfriendly.parse_size('1q')
+        with self.assertRaises(humanfriendly.InvalidSize):
+            humanfriendly.parse_size('a')
 
     def test_format_length(self):
         """Test :func:`humanfriendly.format_length()`."""
@@ -469,8 +478,10 @@ class HumanFriendlyTestCase(TestCase):
         self.assertEqual(1e-02, humanfriendly.parse_length('1cm'))
         self.assertEqual(1e-03, humanfriendly.parse_length('1mm'))
         self.assertEqual(1e-09, humanfriendly.parse_length('1nm'))
-        self.assertRaises(humanfriendly.InvalidLength, humanfriendly.parse_length, '1z')
-        self.assertRaises(humanfriendly.InvalidLength, humanfriendly.parse_length, 'a')
+        with self.assertRaises(humanfriendly.InvalidLength):
+            humanfriendly.parse_length('1z')
+        with self.assertRaises(humanfriendly.InvalidLength):
+            humanfriendly.parse_length('a')
 
     def test_format_number(self):
         """Test :func:`humanfriendly.format_number()`."""
@@ -714,7 +725,8 @@ class HumanFriendlyTestCase(TestCase):
     def test_prompt_for_choice(self):
         """Test :func:`humanfriendly.prompts.prompt_for_choice()`."""
         # Choice selection without any options should raise an exception.
-        self.assertRaises(ValueError, prompt_for_choice, [])
+        with self.assertRaises(ValueError):
+            prompt_for_choice([])
         # If there's only one option no prompt should be rendered so we expect
         # the following code to not raise an EOFError exception (despite
         # connecting standard input to /dev/null).
@@ -748,7 +760,8 @@ class HumanFriendlyTestCase(TestCase):
             assert prompt_for_choice(['foo', 'bar', 'baz']) == 'bar'
         # Test that interactive prompts eventually give up on invalid replies.
         with PatchedAttribute(prompts, 'interactive_prompt', lambda p: ''):
-            self.assertRaises(TooManyInvalidReplies, prompt_for_choice, ['a', 'b', 'c'])
+            with self.assertRaises(TooManyInvalidReplies):
+                prompt_for_choice(['a', 'b', 'c'])
 
     def test_prompt_for_confirmation(self):
         """Test :func:`humanfriendly.prompts.prompt_for_confirmation()`."""
@@ -778,7 +791,8 @@ class HumanFriendlyTestCase(TestCase):
                     assert expected_text in capturer.get_text()
         # Test that interactive prompts eventually give up on invalid replies.
         with PatchedAttribute(prompts, 'interactive_prompt', lambda p: ''):
-            self.assertRaises(TooManyInvalidReplies, prompt_for_confirmation, "Are you sure?")
+            with self.assertRaises(TooManyInvalidReplies):
+                prompt_for_confirmation("Are you sure?")
 
     def test_prompt_for_input(self):
         """Test :func:`humanfriendly.prompts.prompt_for_input()`."""
@@ -789,7 +803,8 @@ class HumanFriendlyTestCase(TestCase):
                 assert prompt_for_input("What is your quest?", default=default_value) == default_value
                 # If standard input isn't connected to a terminal and no default value
                 # is given the EOFError exception should be propagated to the caller.
-                self.assertRaises(EOFError, prompt_for_input, "What is your favorite color?")
+                with self.assertRaises(EOFError):
+                    prompt_for_input("What is your favorite color?")
 
     def test_cli(self):
         """Test the command line interface."""
@@ -880,7 +895,8 @@ class HumanFriendlyTestCase(TestCase):
         assert ansi_style(color=(0, 0, 0)) == '%s38;2;0;0;0%s' % (ANSI_CSI, ANSI_SGR)
         assert ansi_style(color=(255, 255, 255)) == '%s38;2;255;255;255%s' % (ANSI_CSI, ANSI_SGR)
         assert ansi_style(background=(50, 100, 150)) == '%s48;2;50;100;150%s' % (ANSI_CSI, ANSI_SGR)
-        self.assertRaises(ValueError, ansi_style, color='unknown')
+        with self.assertRaises(ValueError):
+            ansi_style(color='unknown')
 
     def test_ansi_width(self):
         """Test :func:`humanfriendly.terminal.ansi_width()`."""
@@ -1280,7 +1296,8 @@ class HumanFriendlyTestCase(TestCase):
         fake_fn = MagicMock()
         with PatchedAttribute(warnings, 'warn', fake_fn):
             assert test_function('foo', 'bar') == 42
-            self.assertRaises(TypeError, test_function, 'foo', 'bar', 'baz')
+            with self.assertRaises(TypeError):
+                test_function('foo', 'bar', 'baz')
         assert fake_fn.was_called
 
     def test_alias_proxy_deprecation_warning(self):

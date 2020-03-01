@@ -566,7 +566,7 @@ and :class:`~humanfriendly.testing.PatchedItem` classes.
 `Release 3.5`_ (2017-06-24)
 ---------------------------
 
-Added :func:`~humanfriendly.testing.TestCase.assertRaises()` enhancements.
+Added ``humanfriendly.testing.TestCase.assertRaises()`` enhancements.
 
 .. _Release 3.5: https://github.com/xolox/python-humanfriendly/compare/3.4.1...3.5
 
