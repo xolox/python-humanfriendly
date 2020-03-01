@@ -11,6 +11,46 @@ Changelog`_. This project adheres to `semantic versioning`_.
 .. _Keep a Changelog: http://keepachangelog.com/
 .. _semantic versioning: http://semver.org/
 
+`Release 7.2`_ (2020-03-01)
+---------------------------
+
+**Enhancements:**
+
+Support for backwards compatible aliases that emit deprecation warnings
+(:mod:`humanfriendly.deprecation`).
+
+I'm currently working on several large refactorings that involve moving things
+around between modules and dreaded having to extend the existing maze of
+(almost but not quite) cyclic import dependencies between modules. This new
+functionality will be adopted to untangle the existing maze in the coming
+release, which will bump the major version number due to this very large change
+in how backwards compatibility is implemented. It is my hope that this new
+functionality will prove to be robust enough to unburden me from the less
+elegant aspects of preserving backwards compatibility 😁.
+
+**Documentation:**
+
+Get rid of broken references and noise in the online documentation once and for all:
+
+- :pypi:`Sphinx` was emitting a screen full of warnings about unknown
+  references. These were bothering me because testing the integration between
+  Sphinx and :mod:`humanfriendly.deprecation` involved lots of broken
+  references as well.
+
+- Additionally the :mod:`humanfriendly.compat` module introduced a lot of noise
+  into the generated documentation because imported classes and their members
+  were being included in the documentation, this is now also fixed.
+
+- Finally I decided to start using ``sphinx-build -nW`` to complain loudly when
+  even just one broken reference is found. This should encourage the discipline
+  to never introduce broken references again!
+
+**Tests:**
+
+Fixed :mod:`unittest` deprecation warnings in the test suite.
+
+.. _Release 7.2: https://github.com/xolox/python-humanfriendly/compare/7.1.1...7.2
+
 `Release 7.1.1`_ (2020-02-18)
 -----------------------------
 
