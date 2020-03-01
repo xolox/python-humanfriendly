@@ -4,7 +4,7 @@
 # Tests for the `humanfriendly' package.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: February 10, 2020
+# Last Change: March 1, 2020
 # URL: https://humanfriendly.readthedocs.io
 
 """Test suite for the `humanfriendly` package."""
@@ -589,7 +589,7 @@ class HumanFriendlyTestCase(TestCase):
         # Generate a table with column names.
         column_names = ['One', 'Two', 'Three']
         data = [['1', '2', '3'], ['a', 'b', 'c']]
-        self.assertEquals(
+        self.assertEqual(
             format_rst_table(data, column_names),
             dedent("""
                 ===  ===  =====
@@ -602,7 +602,7 @@ class HumanFriendlyTestCase(TestCase):
         )
         # Generate a table without column names.
         data = [['1', '2', '3'], ['a', 'b', 'c']]
-        self.assertEquals(
+        self.assertEqual(
             format_rst_table(data),
             dedent("""
                 =  =  =
