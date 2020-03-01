@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: March 1, 2020
+# Last Change: March 2, 2020
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -188,7 +188,7 @@ def is_method(function):
         # Python 3.3 and newer.
         signature = inspect.signature(function)
         return "self" in signature.parameters
-    except ImportError:
+    except AttributeError:
         # Python 3.2 and older.
         metadata = inspect.getargspec(function)
         return "self" in metadata.args
