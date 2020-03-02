@@ -11,6 +11,71 @@ Changelog`_. This project adheres to `semantic versioning`_.
 .. _Keep a Changelog: http://keepachangelog.com/
 .. _semantic versioning: http://semver.org/
 
+`Release 8.0`_ (2020-03-02)
+---------------------------
+
+This release is backwards incompatible in several ways, see the notes below.
+
+**Enhancements:**
+
+- Adopt :func:`functools.wraps()` to make decorator functions more robust.
+
+- Make the :class:`~humanfriendly.terminal.spinners.Spinner` class more
+  customizable. The interval at which spinners are updated and the characters
+  used to draw the animation of spinners can now be customized by callers.
+  This was triggered by `executor issue #2`_.
+
+  .. note:: The text cursor hiding behavior of spinners has been removed
+            because it was found to be problematic (sometimes the text cursor
+            would be hidden but not made visible again, which is disorienting
+            to say the least).
+
+- Improve test skipping based on exception types.
+
+  The :class:`humanfriendly.testing.TestCase` class was originally created to
+  enable skipping of tests that raise specific exception types on Python 2.6.
+  This involved patching test methods, which had the unfortunate side effect
+  of generating confusing :pypi:`pytest` output on test failures.
+
+  Since then :pypi:`unittest2` was integrated which provided real
+  skipping of tests however removing the old test skipping support
+  from the :mod:`humanfriendly.testing` module would have resulted
+  in a backwards incompatible change, so I never bothered. I've now
+  decided to bite the bullet and get this over with:
+
+  1. I've implemented an alternative (finer grained) strategy based on a
+     decorator function that applies to individual test methods, for
+     details see :func:`humanfriendly.testing.skip_on_raise()`.
+
+  2. I've removed the test method wrapping from the
+     :class:`humanfriendly.testing.TestCase` class.
+
+  .. note:: This change is backwards incompatible, in fact it breaks the
+            test suites of two other projects of mine (:pypi:`executor` and
+            :pypi:`vcs-repo-mgr`) because they depend on the old test method
+            wrapping approach. Both test suites will need to be migrated to
+            the :func:`~humanfriendly.testing.skip_on_raise()` decorator.
+
+**Internal changes:**
+
+- The "deprecated imports" feature provided by :mod:`humanfriendly.deprecation`
+  has been adopted to clean up the maze of (almost but not quite) cyclic import
+  dependencies between modules.
+
+- HTML to ANSI functionality has been extracted to a new
+  :mod:`humanfriendly.terminal.html` module.
+
+- Support for spinners has been extracted to a new
+  :mod:`humanfriendly.terminal.spinners` module.
+
+- The use of positional arguments to initialize
+  :class:`~humanfriendly.terminal.spinners.Spinner` objects has been deprecated
+  using the new :func:`humanfriendly.deprecation.deprecated_args()` decorator
+  function.
+
+.. _Release 8.0: https://github.com/xolox/python-humanfriendly/compare/7.3...8.0
+.. _executor issue #2: https://github.com/xolox/python-executor/issues/2
+
 `Release 7.3`_ (2020-03-02)
 ---------------------------
 

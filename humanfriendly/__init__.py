@@ -51,7 +51,7 @@ __all__ = (
 )
 
 # Semi-standard module versioning.
-__version__ = '7.3'
+__version__ = '8.0'
 
 # Named tuples to define units of size.
 SizeUnit = collections.namedtuple('SizeUnit', 'divider, symbol, name')
