@@ -560,8 +560,8 @@ class CaptureOutput(ContextManager):
                         choice to opt out of capturing output.
         """
         self.stdin = StringIO(input)
-        self.stdout = StringIO()
-        self.stderr = self.stdout if merged else StringIO()
+        self.stdout = CaptureBuffer()
+        self.stderr = self.stdout if merged else CaptureBuffer()
         self.patched_attributes = []
         if enabled:
             self.patched_attributes.extend(
@@ -591,9 +591,37 @@ class CaptureOutput(ContextManager):
         for context in self.patched_attributes:
             context.__exit__(exc_type, exc_value, traceback)
 
+    def get_lines(self):
+        """Get the contents of the buffer split into separate lines."""
+        return self.get_text().splitlines()
+
+    def get_text(self):
+        """Get the contents of the buffer as a Unicode string."""
+        return self.stdout.getvalue()
+
     def getvalue(self):
         """Get the text written to :data:`sys.stdout`."""
         return self.stdout.getvalue()
+
+
+class CaptureBuffer(StringIO):
+
+    """
+    Helper for :class:`CaptureOutput` to provide an easy to use API.
+
+    The two methods defined by this subclass were specifically chosen to match
+    the names of the methods provided by my :pypi:`capturer` package which
+    serves a similar role as :class:`CaptureOutput` but knows how to simulate
+    an interactive terminal (tty).
+    """
+
+    def get_lines(self):
+        """Get the contents of the buffer split into separate lines."""
+        return self.get_text().splitlines()
+
+    def get_text(self):
+        """Get the contents of the buffer as a Unicode string."""
+        return self.getvalue()
 
 
 class TestCase(unittest.TestCase):
