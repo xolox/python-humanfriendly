@@ -11,6 +11,26 @@ Changelog`_. This project adheres to `semantic versioning`_.
 .. _Keep a Changelog: http://keepachangelog.com/
 .. _semantic versioning: http://semver.org/
 
+`Release 8.1`_ (2020-03-06)
+---------------------------
+
+**Enhancements:**
+
+- Make it possible to opt out of the output capturing that
+  :func:`humanfriendly.testing.run_cli()` sets up by default.
+
+- Improve feature parity between :class:`humanfriendly.testing.CaptureOutput`
+  and my :pypi:`capturer` package to the point where most of the
+  :pypi:`humanfriendly` test suite can now run without :pypi:`capturer`.
+
+**Internal changes:**
+
+- Refactored the test suite to import all names separately instead of referring
+  to identifiers via their modules (my preferences have changed since this code
+  was written a long time ago).
+
+.. _Release 8.1: https://github.com/xolox/python-humanfriendly/compare/8.0...8.1
+
 `Release 8.0`_ (2020-03-02)
 ---------------------------
 
