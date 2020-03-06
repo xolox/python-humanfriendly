@@ -45,6 +45,7 @@ NOTHING = object()
 # Public identifiers that require documentation.
 __all__ = (
     'CallableTimedOut',
+    'CaptureBuffer',
     'CaptureOutput',
     'ContextManager',
     'CustomSearchPath',
@@ -543,7 +544,21 @@ class MockedProgram(CustomSearchPath):
 
 class CaptureOutput(ContextManager):
 
-    """Context manager that captures what's written to :data:`sys.stdout` and :data:`sys.stderr`."""
+    """
+    Context manager that captures what's written to :data:`sys.stdout` and :data:`sys.stderr`.
+
+    .. attribute:: stdin
+
+       The :class:`~humanfriendly.compat.StringIO` object used to feed the standard input stream.
+
+    .. attribute:: stdout
+
+       The :class:`CaptureBuffer` object used to capture the standard output stream.
+
+    .. attribute:: stderr
+
+       The :class:`CaptureBuffer` object used to capture the standard error stream.
+    """
 
     def __init__(self, merged=False, input='', enabled=True):
         """
@@ -569,15 +584,6 @@ class CaptureOutput(ContextManager):
                 for name in ('stdin', 'stdout', 'stderr')
             )
 
-    stdin = None
-    """The :class:`~humanfriendly.compat.StringIO` object used to feed the standard input stream."""
-
-    stdout = None
-    """The :class:`~humanfriendly.compat.StringIO` object used to capture the standard output stream."""
-
-    stderr = None
-    """The :class:`~humanfriendly.compat.StringIO` object used to capture the standard error stream."""
-
     def __enter__(self):
         """Start capturing what's written to :data:`sys.stdout` and :data:`sys.stderr`."""
         super(CaptureOutput, self).__enter__()
@@ -592,12 +598,12 @@ class CaptureOutput(ContextManager):
             context.__exit__(exc_type, exc_value, traceback)
 
     def get_lines(self):
-        """Get the contents of the buffer split into separate lines."""
+        """Get the contents of :attr:`stdout` split into separate lines."""
         return self.get_text().splitlines()
 
     def get_text(self):
-        """Get the contents of the buffer as a Unicode string."""
-        return self.stdout.getvalue()
+        """Get the contents of :attr:`stdout` as a Unicode string."""
+        return self.stdout.get_text()
 
     def getvalue(self):
         """Get the text written to :data:`sys.stdout`."""
