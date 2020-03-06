@@ -4,7 +4,7 @@
 # Tests for the `humanfriendly' package.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: March 2, 2020
+# Last Change: March 6, 2020
 # URL: https://humanfriendly.readthedocs.io
 
 """Test suite for the `humanfriendly` package."""
@@ -23,8 +23,27 @@ import unittest
 import warnings
 
 # Modules included in our package.
-import humanfriendly
-from humanfriendly import coerce_pattern, prompts
+from humanfriendly import (
+    InvalidDate,
+    InvalidLength,
+    InvalidSize,
+    InvalidTimespan,
+    Timer,
+    coerce_boolean,
+    coerce_pattern,
+    format_length,
+    format_number,
+    format_path,
+    format_size,
+    format_timespan,
+    parse_date,
+    parse_length,
+    parse_path,
+    parse_size,
+    parse_timespan,
+    prompts,
+    round_number,
+)
 from humanfriendly.cli import main
 from humanfriendly.compat import StringIO
 from humanfriendly.decorators import cached
@@ -303,11 +322,11 @@ class HumanFriendlyTestCase(TestCase):
     def test_boolean_coercion(self):
         """Test :func:`humanfriendly.coerce_boolean()`."""
         for value in [True, 'TRUE', 'True', 'true', 'on', 'yes', '1']:
-            self.assertEqual(True, humanfriendly.coerce_boolean(value))
+            self.assertEqual(True, coerce_boolean(value))
         for value in [False, 'FALSE', 'False', 'false', 'off', 'no', '0']:
-            self.assertEqual(False, humanfriendly.coerce_boolean(value))
+            self.assertEqual(False, coerce_boolean(value))
         with self.assertRaises(ValueError):
-            humanfriendly.coerce_boolean('not a boolean')
+            coerce_boolean('not a boolean')
 
     def test_pattern_coercion(self):
         """Test :func:`humanfriendly.coerce_pattern()`."""
@@ -330,188 +349,188 @@ class HumanFriendlyTestCase(TestCase):
         day = hour * 24
         week = day * 7
         year = week * 52
-        assert '1 nanosecond' == humanfriendly.format_timespan(0.000000001, detailed=True)
-        assert '500 nanoseconds' == humanfriendly.format_timespan(0.0000005, detailed=True)
-        assert '1 microsecond' == humanfriendly.format_timespan(0.000001, detailed=True)
-        assert '500 microseconds' == humanfriendly.format_timespan(0.0005, detailed=True)
-        assert '1 millisecond' == humanfriendly.format_timespan(0.001, detailed=True)
-        assert '500 milliseconds' == humanfriendly.format_timespan(0.5, detailed=True)
-        assert '0.5 seconds' == humanfriendly.format_timespan(0.5, detailed=False)
-        assert '0 seconds' == humanfriendly.format_timespan(0)
-        assert '0.54 seconds' == humanfriendly.format_timespan(0.54321)
-        assert '1 second' == humanfriendly.format_timespan(1)
-        assert '3.14 seconds' == humanfriendly.format_timespan(math.pi)
-        assert '1 minute' == humanfriendly.format_timespan(minute)
-        assert '1 minute and 20 seconds' == humanfriendly.format_timespan(80)
-        assert '2 minutes' == humanfriendly.format_timespan(minute * 2)
-        assert '1 hour' == humanfriendly.format_timespan(hour)
-        assert '2 hours' == humanfriendly.format_timespan(hour * 2)
-        assert '1 day' == humanfriendly.format_timespan(day)
-        assert '2 days' == humanfriendly.format_timespan(day * 2)
-        assert '1 week' == humanfriendly.format_timespan(week)
-        assert '2 weeks' == humanfriendly.format_timespan(week * 2)
-        assert '1 year' == humanfriendly.format_timespan(year)
-        assert '2 years' == humanfriendly.format_timespan(year * 2)
+        assert '1 nanosecond' == format_timespan(0.000000001, detailed=True)
+        assert '500 nanoseconds' == format_timespan(0.0000005, detailed=True)
+        assert '1 microsecond' == format_timespan(0.000001, detailed=True)
+        assert '500 microseconds' == format_timespan(0.0005, detailed=True)
+        assert '1 millisecond' == format_timespan(0.001, detailed=True)
+        assert '500 milliseconds' == format_timespan(0.5, detailed=True)
+        assert '0.5 seconds' == format_timespan(0.5, detailed=False)
+        assert '0 seconds' == format_timespan(0)
+        assert '0.54 seconds' == format_timespan(0.54321)
+        assert '1 second' == format_timespan(1)
+        assert '3.14 seconds' == format_timespan(math.pi)
+        assert '1 minute' == format_timespan(minute)
+        assert '1 minute and 20 seconds' == format_timespan(80)
+        assert '2 minutes' == format_timespan(minute * 2)
+        assert '1 hour' == format_timespan(hour)
+        assert '2 hours' == format_timespan(hour * 2)
+        assert '1 day' == format_timespan(day)
+        assert '2 days' == format_timespan(day * 2)
+        assert '1 week' == format_timespan(week)
+        assert '2 weeks' == format_timespan(week * 2)
+        assert '1 year' == format_timespan(year)
+        assert '2 years' == format_timespan(year * 2)
         assert '6 years, 5 weeks, 4 days, 3 hours, 2 minutes and 500 milliseconds' == \
-            humanfriendly.format_timespan(year * 6 + week * 5 + day * 4 + hour * 3 + minute * 2 + 0.5, detailed=True)
+            format_timespan(year * 6 + week * 5 + day * 4 + hour * 3 + minute * 2 + 0.5, detailed=True)
         assert '1 year, 2 weeks and 3 days' == \
-            humanfriendly.format_timespan(year + week * 2 + day * 3 + hour * 12)
+            format_timespan(year + week * 2 + day * 3 + hour * 12)
         # Make sure milliseconds are never shown separately when detailed=False.
         # https://github.com/xolox/python-humanfriendly/issues/10
-        assert '1 minute, 1 second and 100 milliseconds' == humanfriendly.format_timespan(61.10, detailed=True)
-        assert '1 minute and 1.1 second' == humanfriendly.format_timespan(61.10, detailed=False)
+        assert '1 minute, 1 second and 100 milliseconds' == format_timespan(61.10, detailed=True)
+        assert '1 minute and 1.1 second' == format_timespan(61.10, detailed=False)
         # Test for loss of precision as reported in issue 11:
         # https://github.com/xolox/python-humanfriendly/issues/11
-        assert '1 minute and 0.3 seconds' == humanfriendly.format_timespan(60.300)
-        assert '5 minutes and 0.3 seconds' == humanfriendly.format_timespan(300.300)
-        assert '1 second and 15 milliseconds' == humanfriendly.format_timespan(1.015, detailed=True)
-        assert '10 seconds and 15 milliseconds' == humanfriendly.format_timespan(10.015, detailed=True)
-        assert '1 microsecond and 50 nanoseconds' == humanfriendly.format_timespan(0.00000105, detailed=True)
+        assert '1 minute and 0.3 seconds' == format_timespan(60.300)
+        assert '5 minutes and 0.3 seconds' == format_timespan(300.300)
+        assert '1 second and 15 milliseconds' == format_timespan(1.015, detailed=True)
+        assert '10 seconds and 15 milliseconds' == format_timespan(10.015, detailed=True)
+        assert '1 microsecond and 50 nanoseconds' == format_timespan(0.00000105, detailed=True)
         # Test the datetime.timedelta support:
         # https://github.com/xolox/python-humanfriendly/issues/27
         now = datetime.datetime.now()
         then = now - datetime.timedelta(hours=23)
-        assert '23 hours' == humanfriendly.format_timespan(now - then)
+        assert '23 hours' == format_timespan(now - then)
 
     def test_parse_timespan(self):
         """Test :func:`humanfriendly.parse_timespan()`."""
-        self.assertEqual(0, humanfriendly.parse_timespan('0'))
-        self.assertEqual(0, humanfriendly.parse_timespan('0s'))
-        self.assertEqual(0.000000001, humanfriendly.parse_timespan('1ns'))
-        self.assertEqual(0.000000051, humanfriendly.parse_timespan('51ns'))
-        self.assertEqual(0.000001, humanfriendly.parse_timespan('1us'))
-        self.assertEqual(0.000052, humanfriendly.parse_timespan('52us'))
-        self.assertEqual(0.001, humanfriendly.parse_timespan('1ms'))
-        self.assertEqual(0.001, humanfriendly.parse_timespan('1 millisecond'))
-        self.assertEqual(0.5, humanfriendly.parse_timespan('500 milliseconds'))
-        self.assertEqual(0.5, humanfriendly.parse_timespan('0.5 seconds'))
-        self.assertEqual(5, humanfriendly.parse_timespan('5s'))
-        self.assertEqual(5, humanfriendly.parse_timespan('5 seconds'))
-        self.assertEqual(60 * 2, humanfriendly.parse_timespan('2m'))
-        self.assertEqual(60 * 2, humanfriendly.parse_timespan('2 minutes'))
-        self.assertEqual(60 * 3, humanfriendly.parse_timespan('3 min'))
-        self.assertEqual(60 * 3, humanfriendly.parse_timespan('3 mins'))
-        self.assertEqual(60 * 60 * 3, humanfriendly.parse_timespan('3 h'))
-        self.assertEqual(60 * 60 * 3, humanfriendly.parse_timespan('3 hours'))
-        self.assertEqual(60 * 60 * 24 * 4, humanfriendly.parse_timespan('4d'))
-        self.assertEqual(60 * 60 * 24 * 4, humanfriendly.parse_timespan('4 days'))
-        self.assertEqual(60 * 60 * 24 * 7 * 5, humanfriendly.parse_timespan('5 w'))
-        self.assertEqual(60 * 60 * 24 * 7 * 5, humanfriendly.parse_timespan('5 weeks'))
-        with self.assertRaises(humanfriendly.InvalidTimespan):
-            humanfriendly.parse_timespan('1z')
+        self.assertEqual(0, parse_timespan('0'))
+        self.assertEqual(0, parse_timespan('0s'))
+        self.assertEqual(0.000000001, parse_timespan('1ns'))
+        self.assertEqual(0.000000051, parse_timespan('51ns'))
+        self.assertEqual(0.000001, parse_timespan('1us'))
+        self.assertEqual(0.000052, parse_timespan('52us'))
+        self.assertEqual(0.001, parse_timespan('1ms'))
+        self.assertEqual(0.001, parse_timespan('1 millisecond'))
+        self.assertEqual(0.5, parse_timespan('500 milliseconds'))
+        self.assertEqual(0.5, parse_timespan('0.5 seconds'))
+        self.assertEqual(5, parse_timespan('5s'))
+        self.assertEqual(5, parse_timespan('5 seconds'))
+        self.assertEqual(60 * 2, parse_timespan('2m'))
+        self.assertEqual(60 * 2, parse_timespan('2 minutes'))
+        self.assertEqual(60 * 3, parse_timespan('3 min'))
+        self.assertEqual(60 * 3, parse_timespan('3 mins'))
+        self.assertEqual(60 * 60 * 3, parse_timespan('3 h'))
+        self.assertEqual(60 * 60 * 3, parse_timespan('3 hours'))
+        self.assertEqual(60 * 60 * 24 * 4, parse_timespan('4d'))
+        self.assertEqual(60 * 60 * 24 * 4, parse_timespan('4 days'))
+        self.assertEqual(60 * 60 * 24 * 7 * 5, parse_timespan('5 w'))
+        self.assertEqual(60 * 60 * 24 * 7 * 5, parse_timespan('5 weeks'))
+        with self.assertRaises(InvalidTimespan):
+            parse_timespan('1z')
 
     def test_parse_date(self):
         """Test :func:`humanfriendly.parse_date()`."""
-        self.assertEqual((2013, 6, 17, 0, 0, 0), humanfriendly.parse_date('2013-06-17'))
-        self.assertEqual((2013, 6, 17, 2, 47, 42), humanfriendly.parse_date('2013-06-17 02:47:42'))
-        self.assertEqual((2016, 11, 30, 0, 47, 17), humanfriendly.parse_date(u'2016-11-30 00:47:17'))
-        with self.assertRaises(humanfriendly.InvalidDate):
-            humanfriendly.parse_date('2013-06-XY')
+        self.assertEqual((2013, 6, 17, 0, 0, 0), parse_date('2013-06-17'))
+        self.assertEqual((2013, 6, 17, 2, 47, 42), parse_date('2013-06-17 02:47:42'))
+        self.assertEqual((2016, 11, 30, 0, 47, 17), parse_date(u'2016-11-30 00:47:17'))
+        with self.assertRaises(InvalidDate):
+            parse_date('2013-06-XY')
 
     def test_format_size(self):
         """Test :func:`humanfriendly.format_size()`."""
-        self.assertEqual('0 bytes', humanfriendly.format_size(0))
-        self.assertEqual('1 byte', humanfriendly.format_size(1))
-        self.assertEqual('42 bytes', humanfriendly.format_size(42))
-        self.assertEqual('1 KB', humanfriendly.format_size(1000 ** 1))
-        self.assertEqual('1 MB', humanfriendly.format_size(1000 ** 2))
-        self.assertEqual('1 GB', humanfriendly.format_size(1000 ** 3))
-        self.assertEqual('1 TB', humanfriendly.format_size(1000 ** 4))
-        self.assertEqual('1 PB', humanfriendly.format_size(1000 ** 5))
-        self.assertEqual('1 EB', humanfriendly.format_size(1000 ** 6))
-        self.assertEqual('1 ZB', humanfriendly.format_size(1000 ** 7))
-        self.assertEqual('1 YB', humanfriendly.format_size(1000 ** 8))
-        self.assertEqual('1 KiB', humanfriendly.format_size(1024 ** 1, binary=True))
-        self.assertEqual('1 MiB', humanfriendly.format_size(1024 ** 2, binary=True))
-        self.assertEqual('1 GiB', humanfriendly.format_size(1024 ** 3, binary=True))
-        self.assertEqual('1 TiB', humanfriendly.format_size(1024 ** 4, binary=True))
-        self.assertEqual('1 PiB', humanfriendly.format_size(1024 ** 5, binary=True))
-        self.assertEqual('1 EiB', humanfriendly.format_size(1024 ** 6, binary=True))
-        self.assertEqual('1 ZiB', humanfriendly.format_size(1024 ** 7, binary=True))
-        self.assertEqual('1 YiB', humanfriendly.format_size(1024 ** 8, binary=True))
-        self.assertEqual('45 KB', humanfriendly.format_size(1000 * 45))
-        self.assertEqual('2.9 TB', humanfriendly.format_size(1000 ** 4 * 2.9))
+        self.assertEqual('0 bytes', format_size(0))
+        self.assertEqual('1 byte', format_size(1))
+        self.assertEqual('42 bytes', format_size(42))
+        self.assertEqual('1 KB', format_size(1000 ** 1))
+        self.assertEqual('1 MB', format_size(1000 ** 2))
+        self.assertEqual('1 GB', format_size(1000 ** 3))
+        self.assertEqual('1 TB', format_size(1000 ** 4))
+        self.assertEqual('1 PB', format_size(1000 ** 5))
+        self.assertEqual('1 EB', format_size(1000 ** 6))
+        self.assertEqual('1 ZB', format_size(1000 ** 7))
+        self.assertEqual('1 YB', format_size(1000 ** 8))
+        self.assertEqual('1 KiB', format_size(1024 ** 1, binary=True))
+        self.assertEqual('1 MiB', format_size(1024 ** 2, binary=True))
+        self.assertEqual('1 GiB', format_size(1024 ** 3, binary=True))
+        self.assertEqual('1 TiB', format_size(1024 ** 4, binary=True))
+        self.assertEqual('1 PiB', format_size(1024 ** 5, binary=True))
+        self.assertEqual('1 EiB', format_size(1024 ** 6, binary=True))
+        self.assertEqual('1 ZiB', format_size(1024 ** 7, binary=True))
+        self.assertEqual('1 YiB', format_size(1024 ** 8, binary=True))
+        self.assertEqual('45 KB', format_size(1000 * 45))
+        self.assertEqual('2.9 TB', format_size(1000 ** 4 * 2.9))
 
     def test_parse_size(self):
         """Test :func:`humanfriendly.parse_size()`."""
-        self.assertEqual(0, humanfriendly.parse_size('0B'))
-        self.assertEqual(42, humanfriendly.parse_size('42'))
-        self.assertEqual(42, humanfriendly.parse_size('42B'))
-        self.assertEqual(1000, humanfriendly.parse_size('1k'))
-        self.assertEqual(1024, humanfriendly.parse_size('1k', binary=True))
-        self.assertEqual(1000, humanfriendly.parse_size('1 KB'))
-        self.assertEqual(1000, humanfriendly.parse_size('1 kilobyte'))
-        self.assertEqual(1024, humanfriendly.parse_size('1 kilobyte', binary=True))
-        self.assertEqual(1000 ** 2 * 69, humanfriendly.parse_size('69 MB'))
-        self.assertEqual(1000 ** 3, humanfriendly.parse_size('1 GB'))
-        self.assertEqual(1000 ** 4, humanfriendly.parse_size('1 TB'))
-        self.assertEqual(1000 ** 5, humanfriendly.parse_size('1 PB'))
-        self.assertEqual(1000 ** 6, humanfriendly.parse_size('1 EB'))
-        self.assertEqual(1000 ** 7, humanfriendly.parse_size('1 ZB'))
-        self.assertEqual(1000 ** 8, humanfriendly.parse_size('1 YB'))
-        self.assertEqual(1000 ** 3 * 1.5, humanfriendly.parse_size('1.5 GB'))
-        self.assertEqual(1024 ** 8 * 1.5, humanfriendly.parse_size('1.5 YiB'))
-        with self.assertRaises(humanfriendly.InvalidSize):
-            humanfriendly.parse_size('1q')
-        with self.assertRaises(humanfriendly.InvalidSize):
-            humanfriendly.parse_size('a')
+        self.assertEqual(0, parse_size('0B'))
+        self.assertEqual(42, parse_size('42'))
+        self.assertEqual(42, parse_size('42B'))
+        self.assertEqual(1000, parse_size('1k'))
+        self.assertEqual(1024, parse_size('1k', binary=True))
+        self.assertEqual(1000, parse_size('1 KB'))
+        self.assertEqual(1000, parse_size('1 kilobyte'))
+        self.assertEqual(1024, parse_size('1 kilobyte', binary=True))
+        self.assertEqual(1000 ** 2 * 69, parse_size('69 MB'))
+        self.assertEqual(1000 ** 3, parse_size('1 GB'))
+        self.assertEqual(1000 ** 4, parse_size('1 TB'))
+        self.assertEqual(1000 ** 5, parse_size('1 PB'))
+        self.assertEqual(1000 ** 6, parse_size('1 EB'))
+        self.assertEqual(1000 ** 7, parse_size('1 ZB'))
+        self.assertEqual(1000 ** 8, parse_size('1 YB'))
+        self.assertEqual(1000 ** 3 * 1.5, parse_size('1.5 GB'))
+        self.assertEqual(1024 ** 8 * 1.5, parse_size('1.5 YiB'))
+        with self.assertRaises(InvalidSize):
+            parse_size('1q')
+        with self.assertRaises(InvalidSize):
+            parse_size('a')
 
     def test_format_length(self):
         """Test :func:`humanfriendly.format_length()`."""
-        self.assertEqual('0 metres', humanfriendly.format_length(0))
-        self.assertEqual('1 metre', humanfriendly.format_length(1))
-        self.assertEqual('42 metres', humanfriendly.format_length(42))
-        self.assertEqual('1 km', humanfriendly.format_length(1 * 1000))
-        self.assertEqual('15.3 cm', humanfriendly.format_length(0.153))
-        self.assertEqual('1 cm', humanfriendly.format_length(1e-02))
-        self.assertEqual('1 mm', humanfriendly.format_length(1e-03))
-        self.assertEqual('1 nm', humanfriendly.format_length(1e-09))
+        self.assertEqual('0 metres', format_length(0))
+        self.assertEqual('1 metre', format_length(1))
+        self.assertEqual('42 metres', format_length(42))
+        self.assertEqual('1 km', format_length(1 * 1000))
+        self.assertEqual('15.3 cm', format_length(0.153))
+        self.assertEqual('1 cm', format_length(1e-02))
+        self.assertEqual('1 mm', format_length(1e-03))
+        self.assertEqual('1 nm', format_length(1e-09))
 
     def test_parse_length(self):
         """Test :func:`humanfriendly.parse_length()`."""
-        self.assertEqual(0, humanfriendly.parse_length('0m'))
-        self.assertEqual(42, humanfriendly.parse_length('42'))
-        self.assertEqual(1.5, humanfriendly.parse_length('1.5'))
-        self.assertEqual(42, humanfriendly.parse_length('42m'))
-        self.assertEqual(1000, humanfriendly.parse_length('1km'))
-        self.assertEqual(0.153, humanfriendly.parse_length('15.3 cm'))
-        self.assertEqual(1e-02, humanfriendly.parse_length('1cm'))
-        self.assertEqual(1e-03, humanfriendly.parse_length('1mm'))
-        self.assertEqual(1e-09, humanfriendly.parse_length('1nm'))
-        with self.assertRaises(humanfriendly.InvalidLength):
-            humanfriendly.parse_length('1z')
-        with self.assertRaises(humanfriendly.InvalidLength):
-            humanfriendly.parse_length('a')
+        self.assertEqual(0, parse_length('0m'))
+        self.assertEqual(42, parse_length('42'))
+        self.assertEqual(1.5, parse_length('1.5'))
+        self.assertEqual(42, parse_length('42m'))
+        self.assertEqual(1000, parse_length('1km'))
+        self.assertEqual(0.153, parse_length('15.3 cm'))
+        self.assertEqual(1e-02, parse_length('1cm'))
+        self.assertEqual(1e-03, parse_length('1mm'))
+        self.assertEqual(1e-09, parse_length('1nm'))
+        with self.assertRaises(InvalidLength):
+            parse_length('1z')
+        with self.assertRaises(InvalidLength):
+            parse_length('a')
 
     def test_format_number(self):
         """Test :func:`humanfriendly.format_number()`."""
-        self.assertEqual('1', humanfriendly.format_number(1))
-        self.assertEqual('1.5', humanfriendly.format_number(1.5))
-        self.assertEqual('1.56', humanfriendly.format_number(1.56789))
-        self.assertEqual('1.567', humanfriendly.format_number(1.56789, 3))
-        self.assertEqual('1,000', humanfriendly.format_number(1000))
-        self.assertEqual('1,000', humanfriendly.format_number(1000.12, 0))
-        self.assertEqual('1,000,000', humanfriendly.format_number(1000000))
-        self.assertEqual('1,000,000.42', humanfriendly.format_number(1000000.42))
+        self.assertEqual('1', format_number(1))
+        self.assertEqual('1.5', format_number(1.5))
+        self.assertEqual('1.56', format_number(1.56789))
+        self.assertEqual('1.567', format_number(1.56789, 3))
+        self.assertEqual('1,000', format_number(1000))
+        self.assertEqual('1,000', format_number(1000.12, 0))
+        self.assertEqual('1,000,000', format_number(1000000))
+        self.assertEqual('1,000,000.42', format_number(1000000.42))
 
     def test_round_number(self):
         """Test :func:`humanfriendly.round_number()`."""
-        self.assertEqual('1', humanfriendly.round_number(1))
-        self.assertEqual('1', humanfriendly.round_number(1.0))
-        self.assertEqual('1.00', humanfriendly.round_number(1, keep_width=True))
-        self.assertEqual('3.14', humanfriendly.round_number(3.141592653589793))
+        self.assertEqual('1', round_number(1))
+        self.assertEqual('1', round_number(1.0))
+        self.assertEqual('1.00', round_number(1, keep_width=True))
+        self.assertEqual('3.14', round_number(3.141592653589793))
 
     def test_format_path(self):
         """Test :func:`humanfriendly.format_path()`."""
         friendly_path = os.path.join('~', '.vimrc')
         absolute_path = os.path.join(os.environ['HOME'], '.vimrc')
-        self.assertEqual(friendly_path, humanfriendly.format_path(absolute_path))
+        self.assertEqual(friendly_path, format_path(absolute_path))
 
     def test_parse_path(self):
         """Test :func:`humanfriendly.parse_path()`."""
         friendly_path = os.path.join('~', '.vimrc')
         absolute_path = os.path.join(os.environ['HOME'], '.vimrc')
-        self.assertEqual(absolute_path, humanfriendly.parse_path(friendly_path))
+        self.assertEqual(absolute_path, parse_path(friendly_path))
 
     def test_pretty_tables(self):
         """Test :func:`humanfriendly.tables.format_pretty_table()`."""
@@ -668,14 +687,14 @@ class HumanFriendlyTestCase(TestCase):
                               (60 * 60 * 24 * 2, '2 days'),
                               (60 * 60 * 24 * 7, '1 week'),
                               (60 * 60 * 24 * 7 * 2, '2 weeks')):
-            t = humanfriendly.Timer(time.time() - seconds)
-            self.assertEqual(humanfriendly.round_number(t.elapsed_time, keep_width=True), '%i.00' % seconds)
+            t = Timer(time.time() - seconds)
+            self.assertEqual(round_number(t.elapsed_time, keep_width=True), '%i.00' % seconds)
             self.assertEqual(str(t), text)
         # Test rounding to seconds.
-        t = humanfriendly.Timer(time.time() - 2.2)
+        t = Timer(time.time() - 2.2)
         self.assertEqual(t.rounded, '2 seconds')
         # Test automatic timer.
-        automatic_timer = humanfriendly.Timer()
+        automatic_timer = Timer()
         time.sleep(1)
         # XXX The following normalize_timestamp(ndigits=0) calls are intended
         #     to compensate for unreliable clock sources in virtual machines
@@ -683,13 +702,13 @@ class HumanFriendlyTestCase(TestCase):
         #     https://travis-ci.org/xolox/python-humanfriendly/jobs/323944263
         self.assertEqual(normalize_timestamp(automatic_timer.elapsed_time, 0), '1.00')
         # Test resumable timer.
-        resumable_timer = humanfriendly.Timer(resumable=True)
+        resumable_timer = Timer(resumable=True)
         for i in range(2):
             with resumable_timer:
                 time.sleep(1)
         self.assertEqual(normalize_timestamp(resumable_timer.elapsed_time, 0), '2.00')
         # Make sure Timer.__enter__() returns the timer object.
-        with humanfriendly.Timer(resumable=True) as timer:
+        with Timer(resumable=True) as timer:
             assert timer is not None
 
     def test_spinner(self):
@@ -823,18 +842,18 @@ class HumanFriendlyTestCase(TestCase):
         # Test `humanfriendly --format-size'.
         random_byte_count = random.randint(1024, 1024 * 1024)
         returncode, output = run_cli(main, '--format-size=%i' % random_byte_count)
-        assert output.strip() == humanfriendly.format_size(random_byte_count)
+        assert output.strip() == format_size(random_byte_count)
         # Test `humanfriendly --format-size --binary'.
         random_byte_count = random.randint(1024, 1024 * 1024)
         returncode, output = run_cli(main, '--format-size=%i' % random_byte_count, '--binary')
-        assert output.strip() == humanfriendly.format_size(random_byte_count, binary=True)
+        assert output.strip() == format_size(random_byte_count, binary=True)
         # Test `humanfriendly --format-length'.
         random_len = random.randint(1024, 1024 * 1024)
         returncode, output = run_cli(main, '--format-length=%i' % random_len)
-        assert output.strip() == humanfriendly.format_length(random_len)
+        assert output.strip() == format_length(random_len)
         random_len = float(random_len) / 12345.6
         returncode, output = run_cli(main, '--format-length=%f' % random_len)
-        assert output.strip() == humanfriendly.format_length(random_len)
+        assert output.strip() == format_length(random_len)
         # Test `humanfriendly --format-table'.
         returncode, output = run_cli(main, '--format-table', '--delimiter=\t', input='1\t2\t3\n4\t5\t6\n7\t8\t9')
         assert output.strip() == dedent('''
@@ -847,18 +866,18 @@ class HumanFriendlyTestCase(TestCase):
         # Test `humanfriendly --format-timespan'.
         random_timespan = random.randint(5, 600)
         returncode, output = run_cli(main, '--format-timespan=%i' % random_timespan)
-        assert output.strip() == humanfriendly.format_timespan(random_timespan)
+        assert output.strip() == format_timespan(random_timespan)
         # Test `humanfriendly --parse-size'.
         returncode, output = run_cli(main, '--parse-size=5 KB')
-        assert int(output) == humanfriendly.parse_size('5 KB')
+        assert int(output) == parse_size('5 KB')
         # Test `humanfriendly --parse-size'.
         returncode, output = run_cli(main, '--parse-size=5 YiB')
-        assert int(output) == humanfriendly.parse_size('5 YB', binary=True)
+        assert int(output) == parse_size('5 YB', binary=True)
         # Test `humanfriendly --parse-length'.
         returncode, output = run_cli(main, '--parse-length=5 km')
-        assert int(output) == humanfriendly.parse_length('5 km')
+        assert int(output) == parse_length('5 km')
         returncode, output = run_cli(main, '--parse-length=1.05 km')
-        assert float(output) == humanfriendly.parse_length('1.05 km')
+        assert float(output) == parse_length('1.05 km')
         # Test `humanfriendly --run-command'.
         returncode, output = run_cli(main, '--run-command', 'bash', '-c', 'sleep 2 && exit 42')
         assert returncode == 42
@@ -1307,7 +1326,7 @@ class HumanFriendlyTestCase(TestCase):
             module = sys.modules[__name__]
             aliases = dict(concatenate='humanfriendly.text.concatenate')
             proxy = DeprecationProxy(module, aliases)
-            assert proxy.concatenate == humanfriendly.concatenate
+            assert proxy.concatenate == concatenate
         assert fake_fn.was_called
 
     def test_alias_proxy_sphinx_compensation(self):
