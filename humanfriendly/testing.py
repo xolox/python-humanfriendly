@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: March 2, 2020
+# Last Change: March 6, 2020
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -142,6 +142,10 @@ def run_cli(entry_point, *arguments, **options):
                       line arguments (:data:`sys.argv` items 1-N).
     :param options: The following keyword arguments are supported:
 
+                    **capture**
+                     Whether to use :class:`CaptureOutput`. Defaults
+                     to :data:`True` but can be disabled by passing
+                     :data:`False` instead.
                     **input**
                      Refer to :class:`CaptureOutput`.
                     **merged**
@@ -153,7 +157,6 @@ def run_cli(entry_point, *arguments, **options):
               1. The return code (an integer).
               2. The captured output (a string).
     """
-    merged = options.get('merged', False)
     # Add the `program_name' option to the arguments.
     arguments = list(arguments)
     arguments.insert(0, options.pop('program_name', sys.executable))
@@ -169,7 +172,8 @@ def run_cli(entry_point, *arguments, **options):
     try:
         # Temporarily override sys.argv.
         with PatchedAttribute(sys, 'argv', arguments):
-            # Manipulate the standard input/output/error streams.
+            # Manipulate the standard input/output/error streams?
+            options['enabled'] = options.pop('capture', True)
             with CaptureOutput(**options) as capturer:
                 try:
                     # Call the command line interface.
@@ -193,9 +197,10 @@ def run_cli(entry_point, *arguments, **options):
         logger.debug("Command line entry point returned successfully!")
     # Always log the output captured on stdout/stderr, to make it easier to
     # diagnose test failures (but avoid duplicate logging when merged=True).
+    is_merged = options.get('merged', False)
     merged_streams = [('merged streams', stdout)]
     separate_streams = [('stdout', stdout), ('stderr', stderr)]
-    streams = merged_streams if merged else separate_streams
+    streams = merged_streams if is_merged else separate_streams
     for name, value in streams:
         if value:
             logger.debug("Output on %s:\n%s", name, value)
@@ -540,7 +545,7 @@ class CaptureOutput(ContextManager):
 
     """Context manager that captures what's written to :data:`sys.stdout` and :data:`sys.stderr`."""
 
-    def __init__(self, merged=False, input=''):
+    def __init__(self, merged=False, input='', enabled=True):
         """
         Initialize a :class:`CaptureOutput` object.
 
@@ -548,14 +553,21 @@ class CaptureOutput(ContextManager):
                        :data:`False` to capture them separately.
         :param input: The data that reads from :data:`sys.stdin`
                       should return (a string).
+        :param enabled: :data:`True` to enable capturing (the default),
+                        :data:`False` otherwise. This makes it easy to
+                        unconditionally use :class:`CaptureOutput` in
+                        a :keyword:`with` block while preserving the
+                        choice to opt out of capturing output.
         """
         self.stdin = StringIO(input)
         self.stdout = StringIO()
         self.stderr = self.stdout if merged else StringIO()
-        self.patched_attributes = [
-            PatchedAttribute(sys, name, getattr(self, name))
-            for name in ('stdin', 'stdout', 'stderr')
-        ]
+        self.patched_attributes = []
+        if enabled:
+            self.patched_attributes.extend(
+                PatchedAttribute(sys, name, getattr(self, name))
+                for name in ('stdin', 'stdout', 'stderr')
+            )
 
     stdin = None
     """The :class:`~humanfriendly.compat.StringIO` object used to feed the standard input stream."""
