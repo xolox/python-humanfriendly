@@ -4,7 +4,7 @@
 # Tests for the `humanfriendly' package.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: March 6, 2020
+# Last Change: April 19, 2020
 # URL: https://humanfriendly.readthedocs.io
 
 """Test suite for the `humanfriendly` package."""
@@ -44,6 +44,7 @@ from humanfriendly import (
     prompts,
     round_number,
 )
+from humanfriendly.case import CaseInsensitiveDict, CaseInsensitiveKey
 from humanfriendly.cli import main
 from humanfriendly.compat import StringIO
 from humanfriendly.decorators import cached
@@ -128,6 +129,60 @@ from mock import MagicMock
 class HumanFriendlyTestCase(TestCase):
 
     """Container for the `humanfriendly` test suite."""
+
+    def test_case_insensitive_dict(self):
+        """Test the CaseInsensitiveDict class."""
+        # Test support for the dict(iterable) signature.
+        assert len(CaseInsensitiveDict([('key', True), ('KEY', False)])) == 1
+        # Test support for the dict(iterable, **kw) signature.
+        assert len(CaseInsensitiveDict([('one', True), ('ONE', False)], one=False, two=True)) == 2
+        # Test support for the dict(mapping) signature.
+        assert len(CaseInsensitiveDict(dict(key=True, KEY=False))) == 1
+        # Test support for the dict(mapping, **kw) signature.
+        assert len(CaseInsensitiveDict(dict(one=True, ONE=False), one=False, two=True)) == 2
+        # Test support for the dict(**kw) signature.
+        assert len(CaseInsensitiveDict(one=True, ONE=False, two=True)) == 2
+        # Test support for dict.fromkeys().
+        obj = CaseInsensitiveDict.fromkeys(["One", "one", "ONE", "Two", "two", "TWO"])
+        assert len(obj) == 2
+        # Test support for dict.get().
+        obj = CaseInsensitiveDict(existing_key=42)
+        assert obj.get('Existing_Key') == 42
+        # Test support for dict.pop().
+        obj = CaseInsensitiveDict(existing_key=42)
+        assert obj.pop('Existing_Key') == 42
+        assert len(obj) == 0
+        # Test support for dict.setdefault().
+        obj = CaseInsensitiveDict(existing_key=42)
+        assert obj.setdefault('Existing_Key') == 42
+        obj.setdefault('other_key', 11)
+        assert obj['Other_Key'] == 11
+        # Test support for dict.__contains__().
+        obj = CaseInsensitiveDict(existing_key=42)
+        assert 'Existing_Key' in obj
+        # Test support for dict.__delitem__().
+        obj = CaseInsensitiveDict(existing_key=42)
+        del obj['Existing_Key']
+        assert len(obj) == 0
+        # Test support for dict.__getitem__().
+        obj = CaseInsensitiveDict(existing_key=42)
+        assert obj['Existing_Key'] == 42
+        # Test support for dict.__setitem__().
+        obj = CaseInsensitiveDict(existing_key=42)
+        obj['Existing_Key'] = 11
+        assert obj['existing_key'] == 11
+
+    def test_case_insensitive_key(self):
+        """Test the CaseInsensitiveKey class."""
+        # Test the __eq__() special method.
+        polite = CaseInsensitiveKey("Please don't shout")
+        rude = CaseInsensitiveKey("PLEASE DON'T SHOUT")
+        assert polite == rude
+        # Test the __hash__() special method.
+        mapping = {}
+        mapping[polite] = 1
+        mapping[rude] = 2
+        assert len(mapping) == 1
 
     def test_capture_output(self):
         """Test the CaptureOutput class."""

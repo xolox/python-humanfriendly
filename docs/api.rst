@@ -34,6 +34,12 @@ order to avoid unexpected surprises.
 .. automodule:: humanfriendly
    :members:
 
+:mod:`humanfriendly.case`
+------------------------
+
+.. automodule:: humanfriendly.case
+   :members:
+
 :mod:`humanfriendly.cli`
 ------------------------
 
