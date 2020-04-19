@@ -11,6 +11,14 @@ Changelog`_. This project adheres to `semantic versioning`_.
 .. _Keep a Changelog: http://keepachangelog.com/
 .. _semantic versioning: http://semver.org/
 
+`Release 8.2`_ (2020-04-19)
+---------------------------
+
+Added a simple case insensitive dictionary implementation, for details refer to
+the new :mod:`humanfriendly.case` module.
+
+.. _Release 8.2: https://github.com/xolox/python-humanfriendly/compare/8.1...8.2
+
 `Release 8.1`_ (2020-03-06)
 ---------------------------
 
