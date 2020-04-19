@@ -20,6 +20,13 @@ does it support Unicode normalization, hence the word "simple".
 # Standard library modules.
 import collections
 
+try:
+    # Python >= 3.3.
+    from collections.abc import Iterable, Mapping
+except ImportError:
+    # Python 2.7.
+    from collections import Iterable, Mapping
+
 # Modules included in our package.
 from humanfriendly.compat import basestring, unicode
 
@@ -77,11 +84,11 @@ class CaseInsensitiveDict(collections.OrderedDict):
 
     def update(self, other=None, **kw):
         """Update a case insensitive dictionary with new items."""
-        if isinstance(other, collections.Mapping):
+        if isinstance(other, Mapping):
             # Copy the items from the given mapping.
             for key, value in other.items():
                 self[key] = value
-        elif isinstance(other, collections.Iterable):
+        elif isinstance(other, Iterable):
             # Copy the items from the given iterable.
             for key, value in other:
                 self[key] = value
