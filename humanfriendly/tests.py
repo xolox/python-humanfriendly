@@ -503,6 +503,15 @@ class HumanFriendlyTestCase(TestCase):
         with self.assertRaises(InvalidTimespan):
             parse_timespan('1z')
 
+        with self.assertRaises(InvalidTimespan):
+            parse_timespan('1 1')
+
+        with self.assertRaises(InvalidTimespan):
+            parse_timespan('m 1')
+
+        with self.assertRaises(InvalidTimespan):
+            parse_timespan('h s')
+
     def test_parse_date(self):
         """Test :func:`humanfriendly.parse_date()`."""
         self.assertEqual((2013, 6, 17, 0, 0, 0), parse_date('2013-06-17'))
