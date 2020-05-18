@@ -464,8 +464,9 @@ def parse_timespan(timespan):
     """
     Parse a "human friendly" timespan into the number of seconds.
 
-    :param value: A string like ``5h`` (5 hours), ``10m`` (10 minutes) or
-                  ``42s`` (42 seconds).
+    :param value: A string like ``5h`` (5 hours), ``10m`` (10 minutes),
+                  ``42s`` (42 seconds), ``5h2d`` (5 hours 2 days) or
+                  ``10m30s`` (10 minutes 30 sesonds).
     :returns: The number of seconds as a floating point number.
     :raises: :exc:`InvalidTimespan` when the input can't be parsed.
 
@@ -499,19 +500,41 @@ def parse_timespan(timespan):
     >>> parse_timespan('1d')
     86400.0
     """
+
+    def _find_divider(unit):
+        normalized_unit = unit.lower()
+        for time_unit in time_units:
+            if (normalized_unit == time_unit['singular'] or
+                    normalized_unit == time_unit['plural'] or
+                    normalized_unit in time_unit['abbreviations']):
+                return time_unit['divider']
+        return None
+
+    def _to_seconds(pair):
+        """
+        Convert pair of tokens to seconds.
+        """
+        if not is_string(pair[1]):
+            raise ValueError
+
+        divider = _find_divider(pair[1])
+        if divider is None:
+            raise ValueError
+
+        return float(pair[0]) * divider
+
     tokens = tokenize(timespan)
     if tokens and isinstance(tokens[0], numbers.Number):
         # If the input contains only a number, it's assumed to be the number of seconds.
         if len(tokens) == 1:
             return float(tokens[0])
-        # Otherwise we expect to find two tokens: A number and a unit.
-        if len(tokens) == 2 and is_string(tokens[1]):
-            normalized_unit = tokens[1].lower()
-            for unit in time_units:
-                if (normalized_unit == unit['singular'] or
-                        normalized_unit == unit['plural'] or
-                        normalized_unit in unit['abbreviations']):
-                    return float(tokens[0]) * unit['divider']
+        # Otherwise we expect to find an even number of pairs of numbers and units.
+        if len(tokens) % 2 == 0:
+            try:
+                return round(sum(map(_to_seconds, zip(tokens[::2], tokens[1::2]))), 9)
+            except ValueError:
+                pass
+
     # We failed to parse the timespan specification.
     msg = "Failed to parse timespan! (input %r was tokenized as %r)"
     raise InvalidTimespan(format(msg, timespan, tokens))
