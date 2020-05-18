@@ -500,7 +500,6 @@ def parse_timespan(timespan):
     >>> parse_timespan('1d')
     86400.0
     """
-
     def _find_divider(unit):
         normalized_unit = unit.lower()
         for time_unit in time_units:
