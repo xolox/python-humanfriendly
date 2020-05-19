@@ -35,7 +35,7 @@ order to avoid unexpected surprises.
    :members:
 
 :mod:`humanfriendly.case`
-------------------------
+-------------------------
 
 .. automodule:: humanfriendly.case
    :members:

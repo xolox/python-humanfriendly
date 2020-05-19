@@ -466,7 +466,7 @@ def parse_timespan(timespan):
 
     :param value: A string like ``5h`` (5 hours), ``10m`` (10 minutes),
                   ``42s`` (42 seconds), ``5h2d`` (5 hours 2 days) or
-                  ``10m30s`` (10 minutes 30 sesonds).
+                  ``10m30s`` (10 minutes 30 seconds).
     :returns: The number of seconds as a floating point number.
     :raises: :exc:`InvalidTimespan` when the input can't be parsed.
 
