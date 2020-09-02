@@ -341,7 +341,11 @@ def prepare_friendly_prompts():
     This function is called by the other functions in this module to enable
     user friendly prompts.
     """
-    import readline  # NOQA
+    try:
+        import readline  # NOQA
+    except ImportError:
+        # might not be available on Windows if pyreadline isn't installed
+        pass
 
 
 def retry_limit(limit=MAX_ATTEMPTS):
