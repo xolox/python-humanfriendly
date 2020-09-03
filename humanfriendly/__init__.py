@@ -199,16 +199,33 @@ def format_size(num_bytes, keep_width=False, binary=False, force_unit=None):
             # this is going to fail for bytes
             force_tuple_index = symbols.index(force_unit)
             if binary:
-                number = round_number(float(num_bytes) / disk_size_units[force_tuple_index].binary.divider, keep_width=keep_width)
-                return pluralize(number, disk_size_units[force_tuple_index].binary.symbol, disk_size_units[force_tuple_index].binary.symbol)
+                number = round_number(
+                    float(num_bytes) /
+                    disk_size_units[force_tuple_index].binary.divider,
+                    keep_width=keep_width)
+                return pluralize(
+                    number,
+                    disk_size_units[force_tuple_index].binary.symbol,
+                    disk_size_units[force_tuple_index].binary.symbol)
             else:
-                number = round_number(float(num_bytes) / disk_size_units[force_tuple_index].decimal.divider, keep_width=keep_width)
-                return pluralize(number, disk_size_units[force_tuple_index].decimal.symbol, disk_size_units[force_tuple_index].decimal.symbol)
+                number = round_number(
+                    float(num_bytes) /
+                    disk_size_units[force_tuple_index].decimal.divider,
+                    keep_width=keep_width)
+                return pluralize(
+                    number,
+                    disk_size_units[force_tuple_index].decimal.symbol,
+                    disk_size_units[force_tuple_index].decimal.symbol)
         else:
             if force_unit == 'bytes':
-                return pluralize(round_number(float(num_bytes), keep_width=keep_width), 'byte')
+                return pluralize(
+                    round_number(
+                        float(num_bytes),
+                        keep_width=keep_width),
+                    'byte')
             else:
-                raise InvalidSize("You are trying to convert to an invalid unit: {}".format(force_unit))
+                raise InvalidSize(
+                    "You are trying to convert to an invalid unit: {}".format(force_unit))
 
     for unit in reversed(disk_size_units):
         if num_bytes >= unit.binary.divider and binary:
