@@ -952,7 +952,7 @@ class HumanFriendlyTestCase(TestCase):
         # https://github.com/xolox/python-humanfriendly/issues/28
         returncode, output = run_cli(main, '--demo')
         assert returncode == 0
-        lines = [ansi_strip(l) for line in output.splitlines()]
+        lines = [ansi_strip(line) for line in output.splitlines()]
         assert "Text styles:" in lines
         assert "Foreground colors:" in lines
         assert "Background colors:" in lines
