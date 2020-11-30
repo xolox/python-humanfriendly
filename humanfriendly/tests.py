@@ -4,7 +4,7 @@
 # Tests for the `humanfriendly' package.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: November 30, 2020
+# Last Change: December 1, 2020
 # URL: https://humanfriendly.readthedocs.io
 
 """Test suite for the `humanfriendly` package."""
@@ -728,6 +728,8 @@ class HumanFriendlyTestCase(TestCase):
         assert concatenate(['one']) == 'one'
         assert concatenate(['one', 'two']) == 'one and two'
         assert concatenate(['one', 'two', 'three']) == 'one, two and three'
+        # Test the 'conjunction' option.
+        assert concatenate(['one', 'two', 'three'], conjunction='or') == 'one, two or three'
 
     def test_split(self):
         """Test :func:`humanfriendly.text.split()`."""

@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: November 30, 2020
+# Last Change: December 1, 2020
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -93,12 +93,21 @@ def compact_empty_lines(text):
     return ''.join(lines)
 
 
-def concatenate(items):
+def concatenate(items, conjunction='and'):
     """
     Concatenate a list of items in a human friendly way.
 
-    :param items: A sequence of strings.
-    :returns: A single string.
+    :param items:
+
+        A sequence of strings.
+
+    :param conjunction:
+
+        The word to use before the last item (a string, defaults to "and").
+
+    :returns:
+
+        A single string.
 
     >>> from humanfriendly.text import concatenate
     >>> concatenate(["eggs", "milk", "bread"])
@@ -106,7 +115,8 @@ def concatenate(items):
     """
     items = list(items)
     if len(items) > 1:
-        return ', '.join(items[:-1]) + ' and ' + items[-1]
+        last_item = items.pop()
+        return ' '.join([', '.join(items), conjunction, last_item])
     elif items:
         return items[0]
     else:
