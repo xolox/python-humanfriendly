@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: March 1, 2020
+# Last Change: November 30, 2020
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -20,7 +20,6 @@ The :mod:`~humanfriendly.text` module contains simple functions to manipulate te
 """
 
 # Standard library modules.
-import math
 import numbers
 import random
 import re
@@ -284,11 +283,11 @@ def pluralize(count, singular, plural=None):
     :param count: The count (a number).
     :param singular: The singular form of the word (a string).
     :param plural: The plural form of the word (a string or :data:`None`).
-    :returns: The count and singular/plural word concatenated (a string).
+    :returns: The count and singular or plural word concatenated (a string).
     """
     if not plural:
         plural = singular + 's'
-    return '%s %s' % (count, singular if math.floor(float(count)) == 1 else plural)
+    return '%s %s' % (count, singular if float(count) == 1.0 else plural)
 
 
 def random_string(length=(25, 100), characters=string.ascii_letters):

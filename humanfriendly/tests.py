@@ -4,7 +4,7 @@
 # Tests for the `humanfriendly' package.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: April 19, 2020
+# Last Change: November 30, 2020
 # URL: https://humanfriendly.readthedocs.io
 
 """Test suite for the `humanfriendly` package."""
@@ -441,7 +441,7 @@ class HumanFriendlyTestCase(TestCase):
         # Make sure milliseconds are never shown separately when detailed=False.
         # https://github.com/xolox/python-humanfriendly/issues/10
         assert '1 minute, 1 second and 100 milliseconds' == format_timespan(61.10, detailed=True)
-        assert '1 minute and 1.1 second' == format_timespan(61.10, detailed=False)
+        assert '1 minute and 1.1 seconds' == format_timespan(61.10, detailed=False)
         # Test for loss of precision as reported in issue 11:
         # https://github.com/xolox/python-humanfriendly/issues/11
         assert '1 minute and 0.3 seconds' == format_timespan(60.300)
