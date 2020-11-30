@@ -575,6 +575,8 @@ class HumanFriendlyTestCase(TestCase):
         self.assertEqual('1,000', format_number(1000.12, 0))
         self.assertEqual('1,000,000', format_number(1000000))
         self.assertEqual('1,000,000.42', format_number(1000000.42))
+        # Regression test for https://github.com/xolox/python-humanfriendly/issues/40.
+        self.assertEqual('-285.67', format_number(-285.67))
 
     def test_round_number(self):
         """Test :func:`humanfriendly.round_number()`."""
