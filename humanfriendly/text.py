@@ -93,7 +93,7 @@ def compact_empty_lines(text):
     return ''.join(lines)
 
 
-def concatenate(items, conjunction='and'):
+def concatenate(items, conjunction='and', serial_comma=False):
     """
     Concatenate a list of items in a human friendly way.
 
@@ -105,6 +105,11 @@ def concatenate(items, conjunction='and'):
 
         The word to use before the last item (a string, defaults to "and").
 
+    :param serial_comma:
+
+        :data:`True` to use a `serial comma`_, :data:`False` otherwise
+        (defaults to :data:`False`).
+
     :returns:
 
         A single string.
@@ -112,11 +117,16 @@ def concatenate(items, conjunction='and'):
     >>> from humanfriendly.text import concatenate
     >>> concatenate(["eggs", "milk", "bread"])
     'eggs, milk and bread'
+
+    .. _serial comma: https://en.wikipedia.org/wiki/Serial_comma
     """
     items = list(items)
     if len(items) > 1:
-        last_item = items.pop()
-        return ' '.join([', '.join(items), conjunction, last_item])
+        final_item = items.pop()
+        formatted = ', '.join(items)
+        if serial_comma:
+            formatted += ','
+        return ' '.join([formatted, conjunction, final_item])
     elif items:
         return items[0]
     else:

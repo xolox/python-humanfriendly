@@ -730,6 +730,8 @@ class HumanFriendlyTestCase(TestCase):
         assert concatenate(['one', 'two', 'three']) == 'one, two and three'
         # Test the 'conjunction' option.
         assert concatenate(['one', 'two', 'three'], conjunction='or') == 'one, two or three'
+        # Test the 'serial_comma' option.
+        assert concatenate(['one', 'two', 'three'], serial_comma=True) == 'one, two, and three'
 
     def test_split(self):
         """Test :func:`humanfriendly.text.split()`."""
