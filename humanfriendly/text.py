@@ -37,6 +37,7 @@ __all__ = (
     'is_empty_line',
     'join_lines',
     'pluralize',
+    'pluralize_raw',
     'random_string',
     'split',
     'split_paragraphs',
@@ -295,19 +296,36 @@ def pluralize(count, singular, plural=None):
     """
     Combine a count with the singular or plural form of a word.
 
-    If the plural form of the word is not provided it is obtained by
-    concatenating the singular form of the word with the letter "s". Of course
-    this will not always be correct, which is why you have the option to
-    specify both forms.
-
     :param count: The count (a number).
     :param singular: The singular form of the word (a string).
     :param plural: The plural form of the word (a string or :data:`None`).
     :returns: The count and singular or plural word concatenated (a string).
+
+    See :func:`pluralize_raw()` for the logic underneath :func:`pluralize()`.
+    """
+    return '%s %s' % (count, pluralize_raw(count, singular, plural))
+
+
+def pluralize_raw(count, singular, plural=None):
+    """
+    Select the singular or plural form of a word based on a count.
+
+    :param count: The count (a number).
+    :param singular: The singular form of the word (a string).
+    :param plural: The plural form of the word (a string or :data:`None`).
+    :returns: The singular or plural form of the word (a string).
+
+    When the given count is exactly 1.0 the singular form of the word is
+    selected, in all other cases the plural form of the word is selected.
+
+    If the plural form of the word is not provided it is obtained by
+    concatenating the singular form of the word with the letter "s". Of course
+    this will not always be correct, which is why you have the option to
+    specify both forms.
     """
     if not plural:
         plural = singular + 's'
-    return '%s %s' % (count, singular if float(count) == 1.0 else plural)
+    return singular if float(count) == 1.0 else plural
 
 
 def random_string(length=(25, 100), characters=string.ascii_letters):
