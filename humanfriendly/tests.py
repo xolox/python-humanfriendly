@@ -793,8 +793,8 @@ class HumanFriendlyTestCase(TestCase):
                         .replace(ANSI_HIDE_CURSOR, ''))
         lines = [line for line in output.split(ANSI_ERASE_LINE) if line]
         self.assertTrue(len(lines) > 0)
-        self.assertTrue(all('test spinner' in l for l in lines))
-        self.assertTrue(all('%' in l for l in lines))
+        self.assertTrue(all('test spinner' in ln for ln in lines))
+        self.assertTrue(all('%' in ln for ln in lines))
         self.assertEqual(sorted(set(lines)), sorted(lines))
 
     def test_automatic_spinner(self):
@@ -958,7 +958,7 @@ class HumanFriendlyTestCase(TestCase):
         # https://github.com/xolox/python-humanfriendly/issues/28
         returncode, output = run_cli(main, '--demo')
         assert returncode == 0
-        lines = [ansi_strip(l) for l in output.splitlines()]
+        lines = [ansi_strip(ln) for ln in output.splitlines()]
         assert "Text styles:" in lines
         assert "Foreground colors:" in lines
         assert "Background colors:" in lines

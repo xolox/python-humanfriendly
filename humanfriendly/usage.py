@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: June 24, 2017
+# Last Change: December 1, 2020
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -258,7 +258,7 @@ def render_usage(text):
                 ('\n\n'.join(render_paragraph(p, meta_variables) for p in split_paragraphs(description))).rstrip(),
             ])
         csv_lines = csv_buffer.getvalue().splitlines()
-        output.append('\n'.join('   %s' % l for l in csv_lines))
+        output.append('\n'.join('   %s' % ln for ln in csv_lines))
     logger.debug("Rendered output: %s", output)
     return '\n\n'.join(trim_empty_lines(o) for o in output)
 
