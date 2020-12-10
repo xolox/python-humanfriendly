@@ -11,6 +11,15 @@ Changelog`_. This project adheres to `semantic versioning`_.
 .. _Keep a Changelog: http://keepachangelog.com/
 .. _semantic versioning: http://semver.org/
 
+`Release 9.1`_ (2020-12-10)
+---------------------------
+
+Added :func:`~humanfriendly.compat.on_macos()` function to detect Apple MacOS
+(I need this in an upcoming :pypi:`coloredlogs` release and don't want to have
+to think about how to detect MacOS again in the future 😇).
+
+.. _Release 9.1: https://github.com/xolox/python-humanfriendly/compare/9.0...9.1
+
 `Release 9.0`_ (2020-12-01)
 ---------------------------
 

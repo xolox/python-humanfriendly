@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: March 1, 2020
+# Last Change: December 10, 2020
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -52,6 +52,7 @@ __all__ = (
     'is_unicode',
     'monotonic',
     'name2codepoint',
+    'on_macos',
     'on_windows',
     'unichr',
     'unicode',
@@ -130,6 +131,15 @@ def is_unicode(value):
     :returns: :data:`True` if the value is a Unicode string, :data:`False` otherwise.
     """
     return isinstance(value, unicode)
+
+
+def on_macos():
+    """
+    Check if we're running on Apple MacOS.
+
+    :returns: :data:`True` if running MacOS, :data:`False` otherwise.
+    """
+    return sys.platform.startswith('darwin')
 
 
 def on_windows():
