@@ -1,6 +1,6 @@
 # Test suite requirements.
 capturer >= 2.1
-coloredlogs >= 2.0
+coloredlogs >= 2.0, <= 14.0
 docutils >= 0.15
 mock >= 3.0.5
 pytest >= 3.0.7
