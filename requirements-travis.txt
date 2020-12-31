@@ -1,3 +1,5 @@
 --requirement=requirements-checks.txt
 --requirement=requirements-tests.txt
 coveralls
+# Dependency of coveralls:
+cryptography < 3; python_version == '2.7' and platform_python_implementation == "PyPy"
