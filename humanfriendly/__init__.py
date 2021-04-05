@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: April 19, 2020
+# Last Change: December 10, 2020
 # URL: https://humanfriendly.readthedocs.io
 
 """The main module of the `humanfriendly` package."""
@@ -51,7 +51,7 @@ __all__ = (
 )
 
 # Semi-standard module versioning.
-__version__ = '8.2'
+__version__ = '9.1'
 
 # Named tuples to define units of size.
 SizeUnit = collections.namedtuple('SizeUnit', 'divider, symbol, name')
@@ -353,7 +353,8 @@ def format_number(number, num_decimals=2):
     6,000,000,000
     """
     integer_part, _, decimal_part = str(float(number)).partition('.')
-    reversed_digits = ''.join(reversed(integer_part))
+    negative_sign = integer_part.startswith('-')
+    reversed_digits = ''.join(reversed(integer_part.lstrip('-')))
     parts = []
     while reversed_digits:
         parts.append(reversed_digits[:3])
@@ -362,6 +363,8 @@ def format_number(number, num_decimals=2):
     decimals_to_add = decimal_part[:num_decimals].rstrip('0')
     if decimals_to_add:
         formatted_number += '.' + decimals_to_add
+    if negative_sign:
+        formatted_number = '-' + formatted_number
     return formatted_number
 
 

@@ -4,7 +4,7 @@
 # Tests for the `humanfriendly' package.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: April 19, 2020
+# Last Change: December 1, 2020
 # URL: https://humanfriendly.readthedocs.io
 
 """Test suite for the `humanfriendly` package."""
@@ -441,7 +441,7 @@ class HumanFriendlyTestCase(TestCase):
         # Make sure milliseconds are never shown separately when detailed=False.
         # https://github.com/xolox/python-humanfriendly/issues/10
         assert '1 minute, 1 second and 100 milliseconds' == format_timespan(61.10, detailed=True)
-        assert '1 minute and 1.1 second' == format_timespan(61.10, detailed=False)
+        assert '1 minute and 1.1 seconds' == format_timespan(61.10, detailed=False)
         # Test for loss of precision as reported in issue 11:
         # https://github.com/xolox/python-humanfriendly/issues/11
         assert '1 minute and 0.3 seconds' == format_timespan(60.300)
@@ -605,6 +605,8 @@ class HumanFriendlyTestCase(TestCase):
         self.assertEqual('1,000', format_number(1000.12, 0))
         self.assertEqual('1,000,000', format_number(1000000))
         self.assertEqual('1,000,000.42', format_number(1000000.42))
+        # Regression test for https://github.com/xolox/python-humanfriendly/issues/40.
+        self.assertEqual('-285.67', format_number(-285.67))
 
     def test_round_number(self):
         """Test :func:`humanfriendly.round_number()`."""
@@ -758,6 +760,10 @@ class HumanFriendlyTestCase(TestCase):
         assert concatenate(['one']) == 'one'
         assert concatenate(['one', 'two']) == 'one and two'
         assert concatenate(['one', 'two', 'three']) == 'one, two and three'
+        # Test the 'conjunction' option.
+        assert concatenate(['one', 'two', 'three'], conjunction='or') == 'one, two or three'
+        # Test the 'serial_comma' option.
+        assert concatenate(['one', 'two', 'three'], serial_comma=True) == 'one, two, and three'
 
     def test_split(self):
         """Test :func:`humanfriendly.text.split()`."""
@@ -817,8 +823,8 @@ class HumanFriendlyTestCase(TestCase):
                         .replace(ANSI_HIDE_CURSOR, ''))
         lines = [line for line in output.split(ANSI_ERASE_LINE) if line]
         self.assertTrue(len(lines) > 0)
-        self.assertTrue(all('test spinner' in x for x in lines))
-        self.assertTrue(all('%' in x for x in lines))
+        self.assertTrue(all('test spinner' in ln for ln in lines))
+        self.assertTrue(all('%' in ln for ln in lines))
         self.assertEqual(sorted(set(lines)), sorted(lines))
 
     def test_automatic_spinner(self):
@@ -982,7 +988,7 @@ class HumanFriendlyTestCase(TestCase):
         # https://github.com/xolox/python-humanfriendly/issues/28
         returncode, output = run_cli(main, '--demo')
         assert returncode == 0
-        lines = [ansi_strip(x) for x in output.splitlines()]
+        lines = [ansi_strip(ln) for ln in output.splitlines()]
         assert "Text styles:" in lines
         assert "Foreground colors:" in lines
         assert "Background colors:" in lines

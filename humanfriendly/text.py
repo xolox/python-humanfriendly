@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: March 1, 2020
+# Last Change: December 1, 2020
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -20,7 +20,6 @@ The :mod:`~humanfriendly.text` module contains simple functions to manipulate te
 """
 
 # Standard library modules.
-import math
 import numbers
 import random
 import re
@@ -38,6 +37,7 @@ __all__ = (
     'is_empty_line',
     'join_lines',
     'pluralize',
+    'pluralize_raw',
     'random_string',
     'split',
     'split_paragraphs',
@@ -94,20 +94,40 @@ def compact_empty_lines(text):
     return ''.join(lines)
 
 
-def concatenate(items):
+def concatenate(items, conjunction='and', serial_comma=False):
     """
     Concatenate a list of items in a human friendly way.
 
-    :param items: A sequence of strings.
-    :returns: A single string.
+    :param items:
+
+        A sequence of strings.
+
+    :param conjunction:
+
+        The word to use before the last item (a string, defaults to "and").
+
+    :param serial_comma:
+
+        :data:`True` to use a `serial comma`_, :data:`False` otherwise
+        (defaults to :data:`False`).
+
+    :returns:
+
+        A single string.
 
     >>> from humanfriendly.text import concatenate
     >>> concatenate(["eggs", "milk", "bread"])
     'eggs, milk and bread'
+
+    .. _serial comma: https://en.wikipedia.org/wiki/Serial_comma
     """
     items = list(items)
     if len(items) > 1:
-        return ', '.join(items[:-1]) + ' and ' + items[-1]
+        final_item = items.pop()
+        formatted = ', '.join(items)
+        if serial_comma:
+            formatted += ','
+        return ' '.join([formatted, conjunction, final_item])
     elif items:
         return items[0]
     else:
@@ -276,19 +296,36 @@ def pluralize(count, singular, plural=None):
     """
     Combine a count with the singular or plural form of a word.
 
-    If the plural form of the word is not provided it is obtained by
-    concatenating the singular form of the word with the letter "s". Of course
-    this will not always be correct, which is why you have the option to
-    specify both forms.
+    :param count: The count (a number).
+    :param singular: The singular form of the word (a string).
+    :param plural: The plural form of the word (a string or :data:`None`).
+    :returns: The count and singular or plural word concatenated (a string).
+
+    See :func:`pluralize_raw()` for the logic underneath :func:`pluralize()`.
+    """
+    return '%s %s' % (count, pluralize_raw(count, singular, plural))
+
+
+def pluralize_raw(count, singular, plural=None):
+    """
+    Select the singular or plural form of a word based on a count.
 
     :param count: The count (a number).
     :param singular: The singular form of the word (a string).
     :param plural: The plural form of the word (a string or :data:`None`).
-    :returns: The count and singular/plural word concatenated (a string).
+    :returns: The singular or plural form of the word (a string).
+
+    When the given count is exactly 1.0 the singular form of the word is
+    selected, in all other cases the plural form of the word is selected.
+
+    If the plural form of the word is not provided it is obtained by
+    concatenating the singular form of the word with the letter "s". Of course
+    this will not always be correct, which is why you have the option to
+    specify both forms.
     """
     if not plural:
         plural = singular + 's'
-    return '%s %s' % (count, singular if math.floor(float(count)) == 1 else plural)
+    return singular if float(count) == 1.0 else plural
 
 
 def random_string(length=(25, 100), characters=string.ascii_letters):

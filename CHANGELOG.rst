@@ -11,6 +11,44 @@ Changelog`_. This project adheres to `semantic versioning`_.
 .. _Keep a Changelog: http://keepachangelog.com/
 .. _semantic versioning: http://semver.org/
 
+`Release 9.1`_ (2020-12-10)
+---------------------------
+
+Added :func:`~humanfriendly.compat.on_macos()` function to detect Apple MacOS
+(I need this in an upcoming :pypi:`coloredlogs` release and don't want to have
+to think about how to detect MacOS again in the future 😇).
+
+.. _Release 9.1: https://github.com/xolox/python-humanfriendly/compare/9.0...9.1
+
+`Release 9.0`_ (2020-12-01)
+---------------------------
+
+The major version number was bumped because the bug fix for
+:func:`~humanfriendly.text.pluralize()` is backwards incompatible
+and (even though this seems like very "cosmetic" functionality)
+version numbers are cheap, so who cares 😉.
+
+**Bug fixes:**
+
+- Changed :func:`~humanfriendly.format_number()` to properly support negative
+  numbers (as suggested in `issue #40`_).
+
+- Changed :func:`~humanfriendly.text.pluralize()` to generate "1.5 seconds"
+  instead of "1.5 second" (as suggested in `issue #43`_).
+
+**Enhancements:**
+
+- Enhanced :func:`~humanfriendly.text.concatenate()` to support ``conjunction``
+  and ``serial_comma`` keyword arguments (as suggested in `issue #30`_).
+
+- Added :func:`~humanfriendly.text.pluralize_raw()` to select singular or
+  plural form without prefixing the count to the text that is returned.
+
+.. _Release 9.0: https://github.com/xolox/python-humanfriendly/compare/8.2...9.0
+.. _issue #30: https://github.com/xolox/python-humanfriendly/issues/30
+.. _issue #40: https://github.com/xolox/python-humanfriendly/issues/40
+.. _issue #43: https://github.com/xolox/python-humanfriendly/issues/43
+
 `Release 8.2`_ (2020-04-19)
 ---------------------------
 
