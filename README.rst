@@ -144,7 +144,7 @@ License
 
 This software is licensed under the `MIT license`_.
 
-© 2020 Peter Odding.
+© 2021 Peter Odding.
 
 .. External references:
 .. _#4: https://github.com/xolox/python-humanfriendly/issues/4
