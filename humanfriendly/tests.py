@@ -4,7 +4,7 @@
 # Tests for the `humanfriendly' package.
 #
 # Author: Peter Odding <peter.odding@paylogic.eu>
-# Last Change: December 1, 2020
+# Last Change: June 11, 2021
 # URL: https://humanfriendly.readthedocs.io
 
 """Test suite for the `humanfriendly` package."""
@@ -793,8 +793,8 @@ class HumanFriendlyTestCase(TestCase):
                         .replace(ANSI_HIDE_CURSOR, ''))
         lines = [line for line in output.split(ANSI_ERASE_LINE) if line]
         self.assertTrue(len(lines) > 0)
-        self.assertTrue(all('test spinner' in ln for ln in lines))
-        self.assertTrue(all('%' in ln for ln in lines))
+        self.assertTrue(all('test spinner' in line for line in lines))
+        self.assertTrue(all('%' in line for line in lines))
         self.assertEqual(sorted(set(lines)), sorted(lines))
 
     def test_automatic_spinner(self):
@@ -958,7 +958,7 @@ class HumanFriendlyTestCase(TestCase):
         # https://github.com/xolox/python-humanfriendly/issues/28
         returncode, output = run_cli(main, '--demo')
         assert returncode == 0
-        lines = [ansi_strip(ln) for ln in output.splitlines()]
+        lines = [ansi_strip(line) for line in output.splitlines()]
         assert "Text styles:" in lines
         assert "Foreground colors:" in lines
         assert "Background colors:" in lines
