@@ -2,6 +2,7 @@
 *.pyc
 .coverage
 .coverage.*
+.tox
 __pycache__/
 dist/*.tar.gz
 dist/*.zip
