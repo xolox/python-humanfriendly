@@ -11,6 +11,28 @@ Changelog`_. This project adheres to `semantic versioning`_.
 .. _Keep a Changelog: http://keepachangelog.com/
 .. _semantic versioning: http://semver.org/
 
+`Release 9.2`_ (2021-06-11)
+---------------------------
+
+Maintenance release:
+
+- Merged pull request `#46`_ which fixes several :pypi:`flake8` warnings.
+
+- Merged pull request `#49`_ which marks Python 3.9 support final.
+
+- Merged pull request `#51`_ which helps to stabilize the test suite.
+
+- Merged pull request `#52`_ which updates the :mod:`humanfriendly.sphinx`
+  module to include Sphinx extension metadata that has become mandatory in a
+  recent Sphinx release. After merging the pull request I added additional
+  metadata including the version.
+
+.. _Release 9.2: https://github.com/xolox/python-humanfriendly/compare/9.1...9.2
+.. _#46: https://github.com/xolox/python-humanfriendly/pull/46
+.. _#49: https://github.com/xolox/python-humanfriendly/pull/49
+.. _#51: https://github.com/xolox/python-humanfriendly/pull/51
+.. _#52: https://github.com/xolox/python-humanfriendly/pull/52
+
 `Release 9.1`_ (2020-12-10)
 ---------------------------
 

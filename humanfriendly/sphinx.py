@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: March 1, 2020
+# Last Change: June 11, 2021
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -245,11 +245,15 @@ def setup(app):
     like that idea you may be better of calling the individual functions from
     your own ``setup()`` function.
     """
+    from humanfriendly import __version__
+
     enable_deprecation_notes(app)
     enable_man_role(app)
     enable_pypi_role(app)
     enable_special_methods(app)
     enable_usage_formatting(app)
+
+    return dict(parallel_read_safe=True, parallel_write_safe=True, version=__version__)
 
 
 def special_methods_callback(app, what, name, obj, skip, options):
