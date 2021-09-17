@@ -35,15 +35,18 @@ Getting started
 
 It's very simple to start using the `humanfriendly` package::
 
-   >>> import humanfriendly
-   >>> user_input = raw_input("Enter a readable file size: ")
-   Enter a readable file size: 16G
-   >>> num_bytes = humanfriendly.parse_size(user_input)
-   >>> print num_bytes
+   >>> from humanfriendly import format_size, parse_size
+   >>> from humanfriendly.prompts import prompt_for_input
+   >>> user_input = prompt_for_input("Enter a readable file size: ")
+
+     Enter a readable file size: 16G
+
+   >>> num_bytes = parse_size(user_input)
+   >>> print(num_bytes)
    16000000000
-   >>> print "You entered:", humanfriendly.format_size(num_bytes)
+   >>> print("You entered:", format_size(num_bytes))
    You entered: 16 GB
-   >>> print "You entered:", humanfriendly.format_size(num_bytes, binary=True)
+   >>> print("You entered:", format_size(num_bytes, binary=True))
    You entered: 14.9 GiB
 
 Command line
