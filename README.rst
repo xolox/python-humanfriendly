@@ -1,11 +1,11 @@
 humanfriendly: Human friendly input/output in Python
 ====================================================
 
-.. image:: https://travis-ci.org/xolox/python-humanfriendly.svg?branch=master
-   :target: https://travis-ci.org/xolox/python-humanfriendly
+.. image:: https://github.com/xolox/python-humanfriendly/actions/workflows/test.yml/badge.svg?branch=master
+   :target: https://github.com/xolox/python-humanfriendly/actions
 
-.. image:: https://coveralls.io/repos/github/xolox/python-humanfriendly/badge.svg?branch=master
-   :target: https://coveralls.io/github/xolox/python-humanfriendly?branch=master
+.. image:: https://codecov.io/gh/xolox/python-humanfriendly/branch/master/graph/badge.svg?token=jYaj4T74TU
+   :target: https://codecov.io/gh/xolox/python-humanfriendly
 
 The functions and classes in the `humanfriendly` package can be used to make
 text interfaces more user friendly. Some example features:
