@@ -3,7 +3,7 @@
 # Setup script for the `humanfriendly' package.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: February 16, 2020
+# Last Change: September 17, 2021
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -49,9 +49,10 @@ def get_install_requires():
         if sys.version_info.major == 2:
             install_requires.append('monotonic')
         if sys.platform == 'win32':
-            # pyreadline isn't compatible with Python 3.9+
-            # https://github.com/pyreadline/pyreadline/issues/65
-            install_requires.append('pyreadline ; python_version<"3.9"')
+            # For details about these two conditional requirements please
+            # see https://github.com/xolox/python-humanfriendly/pull/45.
+            install_requires.append('pyreadline ; python_version < "3.8"')
+            install_requires.append('pyreadline3 ; python_version >= "3.8"')
     return sorted(install_requires)
 
 
@@ -59,16 +60,11 @@ def get_extras_require():
     """Get the conditional dependencies for wheel distributions."""
     extras_require = {}
     if have_environment_marker_support():
-        # Conditional `monotonic' dependency.
-        expression = ':%s' % ' or '.join([
-            'python_version == "2.7"',
-        ])
-        extras_require[expression] = ['monotonic']
-        # Conditional `pyreadline' dependency.
-        # pyreadline isn't compatible with Python 3.9+
-        # https://github.com/pyreadline/pyreadline/issues/65
-        expression = ':sys_platform == "win32" and python_version<"3.9"'
-        extras_require[expression] = 'pyreadline'
+        # Conditional 'monotonic' dependency.
+        extras_require[':python_version == "2.7"'] = ['monotonic']
+        # Conditional 'pyreadline' or 'pyreadline3' dependency.
+        extras_require[':sys_platform == "win32" and python_version<"3.8"'] = 'pyreadline'
+        extras_require[':sys_platform == "win32" and python_version>="3.8"'] = 'pyreadline3'
     return extras_require
 
 
