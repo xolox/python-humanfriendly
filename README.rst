@@ -19,7 +19,7 @@ text interfaces more user friendly. Some example features:
 - Prompting the user to select a choice from a list of options by typing the
   option's number or a unique substring of the option.
 
-- Terminal interaction including text styling (ANSI escape sequences), user
+- Terminal interaction including text styling (`ANSI escape sequences`_), user
   friendly rendering of usage messages and querying the terminal for its
   size.
 
@@ -48,6 +48,11 @@ It's very simple to start using the `humanfriendly` package::
    You entered: 16 GB
    >>> print("You entered:", format_size(num_bytes, binary=True))
    You entered: 14.9 GiB
+
+To get a demonstration of supported terminal text styles (based on
+`ANSI escape sequences`_) you can run the following command::
+
+   $ humanfriendly --demo
 
 Command line
 ------------
@@ -153,6 +158,7 @@ This software is licensed under the `MIT license`_.
 .. _#4: https://github.com/xolox/python-humanfriendly/issues/4
 .. _#8: https://github.com/xolox/python-humanfriendly/pull/8
 .. _#9: https://github.com/xolox/python-humanfriendly/pull/9
+.. _ANSI escape sequences: https://en.wikipedia.org/wiki/ANSI_escape_code
 .. _changelog: https://humanfriendly.readthedocs.io/en/latest/changelog.html
 .. _colorama: https://pypi.org/project/colorama
 .. _format_size(): https://humanfriendly.readthedocs.io/en/latest/#humanfriendly.format_size
