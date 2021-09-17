@@ -1,7 +1,7 @@
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
-# Last Change: December 10, 2020
+# Last Change: September 17, 2021
 # URL: https://humanfriendly.readthedocs.io
 
 """
@@ -56,16 +56,11 @@ __all__ = (
     'on_windows',
     'unichr',
     'unicode',
-    # This export remains here so as not to break my dozen or so other Python
-    # projects using 'from humanfriendly.compat import unittest' from good old
-    # times (when Python 2.6 was still a thing). It will eventually be removed.
-    'unittest',
     'which',
 )
 
 # Standard library modules.
 import sys
-import unittest
 
 # Differences between Python 2 and 3.
 try:
