@@ -49,7 +49,9 @@ def get_install_requires():
         if sys.version_info.major == 2:
             install_requires.append('monotonic')
         if sys.platform == 'win32':
-            install_requires.append('pyreadline')
+            # pyreadline isn't compatible with Python 3.9+
+            # https://github.com/pyreadline/pyreadline/issues/65
+            install_requires.append('pyreadline ; python_version<"3.9"')
     return sorted(install_requires)
 
 
@@ -63,7 +65,9 @@ def get_extras_require():
         ])
         extras_require[expression] = ['monotonic']
         # Conditional `pyreadline' dependency.
-        expression = ':sys_platform == "win32"'
+        # pyreadline isn't compatible with Python 3.9+
+        # https://github.com/pyreadline/pyreadline/issues/65
+        expression = ':sys_platform == "win32" and python_version<"3.9"'
         extras_require[expression] = 'pyreadline'
     return extras_require
 
