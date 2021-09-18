@@ -209,7 +209,7 @@ class DeprecationProxy(types.ModuleType):
         :param aliases: A dictionary of aliases.
         """
         # Initialize our superclass.
-        super(DeprecationProxy, self).__init__(name=module.__name__)
+        super().__init__(name=module.__name__)
         # Store initializer arguments.
         self.module = module
         self.aliases = aliases

@@ -303,7 +303,7 @@ def pluralize(count, singular, plural=None):
 
     See :func:`pluralize_raw()` for the logic underneath :func:`pluralize()`.
     """
-    return '%s %s' % (count, pluralize_raw(count, singular, plural))
+    return f'{count} {pluralize_raw(count, singular, plural)}'
 
 
 def pluralize_raw(count, singular, plural=None):

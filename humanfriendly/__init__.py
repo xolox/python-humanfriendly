@@ -637,7 +637,7 @@ def parse_path(pathname):
     return os.path.abspath(os.path.expanduser(os.path.expandvars(pathname)))
 
 
-class Timer(object):
+class Timer:
 
     """
     Easy to use timer to keep track of long during operations.

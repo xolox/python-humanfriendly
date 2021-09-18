@@ -249,7 +249,7 @@ class CallableTimedOut(Exception):
     """Raised by :func:`retry()` when the timeout expires."""
 
 
-class ContextManager(object):
+class ContextManager:
 
     """Base class to enable composition of context managers."""
 
@@ -285,7 +285,7 @@ class PatchedAttribute(ContextManager):
         :returns: The object whose attribute was patched.
         """
         # Enable composition of context managers.
-        super(PatchedAttribute, self).__enter__()
+        super().__enter__()
         # Patch the object's attribute.
         self.original_value = getattr(self.object_to_patch, self.attribute_to_patch, NOTHING)
         setattr(self.object_to_patch, self.attribute_to_patch, self.patched_value)
@@ -294,7 +294,7 @@ class PatchedAttribute(ContextManager):
     def __exit__(self, exc_type=None, exc_value=None, traceback=None):
         """Restore the attribute to its original value."""
         # Enable composition of context managers.
-        super(PatchedAttribute, self).__exit__(exc_type, exc_value, traceback)
+        super().__exit__(exc_type, exc_value, traceback)
         # Restore the object's attribute.
         if self.original_value is NOTHING:
             delattr(self.object_to_patch, self.attribute_to_patch)
@@ -326,7 +326,7 @@ class PatchedItem(ContextManager):
         :returns: The object whose item was patched.
         """
         # Enable composition of context managers.
-        super(PatchedItem, self).__enter__()
+        super().__enter__()
         # Patch the object's item.
         try:
             self.original_value = self.object_to_patch[self.item_to_patch]
@@ -338,7 +338,7 @@ class PatchedItem(ContextManager):
     def __exit__(self, exc_type=None, exc_value=None, traceback=None):
         """Restore the item to its original value."""
         # Enable composition of context managers.
-        super(PatchedItem, self).__exit__(exc_type, exc_value, traceback)
+        super().__exit__(exc_type, exc_value, traceback)
         # Restore the object's item.
         if self.original_value is NOTHING:
             del self.object_to_patch[self.item_to_patch]
@@ -377,7 +377,7 @@ class TemporaryDirectory(ContextManager):
         :returns: The pathname of the directory (a string).
         """
         # Enable composition of context managers.
-        super(TemporaryDirectory, self).__enter__()
+        super().__enter__()
         # Create the temporary directory.
         self.temporary_directory = tempfile.mkdtemp(**self.mkdtemp_options)
         return self.temporary_directory
@@ -385,7 +385,7 @@ class TemporaryDirectory(ContextManager):
     def __exit__(self, exc_type=None, exc_value=None, traceback=None):
         """Cleanup the temporary directory using :func:`shutil.rmtree()`."""
         # Enable composition of context managers.
-        super(TemporaryDirectory, self).__exit__(exc_type, exc_value, traceback)
+        super().__exit__(exc_type, exc_value, traceback)
         # Cleanup the temporary directory.
         if self.temporary_directory is not None:
             shutil.rmtree(self.temporary_directory)
@@ -425,7 +425,7 @@ class MockedHomeDirectory(PatchedItem, TemporaryDirectory):
 
     def __exit__(self, exc_type=None, exc_value=None, traceback=None):
         """Deactivate the custom ``$HOME``."""
-        super(MockedHomeDirectory, self).__exit__(exc_type, exc_value, traceback)
+        super().__exit__(exc_type, exc_value, traceback)
 
 
 class CustomSearchPath(PatchedItem, TemporaryDirectory):
@@ -474,7 +474,7 @@ class CustomSearchPath(PatchedItem, TemporaryDirectory):
 
     def __exit__(self, exc_type=None, exc_value=None, traceback=None):
         """Deactivate the custom ``$PATH``."""
-        super(CustomSearchPath, self).__exit__(exc_type, exc_value, traceback)
+        super().__exit__(exc_type, exc_value, traceback)
 
     @property
     def current_search_path(self):
@@ -507,7 +507,7 @@ class MockedProgram(CustomSearchPath):
         self.program_script = script
         self.program_signal_file = None
         # Initialize our superclasses.
-        super(MockedProgram, self).__init__()
+        super().__init__()
 
     def __enter__(self):
         """
@@ -516,7 +516,7 @@ class MockedProgram(CustomSearchPath):
         :returns: The pathname of the directory that has
                   been added to ``$PATH`` (a string).
         """
-        directory = super(MockedProgram, self).__enter__()
+        directory = super().__enter__()
         self.program_signal_file = os.path.join(directory, 'program-was-run-%s' % random_string(10))
         pathname = os.path.join(directory, self.program_name)
         with open(pathname, 'w') as handle:
@@ -539,7 +539,7 @@ class MockedProgram(CustomSearchPath):
             assert self.program_signal_file and os.path.isfile(self.program_signal_file), \
                 ("It looks like %r was never run!" % self.program_name)
         finally:
-            return super(MockedProgram, self).__exit__(*args, **kw)
+            return super().__exit__(*args, **kw)
 
 
 class CaptureOutput(ContextManager):
@@ -586,14 +586,14 @@ class CaptureOutput(ContextManager):
 
     def __enter__(self):
         """Start capturing what's written to :data:`sys.stdout` and :data:`sys.stderr`."""
-        super(CaptureOutput, self).__enter__()
+        super().__enter__()
         for context in self.patched_attributes:
             context.__enter__()
         return self
 
     def __exit__(self, exc_type=None, exc_value=None, traceback=None):
         """Stop capturing what's written to :data:`sys.stdout` and :data:`sys.stderr`."""
-        super(CaptureOutput, self).__exit__(exc_type, exc_value, traceback)
+        super().__exit__(exc_type, exc_value, traceback)
         for context in self.patched_attributes:
             context.__exit__(exc_type, exc_value, traceback)
 
@@ -641,7 +641,7 @@ class TestCase(unittest.TestCase):
         Any positional and/or keyword arguments are passed on to the
         initializer of the superclass.
         """
-        super(TestCase, self).__init__(*args, **kw)
+        super().__init__(*args, **kw)
 
     def setUp(self, log_level=logging.DEBUG):
         """setUp(log_level=logging.DEBUG)

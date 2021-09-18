@@ -182,13 +182,13 @@ def format_pretty_table(data, column_names=None, horizontal_bar='-', vertical_ba
             else:
                 line.append(' ' + column + padding + ' ')
             line.append(vertical_bar)
-        lines.append(u''.join(line))
+        lines.append(''.join(line))
         if column_names and row_index == 0:
             lines.append(line_delimiter)
     # End the table with a vertical bar.
     lines.append(line_delimiter)
     # Join the lines, returning a single string.
-    return u'\n'.join(lines)
+    return '\n'.join(lines)
 
 
 def format_robust_table(data, column_names):
@@ -250,7 +250,7 @@ def format_robust_table(data, column_names):
             stripped_column = column_text.strip()
             if '\n' not in stripped_column:
                 # Columns without line breaks are formatted inline.
-                lines.append("%s %s" % (column_names[column_index], stripped_column))
+                lines.append(f"{column_names[column_index]} {stripped_column}")
             else:
                 # Columns with line breaks could very well contain indented
                 # lines, so we'll put the column name on a separate line. This
@@ -262,12 +262,12 @@ def format_robust_table(data, column_names):
     # Calculate the width of the row delimiter.
     num_rows, num_columns = find_terminal_size()
     longest_line = max(max(map(ansi_width, lines)) for lines in blocks)
-    delimiter = u"\n%s\n" % ('-' * min(longest_line, num_columns))
+    delimiter = "\n%s\n" % ('-' * min(longest_line, num_columns))
     # Force a delimiter at the start and end of the table.
     blocks.insert(0, "")
     blocks.append("")
     # Embed the row delimiter between every two blocks.
-    return delimiter.join(u"\n".join(b) for b in blocks).strip()
+    return delimiter.join("\n".join(b) for b in blocks).strip()
 
 
 def format_rst_table(data, column_names=None):

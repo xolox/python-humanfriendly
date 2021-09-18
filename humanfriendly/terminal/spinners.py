@@ -111,7 +111,7 @@ MINIMUM_INTERVAL = 0.2
 """Spinners are redrawn with a frequency no higher than this number (a floating point number of seconds)."""
 
 
-class Spinner(object):
+class Spinner:
 
     """Show a spinner on the terminal as a simple means of feedback to the user."""
 
@@ -207,10 +207,10 @@ class Spinner(object):
                 if not label:
                     raise Exception("No label set for spinner!")
                 elif self.total and progress:
-                    label = "%s: %.2f%%" % (label, progress / (self.total / 100.0))
+                    label = f"{label}: {progress / (self.total / 100.0):.2f}%"
                 elif self.timer and self.timer.elapsed_time > 2:
-                    label = "%s (%s)" % (label, self.timer.rounded)
-                self.stream.write("%s %s %s ..\r" % (ANSI_ERASE_LINE, state, label))
+                    label = f"{label} ({self.timer.rounded})"
+                self.stream.write(f"{ANSI_ERASE_LINE} {state} {label} ..\r")
                 self.counter += 1
 
     def sleep(self):
@@ -252,7 +252,7 @@ class Spinner(object):
         self.clear()
 
 
-class AutomaticSpinner(object):
+class AutomaticSpinner:
 
     """
     Show a spinner on the terminal that automatically starts animating.

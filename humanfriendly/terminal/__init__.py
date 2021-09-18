@@ -95,7 +95,7 @@ ANSI_SGR = 'm'
 ANSI_ERASE_LINE = '%sK' % ANSI_CSI
 """The ANSI escape sequence to erase the current line (a string)."""
 
-ANSI_RESET = '%s0%s' % (ANSI_CSI, ANSI_SGR)
+ANSI_RESET = f'{ANSI_CSI}0{ANSI_SGR}'
 """The ANSI escape sequence to reset styling (a string)."""
 
 ANSI_HIDE_CURSOR = '%s?25l' % ANSI_CSI
@@ -119,7 +119,7 @@ A dictionary with (name, number) pairs of text styles (effects). Used by
 styles. Only widely supported text styles are included here.
 """
 
-CLEAN_OUTPUT_PATTERN = re.compile(u'(\r|\n|\b|%s)' % re.escape(ANSI_ERASE_LINE))
+CLEAN_OUTPUT_PATTERN = re.compile('(\r|\n|\b|%s)' % re.escape(ANSI_ERASE_LINE))
 """
 A compiled regular expression used to separate significant characters from other text.
 
@@ -156,7 +156,7 @@ def ansi_strip(text, readline_hints=True):
                            used to remove `readline hints`_ from the string.
     :returns: The text without ANSI escape sequences (a string).
     """
-    pattern = '%s.*?%s' % (re.escape(ANSI_CSI), re.escape(ANSI_SGR))
+    pattern = f'{re.escape(ANSI_CSI)}.*?{re.escape(ANSI_SGR)}'
     text = re.sub(pattern, '', text)
     if readline_hints:
         text = readline_strip(text)

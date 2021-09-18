@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """Documentation build configuration file for the `humanfriendly` package."""
 
 import os

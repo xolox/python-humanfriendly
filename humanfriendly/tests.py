@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# vim: fileencoding=utf-8 :
 
 # Tests for the `humanfriendly' package.
 #
@@ -123,7 +122,7 @@ from humanfriendly.usage import (
 )
 
 # Test dependencies.
-from mock import MagicMock
+from unittest.mock import MagicMock
 
 
 class HumanFriendlyTestCase(TestCase):
@@ -279,7 +278,7 @@ class HumanFriendlyTestCase(TestCase):
 
     def test_patch_attribute(self):
         """Test :class:`humanfriendly.testing.PatchedAttribute`."""
-        class Subject(object):
+        class Subject:
             my_attribute = 42
         instance = Subject()
         assert instance.my_attribute == 42
@@ -486,7 +485,7 @@ class HumanFriendlyTestCase(TestCase):
         """Test :func:`humanfriendly.parse_date()`."""
         self.assertEqual((2013, 6, 17, 0, 0, 0), parse_date('2013-06-17'))
         self.assertEqual((2013, 6, 17, 2, 47, 42), parse_date('2013-06-17 02:47:42'))
-        self.assertEqual((2016, 11, 30, 0, 47, 17), parse_date(u'2016-11-30 00:47:17'))
+        self.assertEqual((2016, 11, 30, 0, 47, 17), parse_date('2016-11-30 00:47:17'))
         with self.assertRaises(InvalidDate):
             parse_date('2013-06-XY')
 
@@ -969,20 +968,20 @@ class HumanFriendlyTestCase(TestCase):
 
     def test_ansi_style(self):
         """Test :func:`humanfriendly.terminal.ansi_style()`."""
-        assert ansi_style(bold=True) == '%s1%s' % (ANSI_CSI, ANSI_SGR)
-        assert ansi_style(faint=True) == '%s2%s' % (ANSI_CSI, ANSI_SGR)
-        assert ansi_style(italic=True) == '%s3%s' % (ANSI_CSI, ANSI_SGR)
-        assert ansi_style(underline=True) == '%s4%s' % (ANSI_CSI, ANSI_SGR)
-        assert ansi_style(inverse=True) == '%s7%s' % (ANSI_CSI, ANSI_SGR)
-        assert ansi_style(strike_through=True) == '%s9%s' % (ANSI_CSI, ANSI_SGR)
-        assert ansi_style(color='blue') == '%s34%s' % (ANSI_CSI, ANSI_SGR)
-        assert ansi_style(background='blue') == '%s44%s' % (ANSI_CSI, ANSI_SGR)
-        assert ansi_style(color='blue', bright=True) == '%s94%s' % (ANSI_CSI, ANSI_SGR)
-        assert ansi_style(color=214) == '%s38;5;214%s' % (ANSI_CSI, ANSI_SGR)
-        assert ansi_style(background=214) == '%s39;5;214%s' % (ANSI_CSI, ANSI_SGR)
-        assert ansi_style(color=(0, 0, 0)) == '%s38;2;0;0;0%s' % (ANSI_CSI, ANSI_SGR)
-        assert ansi_style(color=(255, 255, 255)) == '%s38;2;255;255;255%s' % (ANSI_CSI, ANSI_SGR)
-        assert ansi_style(background=(50, 100, 150)) == '%s48;2;50;100;150%s' % (ANSI_CSI, ANSI_SGR)
+        assert ansi_style(bold=True) == f'{ANSI_CSI}1{ANSI_SGR}'
+        assert ansi_style(faint=True) == f'{ANSI_CSI}2{ANSI_SGR}'
+        assert ansi_style(italic=True) == f'{ANSI_CSI}3{ANSI_SGR}'
+        assert ansi_style(underline=True) == f'{ANSI_CSI}4{ANSI_SGR}'
+        assert ansi_style(inverse=True) == f'{ANSI_CSI}7{ANSI_SGR}'
+        assert ansi_style(strike_through=True) == f'{ANSI_CSI}9{ANSI_SGR}'
+        assert ansi_style(color='blue') == f'{ANSI_CSI}34{ANSI_SGR}'
+        assert ansi_style(background='blue') == f'{ANSI_CSI}44{ANSI_SGR}'
+        assert ansi_style(color='blue', bright=True) == f'{ANSI_CSI}94{ANSI_SGR}'
+        assert ansi_style(color=214) == f'{ANSI_CSI}38;5;214{ANSI_SGR}'
+        assert ansi_style(background=214) == f'{ANSI_CSI}39;5;214{ANSI_SGR}'
+        assert ansi_style(color=(0, 0, 0)) == f'{ANSI_CSI}38;2;0;0;0{ANSI_SGR}'
+        assert ansi_style(color=(255, 255, 255)) == f'{ANSI_CSI}38;2;255;255;255{ANSI_SGR}'
+        assert ansi_style(background=(50, 100, 150)) == f'{ANSI_CSI}48;2;50;100;150{ANSI_SGR}'
         with self.assertRaises(ValueError):
             ansi_style(color='unknown')
 
@@ -1069,7 +1068,7 @@ class HumanFriendlyTestCase(TestCase):
         # Try a somewhat convoluted but nevertheless real life example from my
         # personal chat archives that causes humanfriendly releases 4.15 and
         # 4.15.1 to raise an exception.
-        assert html_to_ansi(u'''
+        assert html_to_ansi('''
             Tweakers zit er idd nog steeds:<br><br>
             peter@peter-work&gt; curl -s <a href="tweakers.net">tweakers.net</a> | grep -i hosting<br>
             &lt;a href="<a href="http://www.true.nl/webhosting/">http://www.true.nl/webhosting/</a>"
@@ -1418,7 +1417,7 @@ class HumanFriendlyTestCase(TestCase):
 
     def test_sphinx_customizations(self):
         """Test the :mod:`humanfriendly.sphinx` module."""
-        class FakeApp(object):
+        class FakeApp:
 
             def __init__(self):
                 self.callbacks = {}

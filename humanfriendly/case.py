@@ -42,7 +42,7 @@ class CaseInsensitiveDict(collections.OrderedDict):
     def __init__(self, other=None, **kw):
         """Initialize a :class:`CaseInsensitiveDict` object."""
         # Initialize our superclass.
-        super(CaseInsensitiveDict, self).__init__()
+        super().__init__()
         # Handle the initializer arguments.
         self.update(other, **kw)
 
@@ -66,15 +66,15 @@ class CaseInsensitiveDict(collections.OrderedDict):
 
     def get(self, key, default=None):
         """Get the value of an existing item."""
-        return super(CaseInsensitiveDict, self).get(self.coerce_key(key), default)
+        return super().get(self.coerce_key(key), default)
 
     def pop(self, key, default=None):
         """Remove an item from a case insensitive dictionary."""
-        return super(CaseInsensitiveDict, self).pop(self.coerce_key(key), default)
+        return super().pop(self.coerce_key(key), default)
 
     def setdefault(self, key, default=None):
         """Get the value of an existing item or add a new item."""
-        return super(CaseInsensitiveDict, self).setdefault(self.coerce_key(key), default)
+        return super().setdefault(self.coerce_key(key), default)
 
     def update(self, other=None, **kw):
         """Update a case insensitive dictionary with new items."""
@@ -97,19 +97,19 @@ class CaseInsensitiveDict(collections.OrderedDict):
 
     def __contains__(self, key):
         """Check if a case insensitive dictionary contains the given key."""
-        return super(CaseInsensitiveDict, self).__contains__(self.coerce_key(key))
+        return super().__contains__(self.coerce_key(key))
 
     def __delitem__(self, key):
         """Delete an item in a case insensitive dictionary."""
-        return super(CaseInsensitiveDict, self).__delitem__(self.coerce_key(key))
+        return super().__delitem__(self.coerce_key(key))
 
     def __getitem__(self, key):
         """Get the value of an item in a case insensitive dictionary."""
-        return super(CaseInsensitiveDict, self).__getitem__(self.coerce_key(key))
+        return super().__getitem__(self.coerce_key(key))
 
     def __setitem__(self, key, value):
         """Set the value of an item in a case insensitive dictionary."""
-        return super(CaseInsensitiveDict, self).__setitem__(self.coerce_key(key), value)
+        return super().__setitem__(self.coerce_key(key), value)
 
 
 class CaseInsensitiveKey(unicode):

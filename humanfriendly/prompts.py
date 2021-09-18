@@ -1,5 +1,3 @@
-# vim: fileencoding=utf-8
-
 # Human friendly input/output in Python.
 #
 # Author: Peter Odding <peter@peterodding.com>
@@ -179,7 +177,7 @@ def prompt_for_choice(choices, default=None, padding=True):
     prompt_text = ('\n\n' if padding else '\n').join([
         # Present the available choices in a user friendly way.
         "\n".join([
-            (u" %i. %s" % (i, choice)) + (" (default choice)" if choice == default else "")
+            (" %i. %s" % (i, choice)) + (" (default choice)" if choice == default else "")
             for i, choice in enumerate(choices, start=1)
         ]),
         # Instructions for the user.
@@ -327,7 +325,7 @@ def prepare_prompt_text(prompt_text, **options):
 
 
 def prepare_friendly_prompts():
-    u"""
+    """
     Make interactive prompts more user friendly.
 
     The prompts presented by :func:`python2:raw_input()` (in Python 2) and
