@@ -20,6 +20,7 @@ import time
 import types
 import unittest
 import warnings
+from io import StringIO
 
 # Modules included in our package.
 from humanfriendly import (
@@ -45,7 +46,6 @@ from humanfriendly import (
 )
 from humanfriendly.case import CaseInsensitiveDict, CaseInsensitiveKey
 from humanfriendly.cli import main
-from humanfriendly.compat import StringIO
 from humanfriendly.decorators import cached
 from humanfriendly.deprecation import DeprecationProxy, define_aliases, deprecated_args, get_aliases
 from humanfriendly.prompts import (
@@ -822,31 +822,31 @@ class HumanFriendlyTestCase(TestCase):
                 only_option = 'only one option (shortcut)'
                 assert prompt_for_choice([only_option]) == only_option
         # Choice selection by full string match.
-        with PatchedAttribute(prompts, 'interactive_prompt', lambda p: 'foo'):
+        with PatchedAttribute(prompts, 'input', lambda p: 'foo'):
             assert prompt_for_choice(['foo', 'bar']) == 'foo'
         # Choice selection by substring input.
-        with PatchedAttribute(prompts, 'interactive_prompt', lambda p: 'f'):
+        with PatchedAttribute(prompts, 'input', lambda p: 'f'):
             assert prompt_for_choice(['foo', 'bar']) == 'foo'
         # Choice selection by number.
-        with PatchedAttribute(prompts, 'interactive_prompt', lambda p: '2'):
+        with PatchedAttribute(prompts, 'input', lambda p: '2'):
             assert prompt_for_choice(['foo', 'bar']) == 'bar'
         # Choice selection by going with the default.
-        with PatchedAttribute(prompts, 'interactive_prompt', lambda p: ''):
+        with PatchedAttribute(prompts, 'input', lambda p: ''):
             assert prompt_for_choice(['foo', 'bar'], default='bar') == 'bar'
         # Invalid substrings are refused.
         replies = ['', 'q', 'z']
-        with PatchedAttribute(prompts, 'interactive_prompt', lambda p: replies.pop(0)):
+        with PatchedAttribute(prompts, 'input', lambda p: replies.pop(0)):
             assert prompt_for_choice(['foo', 'bar', 'baz']) == 'baz'
         # Choice selection by substring input requires an unambiguous substring match.
         replies = ['a', 'q']
-        with PatchedAttribute(prompts, 'interactive_prompt', lambda p: replies.pop(0)):
+        with PatchedAttribute(prompts, 'input', lambda p: replies.pop(0)):
             assert prompt_for_choice(['foo', 'bar', 'baz', 'qux']) == 'qux'
         # Invalid numbers are refused.
         replies = ['42', '2']
-        with PatchedAttribute(prompts, 'interactive_prompt', lambda p: replies.pop(0)):
+        with PatchedAttribute(prompts, 'input', lambda p: replies.pop(0)):
             assert prompt_for_choice(['foo', 'bar', 'baz']) == 'bar'
         # Test that interactive prompts eventually give up on invalid replies.
-        with PatchedAttribute(prompts, 'interactive_prompt', lambda p: ''):
+        with PatchedAttribute(prompts, 'input', lambda p: ''):
             with self.assertRaises(TooManyInvalidReplies):
                 prompt_for_choice(['a', 'b', 'c'])
 
@@ -854,30 +854,30 @@ class HumanFriendlyTestCase(TestCase):
         """Test :func:`humanfriendly.prompts.prompt_for_confirmation()`."""
         # Test some (more or less) reasonable replies that indicate agreement.
         for reply in 'yes', 'Yes', 'YES', 'y', 'Y':
-            with PatchedAttribute(prompts, 'interactive_prompt', lambda p: reply):
+            with PatchedAttribute(prompts, 'input', lambda p: reply):
                 assert prompt_for_confirmation("Are you sure?") is True
         # Test some (more or less) reasonable replies that indicate disagreement.
         for reply in 'no', 'No', 'NO', 'n', 'N':
-            with PatchedAttribute(prompts, 'interactive_prompt', lambda p: reply):
+            with PatchedAttribute(prompts, 'input', lambda p: reply):
                 assert prompt_for_confirmation("Are you sure?") is False
         # Test that empty replies select the default choice.
         for default_choice in True, False:
-            with PatchedAttribute(prompts, 'interactive_prompt', lambda p: ''):
+            with PatchedAttribute(prompts, 'input', lambda p: ''):
                 assert prompt_for_confirmation("Are you sure?", default=default_choice) is default_choice
         # Test that a warning is shown when no input nor a default is given.
         replies = ['', 'y']
-        with PatchedAttribute(prompts, 'interactive_prompt', lambda p: replies.pop(0)):
+        with PatchedAttribute(prompts, 'input', lambda p: replies.pop(0)):
             with CaptureOutput(merged=True) as capturer:
                 assert prompt_for_confirmation("Are you sure?") is True
                 assert "there's no default choice" in capturer.get_text()
         # Test that the default reply is shown in uppercase.
-        with PatchedAttribute(prompts, 'interactive_prompt', lambda p: 'y'):
+        with PatchedAttribute(prompts, 'input', lambda p: 'y'):
             for default_value, expected_text in (True, 'Y/n'), (False, 'y/N'), (None, 'y/n'):
                 with CaptureOutput(merged=True) as capturer:
                     assert prompt_for_confirmation("Are you sure?", default=default_value) is True
                     assert expected_text in capturer.get_text()
         # Test that interactive prompts eventually give up on invalid replies.
-        with PatchedAttribute(prompts, 'interactive_prompt', lambda p: ''):
+        with PatchedAttribute(prompts, 'input', lambda p: ''):
             with self.assertRaises(TooManyInvalidReplies):
                 prompt_for_confirmation("Are you sure?")
 

@@ -21,9 +21,6 @@ does it support Unicode normalization, hence the word "simple".
 import collections
 from collections.abc import Iterable, Mapping
 
-# Modules included in our package.
-from humanfriendly.compat import basestring, unicode
-
 # Public identifiers that require documentation.
 __all__ = ("CaseInsensitiveDict", "CaseInsensitiveKey")
 
@@ -55,7 +52,7 @@ class CaseInsensitiveDict(collections.OrderedDict):
                   object is returned, otherwise the value of `key` is
                   returned unmodified.
         """
-        if isinstance(key, basestring):
+        if isinstance(key, str):
             key = CaseInsensitiveKey(key)
         return key
 
@@ -112,7 +109,7 @@ class CaseInsensitiveDict(collections.OrderedDict):
         return super().__setitem__(self.coerce_key(key), value)
 
 
-class CaseInsensitiveKey(unicode):
+class CaseInsensitiveKey(str):
 
     """
     Simple case insensitive dictionary key implementation.
@@ -128,7 +125,7 @@ class CaseInsensitiveKey(unicode):
     def __new__(cls, value):
         """Create a :class:`CaseInsensitiveKey` object."""
         # Delegate string object creation to our superclass.
-        obj = unicode.__new__(cls, value)
+        obj = str.__new__(cls, value)
         # Store the lowercased string and its hash value.
         normalized = obj.lower()
         obj._normalized = normalized
@@ -144,7 +141,7 @@ class CaseInsensitiveKey(unicode):
         if isinstance(other, CaseInsensitiveKey):
             # Fast path (and the most common case): Comparison with same type.
             return self._normalized == other._normalized
-        elif isinstance(other, unicode):
+        elif isinstance(other, str):
             # Slow path: Comparison with strings that need lowercasing.
             return self._normalized == other.lower()
         else:

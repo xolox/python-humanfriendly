@@ -37,12 +37,12 @@ import csv
 import functools
 import logging
 import re
+from io import StringIO
 
 # Standard library module or external dependency (see setup.py).
 from importlib import import_module
 
 # Modules included in our package.
-from humanfriendly.compat import StringIO
 from humanfriendly.text import dedent, split_paragraphs, trim_empty_lines
 
 # Public identifiers that require documentation.

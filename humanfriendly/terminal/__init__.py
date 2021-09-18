@@ -42,7 +42,7 @@ except ImportError:
     HAVE_IOCTL = False
 
 # Modules included in our package.
-from humanfriendly.compat import coerce_string, is_unicode, on_windows, which
+from humanfriendly.compat import coerce_string, on_windows
 from humanfriendly.decorators import cached
 from humanfriendly.deprecation import define_aliases
 from humanfriendly.text import concatenate, format
@@ -690,9 +690,9 @@ def show_pager(formatted_text, encoding=DEFAULT_ENCODING):
     if connected_to_terminal():
         # Make sure the selected pager command is available.
         command_line = get_pager_command(formatted_text)
-        if which(command_line[0]):
+        if sys.which(command_line[0]):
             pager = subprocess.Popen(command_line, stdin=subprocess.PIPE)
-            if is_unicode(formatted_text):
+            if isinstance(formatted_text, str):
                 formatted_text = formatted_text.encode(encoding)
             pager.communicate(input=formatted_text)
             return

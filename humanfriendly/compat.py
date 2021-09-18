@@ -5,107 +5,39 @@
 # URL: https://humanfriendly.readthedocs.io
 
 """
-Compatibility with Python 2 and 3.
+Compatibility.
 
-This module exposes aliases and functions that make it easier to write Python
-code that is compatible with Python 2 and Python 3.
-
-.. data:: basestring
-
-   Alias for :func:`python2:basestring` (in Python 2) or :class:`python3:str`
-   (in Python 3). See also :func:`is_string()`.
-
-.. data:: HTMLParser
-
-   Alias for :class:`python2:HTMLParser.HTMLParser` (in Python 2) or
-   :class:`python3:html.parser.HTMLParser` (in Python 3).
-
-.. data:: interactive_prompt
-
-   Alias for :func:`python2:raw_input()` (in Python 2) or
-   :func:`python3:input()` (in Python 3).
-
-.. data:: StringIO
-
-   Alias for :class:`python2:StringIO.StringIO` (in Python 2) or
-   :class:`python3:io.StringIO` (in Python 3).
-
-.. data:: unicode
-
-   Alias for :func:`python2:unicode` (in Python 2) or :class:`python3:str` (in
-   Python 3). See also :func:`coerce_string()`.
+This module exposes compatibility aliases and functions.
 """
-
-__all__ = (
-    'HTMLParser',
-    'StringIO',
-    'basestring',
-    'coerce_string',
-    'interactive_prompt',
-    'is_string',
-    'is_unicode',
-    'name2codepoint',
-    'on_macos',
-    'on_windows',
-    'unichr',
-    'unicode',
-    'which',
-)
-
 # Standard library modules.
 import sys
 
-# Differences between Python 2 and 3.
-try:
-    # Python 2.
-    unicode = unicode
-    unichr = unichr
-    basestring = basestring
-    interactive_prompt = raw_input
-    from distutils.spawn import find_executable as which
-    from HTMLParser import HTMLParser
-    from StringIO import StringIO
-    from htmlentitydefs import name2codepoint
-except (ImportError, NameError):
-    # Python 3.
-    unicode = str
-    unichr = chr
-    basestring = str
-    interactive_prompt = input
-    from shutil import which
-    from html.parser import HTMLParser
-    from io import StringIO
-    from html.entities import name2codepoint
+__all__ = (
+    'coerce_string',
+    'is_string',
+    'on_macos',
+    'on_windows',
+)
 
 
 def coerce_string(value):
     """
-    Coerce any value to a Unicode string (:func:`python2:unicode` in Python 2 and :class:`python3:str` in Python 3).
+    Coerce any value to a :class:`python3:str` string.
 
     :param value: The value to coerce.
     :returns: The value coerced to a Unicode string.
     """
-    return value if is_string(value) else unicode(value)
+    return str(value)
 
 
 def is_string(value):
     """
-    Check if a value is a :func:`python2:basestring` (in Python 2) or :class:`python3:str` (in Python 3) object.
+    Check if a value is a :class:`python3:str` object.
 
     :param value: The value to check.
     :returns: :data:`True` if the value is a string, :data:`False` otherwise.
     """
-    return isinstance(value, basestring)
-
-
-def is_unicode(value):
-    """
-    Check if a value is a :func:`python2:unicode` (in Python 2) or :class:`python2:str` (in Python 3) object.
-
-    :param value: The value to check.
-    :returns: :data:`True` if the value is a Unicode string, :data:`False` otherwise.
-    """
-    return isinstance(value, unicode)
+    return isinstance(value, str)
 
 
 def on_macos():

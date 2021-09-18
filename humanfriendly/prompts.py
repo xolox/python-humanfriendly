@@ -18,7 +18,6 @@ import logging
 import sys
 
 # Modules included in our package.
-from humanfriendly.compat import interactive_prompt
 from humanfriendly.terminal import (
     HIGHLIGHT_COLOR,
     ansi_strip,
@@ -265,7 +264,7 @@ def prompt_for_input(question, default=None, padding=True, strip=True):
             question = question.replace('\n', '\n ')
         # Render the prompt and wait for the user's reply.
         try:
-            reply = interactive_prompt(question)
+            reply = input(question)
         finally:
             if reply is None:
                 # If the user terminated the prompt using Control-C or

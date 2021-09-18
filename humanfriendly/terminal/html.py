@@ -8,9 +8,11 @@
 
 # Standard library modules.
 import re
+from html.entities import name2codepoint
+from html.parser import HTMLParser
+from io import StringIO
 
 # Modules included in our package.
-from humanfriendly.compat import HTMLParser, StringIO, name2codepoint, unichr
 from humanfriendly.text import compact_empty_lines
 from humanfriendly.terminal import ANSI_COLOR_CODES, ANSI_RESET, ansi_style
 
@@ -193,7 +195,7 @@ class HTMLConverter(HTMLParser):
 
         :param value: The decimal or hexadecimal value (a string).
         """
-        self.output.write(unichr(int(value[1:], 16) if value.startswith('x') else int(value)))
+        self.output.write(chr(int(value[1:], 16) if value.startswith('x') else int(value)))
 
     def handle_data(self, data):
         """
@@ -251,7 +253,7 @@ class HTMLConverter(HTMLParser):
 
         :param name: The name of the character reference (a string).
         """
-        self.output.write(unichr(name2codepoint[name]))
+        self.output.write(chr(name2codepoint[name]))
 
     def handle_starttag(self, tag, attrs):
         """
