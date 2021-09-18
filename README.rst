@@ -23,8 +23,8 @@ text interfaces more user friendly. Some example features:
   friendly rendering of usage messages and querying the terminal for its
   size.
 
-The `humanfriendly` package is currently tested on Python 2.7, 3.5+ and PyPy
-(2.7) on Linux and macOS. While the intention is to support Windows as well,
+The `humanfriendly` package is currently tested on Python 3.6+ and PyPy3
+on Linux and macOS. While the intention is to support Windows as well,
 you may encounter some rough edges.
 
 .. contents::

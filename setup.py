@@ -46,8 +46,6 @@ def get_install_requires():
     """Get the conditional dependencies for source distributions."""
     install_requires = []
     if 'bdist_wheel' not in sys.argv:
-        if sys.version_info.major == 2:
-            install_requires.append('monotonic')
         if sys.platform == 'win32':
             # For details about these two conditional requirements please
             # see https://github.com/xolox/python-humanfriendly/pull/45.
@@ -60,8 +58,6 @@ def get_extras_require():
     """Get the conditional dependencies for wheel distributions."""
     extras_require = {}
     if have_environment_marker_support():
-        # Conditional 'monotonic' dependency.
-        extras_require[':python_version == "2.7"'] = ['monotonic']
         # Conditional 'pyreadline' or 'pyreadline3' dependency.
         extras_require[':sys_platform == "win32" and python_version<"3.8"'] = 'pyreadline'
         extras_require[':sys_platform == "win32" and python_version>="3.8"'] = 'pyreadline3'
@@ -108,7 +104,7 @@ setup(
         'capturer >= 2.1',
         'coloredlogs >= 2.0',
     ],
-    python_requires='>=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*',
+    python_requires='>=3.6',
     classifiers=[
         'Development Status :: 6 - Mature',
         'Environment :: Console',
@@ -118,14 +114,13 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Natural Language :: English',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3 :: Only',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: Implementation :: PyPy',
         'Topic :: Communications',

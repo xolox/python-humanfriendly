@@ -17,7 +17,7 @@ import re
 import time
 
 # Modules included in our package.
-from humanfriendly.compat import is_string, monotonic
+from humanfriendly.compat import is_string
 from humanfriendly.deprecation import define_aliases
 from humanfriendly.text import concatenate, format, pluralize, tokenize
 
@@ -651,7 +651,7 @@ class Timer(object):
         :param resumable: Create a resumable timer (defaults to :data:`False`).
 
         When `start_time` is given :class:`Timer` uses :func:`time.time()` as a
-        clock source, otherwise it uses :func:`humanfriendly.compat.monotonic()`.
+        clock source, otherwise it uses :func:`time.monotonic()`.
         """
         if resumable:
             self.monotonic = True
@@ -665,7 +665,7 @@ class Timer(object):
         else:
             self.monotonic = True
             self.resumable = False
-            self.start_time = monotonic()
+            self.start_time = time.monotonic()
 
     def __enter__(self):
         """
@@ -676,7 +676,7 @@ class Timer(object):
         """
         if not self.resumable:
             raise ValueError("Timer is not resumable!")
-        self.start_time = monotonic()
+        self.start_time = time.monotonic()
         return self
 
     def __exit__(self, exc_type=None, exc_value=None, traceback=None):
@@ -688,7 +688,7 @@ class Timer(object):
         if not self.resumable:
             raise ValueError("Timer is not resumable!")
         if self.start_time:
-            self.total_time += monotonic() - self.start_time
+            self.total_time += time.monotonic() - self.start_time
             self.start_time = 0.0
 
     def sleep(self, seconds):
@@ -726,7 +726,7 @@ class Timer(object):
         if self.resumable:
             elapsed_time += self.total_time
         if self.start_time:
-            current_time = monotonic() if self.monotonic else time.time()
+            current_time = time.monotonic() if self.monotonic else time.time()
             elapsed_time += current_time - self.start_time
         return elapsed_time
 

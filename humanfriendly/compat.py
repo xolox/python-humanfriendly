@@ -34,12 +34,6 @@ code that is compatible with Python 2 and Python 3.
 
    Alias for :func:`python2:unicode` (in Python 2) or :class:`python3:str` (in
    Python 3). See also :func:`coerce_string()`.
-
-.. data:: monotonic
-
-   Alias for :func:`python3:time.monotonic()` (in Python 3.3 and higher) or
-   `monotonic.monotonic()` (a `conditional dependency
-   <https://pypi.org/project/monotonic/>`_ on older Python versions).
 """
 
 __all__ = (
@@ -50,7 +44,6 @@ __all__ = (
     'interactive_prompt',
     'is_string',
     'is_unicode',
-    'monotonic',
     'name2codepoint',
     'on_macos',
     'on_windows',
@@ -83,19 +76,6 @@ except (ImportError, NameError):
     from html.parser import HTMLParser
     from io import StringIO
     from html.entities import name2codepoint
-
-try:
-    # Python 3.3 and higher.
-    from time import monotonic
-except ImportError:
-    # A replacement for older Python versions:
-    # https://pypi.org/project/monotonic/
-    try:
-        from monotonic import monotonic
-    except (ImportError, RuntimeError):
-        # We fall back to the old behavior of using time.time() instead of
-        # failing when {time,monotonic}.monotonic() are both missing.
-        from time import time as monotonic
 
 
 def coerce_string(value):

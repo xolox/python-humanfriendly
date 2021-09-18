@@ -19,13 +19,7 @@ does it support Unicode normalization, hence the word "simple".
 
 # Standard library modules.
 import collections
-
-try:
-    # Python >= 3.3.
-    from collections.abc import Iterable, Mapping
-except ImportError:
-    # Python 2.7.
-    from collections import Iterable, Mapping
+from collections.abc import Iterable, Mapping
 
 # Modules included in our package.
 from humanfriendly.compat import basestring, unicode
