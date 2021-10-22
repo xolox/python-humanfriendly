@@ -267,7 +267,8 @@ def prompt_for_input(question, default=None, padding=True, strip=True):
             question = question.replace('\n', '\n ')
         # Render the prompt and wait for the user's reply.
         try:
-            reply = interactive_prompt(question)
+            print(question)
+            reply = interactive_prompt('')
         finally:
             if reply is None:
                 # If the user terminated the prompt using Control-C or
