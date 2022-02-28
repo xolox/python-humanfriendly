@@ -94,6 +94,9 @@ setup(
     description="Human friendly output for text interfaces using Python",
     long_description=get_contents('README.rst'),
     url='https://humanfriendly.readthedocs.io',
+    project_urls={
+        'Source': 'https://github.com/xolox/python-humanfriendly',
+    },
     author="Peter Odding",
     author_email='peter@peterodding.com',
     license='MIT',
