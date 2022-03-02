@@ -95,7 +95,7 @@ setup(
     long_description=get_contents('README.rst'),
     url='https://humanfriendly.readthedocs.io',
     project_urls={
-        'Source': 'https://github.com/xolox/python-humanfriendly',
+        'Source': 'https://github.com/alteryx/featuretools',
     },
     author="Peter Odding",
     author_email='peter@peterodding.com',
