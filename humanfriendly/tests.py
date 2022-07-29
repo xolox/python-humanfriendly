@@ -59,7 +59,7 @@ from humanfriendly.sphinx import (
     deprecation_note_callback,
     man_role,
     pypi_role,
-    setup,
+    setup as sphinx_setup,
     special_methods_callback,
     usage_message_callback,
 )
@@ -1444,7 +1444,7 @@ class HumanFriendlyTestCase(TestCase):
 
         # Test event callback registration.
         fake_app = FakeApp()
-        setup(fake_app)
+        sphinx_setup(fake_app)
         assert man_role == fake_app.roles['man']
         assert pypi_role == fake_app.roles['pypi']
         assert deprecation_note_callback in fake_app.callbacks['autodoc-process-docstring']
