@@ -11,6 +11,35 @@ Changelog`_. This project adheres to `semantic versioning`_.
 .. _Keep a Changelog: http://keepachangelog.com/
 .. _semantic versioning: http://semver.org/
 
+`Release 10.0`_ (2021-09-17)
+----------------------------
+
+**Noteworthy changes:**
+
+- Merged pull request `#45`_ to resolve the issue caused by the conditional
+  :pypi:`pyreadline` requirement on Windows not supporting Python 3.9+.
+
+- Updated the readme to use Python 3 in the example (reported in issue `#56`_).
+  Also added a mention of the ``humanfriendly --demo`` command.
+
+- Removed the ``humanfriendly.compat.unittest`` alias that presumably no-one is
+  using at this point; it had been rendered useless quite a long time ago
+  (requested in issue `#53`_).
+
+**Internal changes:**
+
+- Merged pull request `#54`_ which migrates the :pypi:`humanfriendly` project
+  from Travis CI to GitHub Actions and from Coveralls.io to Codecov.
+
+- Fixed a deprecation warning concerning ``setup.cfg`` and some Sphinx
+  documentation errors.
+
+.. _Release 10.0: https://github.com/xolox/python-humanfriendly/compare/9.2...10.0
+.. _#45: https://github.com/xolox/python-humanfriendly/pull/45
+.. _#53: https://github.com/xolox/python-humanfriendly/issues/53
+.. _#54: https://github.com/xolox/python-humanfriendly/pull/54
+.. _#56: https://github.com/xolox/python-humanfriendly/issues/56
+
 `Release 9.2`_ (2021-06-11)
 ---------------------------
 

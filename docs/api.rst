@@ -50,7 +50,10 @@ order to avoid unexpected surprises.
 ---------------------------
 
 .. automodule:: humanfriendly.compat
-   :members: coerce_string, is_string, is_unicode, on_windows
+   :members: coerce_string, is_string, is_unicode, on_macos, on_windows
+
+.. The members above are defined explicitly so that Sphinx does not
+.. embed documentation for all of the standard library aliases.
 
 :mod:`humanfriendly.decorators`
 -------------------------------

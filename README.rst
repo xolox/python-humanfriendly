@@ -1,11 +1,11 @@
 humanfriendly: Human friendly input/output in Python
 ====================================================
 
-.. image:: https://travis-ci.org/xolox/python-humanfriendly.svg?branch=master
-   :target: https://travis-ci.org/xolox/python-humanfriendly
+.. image:: https://github.com/xolox/python-humanfriendly/actions/workflows/test.yml/badge.svg?branch=master
+   :target: https://github.com/xolox/python-humanfriendly/actions
 
-.. image:: https://coveralls.io/repos/github/xolox/python-humanfriendly/badge.svg?branch=master
-   :target: https://coveralls.io/github/xolox/python-humanfriendly?branch=master
+.. image:: https://codecov.io/gh/xolox/python-humanfriendly/branch/master/graph/badge.svg?token=jYaj4T74TU
+   :target: https://codecov.io/gh/xolox/python-humanfriendly
 
 The functions and classes in the `humanfriendly` package can be used to make
 text interfaces more user friendly. Some example features:
@@ -19,7 +19,7 @@ text interfaces more user friendly. Some example features:
 - Prompting the user to select a choice from a list of options by typing the
   option's number or a unique substring of the option.
 
-- Terminal interaction including text styling (ANSI escape sequences), user
+- Terminal interaction including text styling (`ANSI escape sequences`_), user
   friendly rendering of usage messages and querying the terminal for its
   size.
 
@@ -35,16 +35,24 @@ Getting started
 
 It's very simple to start using the `humanfriendly` package::
 
-   >>> import humanfriendly
-   >>> user_input = raw_input("Enter a readable file size: ")
-   Enter a readable file size: 16G
-   >>> num_bytes = humanfriendly.parse_size(user_input)
-   >>> print num_bytes
+   >>> from humanfriendly import format_size, parse_size
+   >>> from humanfriendly.prompts import prompt_for_input
+   >>> user_input = prompt_for_input("Enter a readable file size: ")
+
+     Enter a readable file size: 16G
+
+   >>> num_bytes = parse_size(user_input)
+   >>> print(num_bytes)
    16000000000
-   >>> print "You entered:", humanfriendly.format_size(num_bytes)
+   >>> print("You entered:", format_size(num_bytes))
    You entered: 16 GB
-   >>> print "You entered:", humanfriendly.format_size(num_bytes, binary=True)
+   >>> print("You entered:", format_size(num_bytes, binary=True))
    You entered: 14.9 GiB
+
+To get a demonstration of supported terminal text styles (based on
+`ANSI escape sequences`_) you can run the following command::
+
+   $ humanfriendly --demo
 
 Command line
 ------------
@@ -150,6 +158,7 @@ This software is licensed under the `MIT license`_.
 .. _#4: https://github.com/xolox/python-humanfriendly/issues/4
 .. _#8: https://github.com/xolox/python-humanfriendly/pull/8
 .. _#9: https://github.com/xolox/python-humanfriendly/pull/9
+.. _ANSI escape sequences: https://en.wikipedia.org/wiki/ANSI_escape_code
 .. _changelog: https://humanfriendly.readthedocs.io/en/latest/changelog.html
 .. _colorama: https://pypi.org/project/colorama
 .. _format_size(): https://humanfriendly.readthedocs.io/en/latest/#humanfriendly.format_size
