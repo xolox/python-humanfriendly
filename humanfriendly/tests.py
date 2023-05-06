@@ -479,8 +479,38 @@ class HumanFriendlyTestCase(TestCase):
         self.assertEqual(60 * 60 * 24 * 4, parse_timespan('4 days'))
         self.assertEqual(60 * 60 * 24 * 7 * 5, parse_timespan('5 w'))
         self.assertEqual(60 * 60 * 24 * 7 * 5, parse_timespan('5 weeks'))
+
+        self.assertEqual(0, parse_timespan('0m0s'))
+        self.assertEqual(0, parse_timespan('0h0m0s'))
+        self.assertEqual(0.000001001, parse_timespan('1us1ns'))
+        self.assertEqual(0.001001, parse_timespan('1ms1us'))
+        self.assertEqual(0.001001001, parse_timespan('1ms1us1ns'))
+        self.assertEqual(0.5, parse_timespan('0 seconds 500 milliseconds'))
+        self.assertEqual(60 * 2 + 5, parse_timespan('2m5s'))
+        self.assertEqual(60 * 2 + 5, parse_timespan('2 minutes 5 seconds'))
+        self.assertEqual(60 * 2 + 5, parse_timespan('2 min 5 sec'))
+        self.assertEqual(60 * 2 + 5, parse_timespan('2 mins 5 secs'))
+        self.assertEqual(60 * 60 * 3 + 5 * 60, parse_timespan('3h5m'))
+        self.assertEqual(60 * 60 * 3 + 5 * 60, parse_timespan('3 h 5 m'))
+        self.assertEqual(60 * 60 * 3 + 5 * 60, parse_timespan('3 hours 5 minutes'))
+        self.assertEqual(60 * 60 * 24 * 4 + 60 * 60, parse_timespan('4d1h'))
+        self.assertEqual(60 * 60 * 24 * 4 + 60 * 60, parse_timespan('4 days 1 hour'))
+        self.assertEqual(60 * 60 * 24 * 4 + 60 * 60 * 2, parse_timespan('4 days 2 hours'))
+        self.assertEqual(60 * 60 * 24 * 7 * 5 + 60 * 60 * 24 * 2, parse_timespan('5w2d'))
+        self.assertEqual(60 * 60 * 24 * 7 * 5 + 60 * 60 * 24 * 2, parse_timespan('5 w 2 d'))
+        self.assertEqual(60 * 60 * 24 * 7 * 5 + 60 * 60 * 24 * 2, parse_timespan('5 weeks 2 days'))
+
         with self.assertRaises(InvalidTimespan):
             parse_timespan('1z')
+
+        with self.assertRaises(InvalidTimespan):
+            parse_timespan('1 1')
+
+        with self.assertRaises(InvalidTimespan):
+            parse_timespan('m 1')
+
+        with self.assertRaises(InvalidTimespan):
+            parse_timespan('h s')
 
     def test_parse_date(self):
         """Test :func:`humanfriendly.parse_date()`."""
