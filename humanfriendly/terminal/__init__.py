@@ -236,7 +236,7 @@ def ansi_style(**kw):
         elif isinstance(color_value, numbers.Number):
             # Numeric values are assumed to be 256 color codes.
             sequences.extend((
-                39 if color_type == 'background' else 38,
+                48 if color_type == 'background' else 38,
                 5, int(color_value)
             ))
         elif color_value:
