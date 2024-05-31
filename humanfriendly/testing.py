@@ -25,12 +25,16 @@ its much better error reporting) but I've yet to publish a test suite that
 import functools
 import logging
 import os
-import pipes
 import shutil
 import sys
 import tempfile
 import time
 import unittest
+
+try:
+    from shlex import quote  # Python 3
+except ImportError:
+    from pipes import quote  # Python 2 (removed in 3.13)
 
 # Modules included in our package.
 from humanfriendly.compat import StringIO
@@ -521,7 +525,7 @@ class MockedProgram(CustomSearchPath):
         pathname = os.path.join(directory, self.program_name)
         with open(pathname, 'w') as handle:
             handle.write('#!/bin/sh\n')
-            handle.write('echo > %s\n' % pipes.quote(self.program_signal_file))
+            handle.write('echo > %s\n' % quote(self.program_signal_file))
             if self.program_script:
                 handle.write('%s\n' % self.program_script.strip())
             handle.write('exit %i\n' % self.program_returncode)

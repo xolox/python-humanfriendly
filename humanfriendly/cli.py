@@ -79,9 +79,13 @@ Supported options:
 # Standard library modules.
 import functools
 import getopt
-import pipes
 import subprocess
 import sys
+
+try:
+    from shlex import quote  # Python 3
+except ImportError:
+    from pipes import quote  # Python 2 (removed in 3.13)
 
 # Modules included in our package.
 from humanfriendly import (
@@ -176,7 +180,7 @@ def main():
 def run_command(command_line):
     """Run an external command and show a spinner while the command is running."""
     timer = Timer()
-    spinner_label = "Waiting for command: %s" % " ".join(map(pipes.quote, command_line))
+    spinner_label = "Waiting for command: %s" % " ".join(map(quote, command_line))
     with Spinner(label=spinner_label, timer=timer) as spinner:
         process = subprocess.Popen(command_line)
         while True:
