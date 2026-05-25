@@ -253,6 +253,15 @@ class HumanFriendlyTestCase(TestCase):
             assert stdout == b'HELLO WORLD\n'
             assert stderr == b'Fake warning\n'
 
+    def test_mocked_program_requires_execution(self):
+        """Test that :class:`humanfriendly.testing.MockedProgram` asserts execution."""
+        directory = None
+        with self.assertRaises(AssertionError):
+            with MockedProgram(name=random_string()) as directory:
+                assert os.path.isdir(directory)
+        assert directory is not None
+        assert not os.path.exists(directory)
+
     def test_temporary_directory(self):
         """Test :class:`humanfriendly.testing.TemporaryDirectory`."""
         with TemporaryDirectory() as directory:
