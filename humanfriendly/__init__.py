@@ -85,7 +85,7 @@ time_units = (dict(divider=1e-9, singular='nanosecond', plural='nanoseconds', ab
               dict(divider=60 * 60, singular='hour', plural='hours', abbreviations=['h']),
               dict(divider=60 * 60 * 24, singular='day', plural='days', abbreviations=['d']),
               dict(divider=60 * 60 * 24 * 7, singular='week', plural='weeks', abbreviations=['w']),
-              dict(divider=60 * 60 * 24 * 7 * 52, singular='year', plural='years', abbreviations=['y']))
+              dict(divider=60 * 60 * 24 * 365, singular='year', plural='years', abbreviations=['y']))
 
 
 def coerce_boolean(value):
@@ -424,8 +424,8 @@ def format_timespan(num_seconds, detailed=False, max_units=3):
     '3.14 seconds'
     >>> hour = 60 * 60
     >>> day = hour * 24
-    >>> week = day * 7
-    >>> format_timespan(week * 52 + day * 2 + hour * 3)
+    >>> year = day * 365
+    >>> format_timespan(year + day * 2 + hour * 3)
     '1 year, 2 days and 3 hours'
     """
     num_seconds = coerce_seconds(num_seconds)

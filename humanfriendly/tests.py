@@ -411,7 +411,7 @@ class HumanFriendlyTestCase(TestCase):
         hour = minute * 60
         day = hour * 24
         week = day * 7
-        year = week * 52
+        year = day * 365
         assert '1 nanosecond' == format_timespan(0.000000001, detailed=True)
         assert '500 nanoseconds' == format_timespan(0.0000005, detailed=True)
         assert '1 microsecond' == format_timespan(0.000001, detailed=True)
@@ -479,6 +479,8 @@ class HumanFriendlyTestCase(TestCase):
         self.assertEqual(60 * 60 * 24 * 4, parse_timespan('4 days'))
         self.assertEqual(60 * 60 * 24 * 7 * 5, parse_timespan('5 w'))
         self.assertEqual(60 * 60 * 24 * 7 * 5, parse_timespan('5 weeks'))
+        self.assertEqual(60 * 60 * 24 * 365, parse_timespan('1 y'))
+        self.assertEqual(60 * 60 * 24 * 365 * 2, parse_timespan('2 years'))
         with self.assertRaises(InvalidTimespan):
             parse_timespan('1z')
 
