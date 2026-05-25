@@ -421,7 +421,10 @@ def tokenize(text):
     [42.5, 'MB']
     >>> tokenize('42.5 MB')
     [42.5, 'MB']
+    >>> tokenize('1,067.6 KB')
+    [1067.6, 'KB']
     """
+    text = re.sub(r'(?<=\d),(?=\d{3}(?:\D|$))', '', text)
     tokenized_input = []
     for token in re.split(r'(\d+(?:\.\d+)?)', text):
         token = token.strip()

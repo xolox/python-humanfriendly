@@ -533,6 +533,7 @@ class HumanFriendlyTestCase(TestCase):
         self.assertEqual(1000 ** 8, parse_size('1 YB'))
         self.assertEqual(1000 ** 3 * 1.5, parse_size('1.5 GB'))
         self.assertEqual(1024 ** 8 * 1.5, parse_size('1.5 YiB'))
+        self.assertEqual(1067600, parse_size('1,067.6 KB'))
         with self.assertRaises(InvalidSize):
             parse_size('1q')
         with self.assertRaises(InvalidSize):
