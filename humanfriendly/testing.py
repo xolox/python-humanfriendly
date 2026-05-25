@@ -539,7 +539,7 @@ class MockedProgram(CustomSearchPath):
             assert self.program_signal_file and os.path.isfile(self.program_signal_file), \
                 ("It looks like %r was never run!" % self.program_name)
         finally:
-            return super(MockedProgram, self).__exit__(*args, **kw)
+            super(MockedProgram, self).__exit__(*args, **kw)
 
 
 class CaptureOutput(ContextManager):
