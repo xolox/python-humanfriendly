@@ -185,13 +185,22 @@ def format_size(num_bytes, keep_width=False, binary=False):
     >>> format_size(1000 ** 3 * 4)
     '4 GB'
     """
-    for unit in reversed(disk_size_units):
-        if num_bytes >= unit.binary.divider and binary:
-            number = round_number(float(num_bytes) / unit.binary.divider, keep_width=keep_width)
-            return pluralize(number, unit.binary.symbol, unit.binary.symbol)
-        elif num_bytes >= unit.decimal.divider and not binary:
-            number = round_number(float(num_bytes) / unit.decimal.divider, keep_width=keep_width)
-            return pluralize(number, unit.decimal.symbol, unit.decimal.symbol)
+    base = 1024 if binary else 1000
+    ordered_units = list(disk_size_units)
+    for index in range(len(ordered_units) - 1, -1, -1):
+        unit = ordered_units[index]
+        side = unit.binary if binary else unit.decimal
+        if num_bytes >= side.divider:
+            number = round_number(float(num_bytes) / side.divider, keep_width=keep_width)
+            # The unit was chosen from the unrounded byte count, but rounding can
+            # push the mantissa up to `base` (e.g. 999999 bytes -> 999.999 KB,
+            # which rounds to "1000 KB"). When that happens, carry into the next
+            # larger unit so the result reads "1 MB" instead of "1000 KB".
+            if float(number) >= base and index < len(ordered_units) - 1:
+                side = (ordered_units[index + 1].binary if binary
+                        else ordered_units[index + 1].decimal)
+                number = round_number(float(num_bytes) / side.divider, keep_width=keep_width)
+            return pluralize(number, side.symbol, side.symbol)
     return pluralize(num_bytes, 'byte')
 
 
