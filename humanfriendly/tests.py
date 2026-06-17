@@ -513,6 +513,14 @@ class HumanFriendlyTestCase(TestCase):
         self.assertEqual('1 YiB', format_size(1024 ** 8, binary=True))
         self.assertEqual('45 KB', format_size(1000 * 45))
         self.assertEqual('2.9 TB', format_size(1000 ** 4 * 2.9))
+        # Rounding must not leave the mantissa at or above the base while a
+        # larger unit is available: 999999 bytes is 999.999 KB, which rounds to
+        # 1000 KB and should carry into 1 MB (not render as "1000 KB").
+        self.assertEqual('1 MB', format_size(999999))
+        self.assertEqual('1 GB', format_size(999999999))
+        self.assertEqual('1 TB', format_size(999999999999))
+        self.assertEqual('1 MiB', format_size(1024 ** 2 - 1, binary=True))
+        self.assertEqual('1 GiB', format_size(1024 ** 3 - 1, binary=True))
 
     def test_parse_size(self):
         """Test :func:`humanfriendly.parse_size()`."""
