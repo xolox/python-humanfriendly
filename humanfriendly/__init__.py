@@ -353,6 +353,12 @@ def format_number(number, num_decimals=2):
     6,000,000,000
     """
     integer_part, _, decimal_part = str(float(number)).partition('.')
+
+    # Avoid float conversion for integers to prevent bogus output when
+    # str(float()) uses scientific notation (numbers >= 10**16).
+    if type(number) is int:
+        integer_part = str(number)
+        decimal_part = ''
     negative_sign = integer_part.startswith('-')
     reversed_digits = ''.join(reversed(integer_part.lstrip('-')))
     parts = []
