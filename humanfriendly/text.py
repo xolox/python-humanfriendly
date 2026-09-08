@@ -125,7 +125,7 @@ def concatenate(items, conjunction='and', serial_comma=False):
     if len(items) > 1:
         final_item = items.pop()
         formatted = ', '.join(items)
-        if serial_comma:
+        if serial_comma and len(items) > 1:
             formatted += ','
         return ' '.join([formatted, conjunction, final_item])
     elif items:

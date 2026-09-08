@@ -733,6 +733,10 @@ class HumanFriendlyTestCase(TestCase):
         # Test the 'conjunction' option.
         assert concatenate(['one', 'two', 'three'], conjunction='or') == 'one, two or three'
         # Test the 'serial_comma' option.
+        assert concatenate([], serial_comma=True) == ''
+        assert concatenate(['one'], serial_comma=True) == 'one'
+        assert concatenate(['one', 'two'], serial_comma=True) == 'one and two'
+        assert concatenate(iter(['one', 'two']), conjunction='or', serial_comma=True) == 'one or two'
         assert concatenate(['one', 'two', 'three'], serial_comma=True) == 'one, two, and three'
 
     def test_split(self):
