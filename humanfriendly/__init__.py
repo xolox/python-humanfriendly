@@ -483,7 +483,7 @@ def parse_timespan(timespan):
     - ms, millisecond, milliseconds
     - s, sec, secs, second, seconds
     - m, min, mins, minute, minutes
-    - h, hour, hours
+    - h, hr, hrs, hour, hours
     - d, day, days
     - w, week, weeks
     - y, year, years
