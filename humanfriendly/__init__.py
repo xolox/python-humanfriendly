@@ -82,7 +82,7 @@ time_units = (dict(divider=1e-9, singular='nanosecond', plural='nanoseconds', ab
               dict(divider=1e-3, singular='millisecond', plural='milliseconds', abbreviations=['ms']),
               dict(divider=1, singular='second', plural='seconds', abbreviations=['s', 'sec', 'secs']),
               dict(divider=60, singular='minute', plural='minutes', abbreviations=['m', 'min', 'mins']),
-              dict(divider=60 * 60, singular='hour', plural='hours', abbreviations=['h']),
+              dict(divider=60 * 60, singular='hour', plural='hours', abbreviations=['h', 'hr', 'hrs']),
               dict(divider=60 * 60 * 24, singular='day', plural='days', abbreviations=['d']),
               dict(divider=60 * 60 * 24 * 7, singular='week', plural='weeks', abbreviations=['w']),
               dict(divider=60 * 60 * 24 * 7 * 52, singular='year', plural='years', abbreviations=['y']))
