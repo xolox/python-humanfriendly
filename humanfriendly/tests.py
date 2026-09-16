@@ -455,6 +455,16 @@ class HumanFriendlyTestCase(TestCase):
         then = now - datetime.timedelta(hours=23)
         assert '23 hours' == format_timespan(now - then)
 
+    def test_parse_timespan_hour_abbreviations(self):
+        """Accept hour abbreviations without changing existing aliases."""
+        for unit in ('h', 'hr', 'hrs', 'hour', 'hours'):
+            for spelling in (unit, unit.upper()):
+                self.assertEqual(0, parse_timespan('0' + spelling))
+                self.assertEqual(3600, parse_timespan('1 ' + spelling))
+                self.assertEqual(9000, parse_timespan('2.5' + spelling))
+        with self.assertRaises(InvalidTimespan):
+            parse_timespan('1 hrss')
+
     def test_parse_timespan(self):
         """Test :func:`humanfriendly.parse_timespan()`."""
         self.assertEqual(0, parse_timespan('0'))
