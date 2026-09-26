@@ -437,6 +437,16 @@ def format_timespan(num_seconds, detailed=False, max_units=3):
         result = []
         num_seconds = decimal.Decimal(str(num_seconds))
         relevant_units = list(reversed(time_units[0 if detailed else 3:]))
+        # Round the total number of seconds to the precision that will
+        # eventually be displayed for the smallest unit before decomposing
+        # it into units below. Rounding only the smallest unit's count in
+        # isolation (as used to happen here) can inflate its displayed
+        # value up to or past a whole unit of the next larger unit that
+        # was already emitted, producing nonsensical output such as
+        # "1 minute and 60 seconds" instead of "2 minutes".
+        smallest_divider = decimal.Decimal(str(relevant_units[-1]['divider']))
+        quantum = smallest_divider / 100
+        num_seconds = (num_seconds / quantum).to_integral_value(rounding=decimal.ROUND_HALF_EVEN) * quantum
         for unit in relevant_units:
             # Extract the unit count from the remaining time.
             divider = decimal.Decimal(str(unit['divider']))

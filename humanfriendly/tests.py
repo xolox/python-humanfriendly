@@ -449,6 +449,14 @@ class HumanFriendlyTestCase(TestCase):
         assert '1 second and 15 milliseconds' == format_timespan(1.015, detailed=True)
         assert '10 seconds and 15 milliseconds' == format_timespan(10.015, detailed=True)
         assert '1 microsecond and 50 nanoseconds' == format_timespan(0.00000105, detailed=True)
+        # Test that rounding the smallest displayed unit never produces a
+        # count that has reached (or gone past) a whole unit of the next
+        # larger, already emitted unit, which used to render nonsensical
+        # output such as "1 minute and 60 seconds" instead of properly
+        # carrying the extra unit over.
+        assert '2 minutes' == format_timespan(119.999)
+        assert '1 hour' == format_timespan(3599.999)
+        assert '1 minute, 59 seconds and 999 milliseconds' == format_timespan(119.999, detailed=True)
         # Test the datetime.timedelta support:
         # https://github.com/xolox/python-humanfriendly/issues/27
         now = datetime.datetime.now()
