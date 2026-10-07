@@ -139,6 +139,10 @@ like ``humanfriendly --demo`` should work out of the box (if your system is
 up-to-date enough). If this doesn't work then you can install the colorama_
 package, it will be used automatically once installed.
 
+Calling ``enable_ansi_support()`` again restores native Windows ANSI support
+if a child process has changed the console mode. Colorama initialization and
+non-Windows terminal detection remain cached.
+
 Contact
 -------
 

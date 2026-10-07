@@ -11,6 +11,13 @@ Changelog`_. This project adheres to `semantic versioning`_.
 .. _Keep a Changelog: http://keepachangelog.com/
 .. _semantic versioning: http://semver.org/
 
+Unreleased
+----------
+
+- Restore native Windows ANSI support on repeated ``enable_ansi_support()``
+  calls after another process changes the console mode (issue #59). Other
+  support checks and colorama initialization remain cached.
+
 `Release 10.0`_ (2021-09-17)
 ----------------------------
 
