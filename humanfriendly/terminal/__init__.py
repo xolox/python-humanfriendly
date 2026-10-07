@@ -417,7 +417,6 @@ def connected_to_terminal(stream=None):
         return False
 
 
-@cached
 def enable_ansi_support():
     """
     Try to enable support for ANSI escape sequences (required on Windows).
@@ -447,16 +446,23 @@ def enable_ansi_support():
        This makes it possible to call :func:`enable_ansi_support()`
        unconditionally without checking the current platform.
 
-    The :func:`~humanfriendly.decorators.cached` decorator is used to ensure
-    that this function is only executed once, but its return value remains
-    available on later calls.
+    Native Windows console support is enabled on every call, so it can be
+    restored after a child process changes the console mode. The other
+    configurations remain cached to avoid initializing :pypi:`colorama`
+    multiple times.
     """
     if have_windows_native_ansi_support():
         import ctypes
         ctypes.windll.kernel32.SetConsoleMode(ctypes.windll.kernel32.GetStdHandle(-11), 7)
         ctypes.windll.kernel32.SetConsoleMode(ctypes.windll.kernel32.GetStdHandle(-12), 7)
         return True
-    elif on_windows():
+    return _enable_ansi_support()
+
+
+@cached
+def _enable_ansi_support():
+    """Cache ANSI support for configurations without native Windows support."""
+    if on_windows():
         if 'ANSICON' in os.environ:
             return True
         try:

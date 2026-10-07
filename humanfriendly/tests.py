@@ -10,6 +10,7 @@
 """Test suite for the `humanfriendly` package."""
 
 # Standard library modules.
+import ctypes
 import datetime
 import math
 import os
@@ -123,7 +124,97 @@ from humanfriendly.usage import (
 )
 
 # Test dependencies.
-from mock import MagicMock
+from mock import MagicMock, patch
+
+import humanfriendly.terminal as terminal
+
+# Patch the function globals, rather than the public deprecation proxy.
+terminal = terminal.module
+
+
+class AnsiSupportTestCase(unittest.TestCase):
+
+    """Check native console reenabling without changing a real console."""
+
+    def setUp(self):
+        """Clear cached results so each test starts with a fresh configuration."""
+        self.clear_ansi_cache()
+
+    def tearDown(self):
+        """Leave subsequent tests with a fresh configuration."""
+        self.clear_ansi_cache()
+
+    def clear_ansi_cache(self):
+        """Reset caches in both the original and split implementations."""
+        for name in ('enable_ansi_support', '_enable_ansi_support'):
+            function = getattr(terminal, name, None)
+            if hasattr(function, 'cached_results'):
+                del function.cached_results
+
+    def test_native_ansi_reenabled_after_console_mode_changes(self):
+        """Reenable stdout and stderr after an external console mode change."""
+        modes = {}
+        kernel32 = MagicMock()
+        kernel32.GetStdHandle.side_effect = lambda handle: handle
+        kernel32.SetConsoleMode.side_effect = lambda handle, mode: modes.update({handle: mode})
+        with patch.object(terminal, 'have_windows_native_ansi_support', return_value=True), \
+                patch.object(ctypes, 'windll', MagicMock(kernel32=kernel32), create=True):
+            assert terminal.enable_ansi_support() is True
+            assert modes == {-11: 7, -12: 7}
+            # Model a child program disabling ANSI on the shared handles.
+            modes.update({-11: 0, -12: 0})
+            assert terminal.enable_ansi_support() is True
+            assert modes == {-11: 7, -12: 7}
+            assert kernel32.SetConsoleMode.call_count == 4
+
+    def test_colorama_fallback_stays_cached(self):
+        """Initialize colorama only once when native support is unavailable."""
+        colorama = MagicMock()
+        with patch.object(terminal, 'have_windows_native_ansi_support', return_value=False), \
+                patch.object(terminal, 'on_windows', return_value=True), \
+                patch.dict(os.environ, {}, clear=True), \
+                patch.dict(sys.modules, {'colorama': colorama}):
+            assert terminal.enable_ansi_support() is True
+            assert terminal.enable_ansi_support() is True
+            assert colorama.init.call_count == 1
+
+    def test_non_windows_fallback_stays_cached(self):
+        """Preserve cached terminal detection on non-Windows platforms."""
+        with patch.object(terminal, 'have_windows_native_ansi_support', return_value=False), \
+                patch.object(terminal, 'on_windows', return_value=False), \
+                patch.object(terminal, 'connected_to_terminal', side_effect=[True, False]) as connected:
+            assert terminal.enable_ansi_support() is True
+            assert terminal.enable_ansi_support() is True
+            assert connected.call_count == 1
+
+    def test_ansicon_fallback_stays_cached(self):
+        """Keep ANSICON support cached without initializing colorama."""
+        colorama = MagicMock()
+        with patch.object(terminal, 'have_windows_native_ansi_support', return_value=False), \
+                patch.object(terminal, 'on_windows', return_value=True), \
+                patch.dict(os.environ, {'ANSICON': '1'}, clear=True), \
+                patch.dict(sys.modules, {'colorama': colorama}):
+            assert terminal.enable_ansi_support() is True
+            assert terminal.enable_ansi_support() is True
+            assert colorama.init.call_count == 0
+
+    def test_missing_colorama_fallback_stays_false(self):
+        """Keep unsupported Windows configurations cached as false."""
+        with patch.object(terminal, 'have_windows_native_ansi_support', return_value=False), \
+                patch.object(terminal, 'on_windows', return_value=True), \
+                patch.dict(os.environ, {}, clear=True), \
+                patch.dict(sys.modules, {'colorama': None}):
+            assert terminal.enable_ansi_support() is False
+            assert terminal.enable_ansi_support() is False
+
+    def test_non_terminal_fallback_stays_false(self):
+        """Keep a failed non-Windows terminal detection cached as well."""
+        with patch.object(terminal, 'have_windows_native_ansi_support', return_value=False), \
+                patch.object(terminal, 'on_windows', return_value=False), \
+                patch.object(terminal, 'connected_to_terminal', return_value=False) as connected:
+            assert terminal.enable_ansi_support() is False
+            assert terminal.enable_ansi_support() is False
+            assert connected.call_count == 1
 
 
 class HumanFriendlyTestCase(TestCase):
