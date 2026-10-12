@@ -544,6 +544,7 @@ class HumanFriendlyTestCase(TestCase):
         self.assertEqual('1 metre', format_length(1))
         self.assertEqual('42 metres', format_length(42))
         self.assertEqual('1 km', format_length(1 * 1000))
+        self.assertEqual('1 km', format_length(999.999))
         self.assertEqual('15.3 cm', format_length(0.153))
         self.assertEqual('1 cm', format_length(1e-02))
         self.assertEqual('1 mm', format_length(1e-03))

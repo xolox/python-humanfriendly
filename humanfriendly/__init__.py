@@ -284,9 +284,13 @@ def format_length(num_metres, keep_width=False):
     >>> format_length(0.004)
     '4 mm'
     """
-    for unit in reversed(length_size_units):
+    units = list(reversed(length_size_units))
+    for index, unit in enumerate(units):
         if num_metres >= unit['divider']:
             number = round_number(float(num_metres) / unit['divider'], keep_width=keep_width)
+            if index and float(number) >= units[index - 1]['divider'] / unit['divider']:
+                unit = units[index - 1]
+                number = round_number(float(num_metres) / unit['divider'], keep_width=keep_width)
             return pluralize(number, unit['singular'], unit['plural'])
     return pluralize(num_metres, 'metre')
 
