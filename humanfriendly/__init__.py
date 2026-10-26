@@ -429,13 +429,14 @@ def format_timespan(num_seconds, detailed=False, max_units=3):
     '1 year, 2 days and 3 hours'
     """
     num_seconds = coerce_seconds(num_seconds)
-    if num_seconds < 60 and not detailed:
+    if abs(num_seconds) < 60 and not detailed:
         # Fast path.
         return pluralize(round_number(num_seconds), 'second')
     else:
         # Slow path.
+        is_negative = num_seconds < 0
         result = []
-        num_seconds = decimal.Decimal(str(num_seconds))
+        num_seconds = decimal.Decimal(str(abs(num_seconds)))
         relevant_units = list(reversed(time_units[0 if detailed else 3:]))
         for unit in relevant_units:
             # Extract the unit count from the remaining time.
@@ -454,13 +455,16 @@ def format_timespan(num_seconds, detailed=False, max_units=3):
                 result.append(pluralize(count, unit['singular'], unit['plural']))
         if len(result) == 1:
             # A single count/unit combination.
-            return result[0]
+            formatted = result[0]
         else:
             if not detailed:
                 # Remove `insignificant' data from the formatted timespan.
                 result = result[:max_units]
             # Format the timespan in a readable way.
-            return concatenate(result)
+            formatted = concatenate(result)
+        # Apply a single leading minus sign for negative timespans instead of
+        # letting each individual unit carry its own sign.
+        return ('-' + formatted) if is_negative else formatted
 
 
 def parse_timespan(timespan):

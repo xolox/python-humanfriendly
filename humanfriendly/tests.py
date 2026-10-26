@@ -448,6 +448,12 @@ class HumanFriendlyTestCase(TestCase):
         assert '5 minutes and 0.3 seconds' == format_timespan(300.300)
         assert '1 second and 15 milliseconds' == format_timespan(1.015, detailed=True)
         assert '10 seconds and 15 milliseconds' == format_timespan(10.015, detailed=True)
+        # Negative timespans should get a single leading minus sign instead
+        # of a minus sign on every individual unit.
+        assert '-1 hour, 1 minute and 40 seconds' == format_timespan(-3700, detailed=True)
+        assert '-1 minute and 30 seconds' == format_timespan(-90, detailed=True)
+        assert '-30 seconds' == format_timespan(-30, detailed=False)
+        assert '-1 hour, 1 minute and 40 seconds' == format_timespan(-3700, detailed=False)
         assert '1 microsecond and 50 nanoseconds' == format_timespan(0.00000105, detailed=True)
         # Test the datetime.timedelta support:
         # https://github.com/xolox/python-humanfriendly/issues/27
