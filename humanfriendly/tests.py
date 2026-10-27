@@ -184,6 +184,31 @@ class HumanFriendlyTestCase(TestCase):
         mapping[rude] = 2
         assert len(mapping) == 1
 
+    def test_case_insensitive_key_inequality(self):
+        """Keep case-insensitive inequality consistent with equality."""
+        lower = CaseInsensitiveKey('content-type')
+        upper = CaseInsensitiveKey('CONTENT-TYPE')
+        assert lower == upper
+        assert not (lower != upper)
+        assert not (upper != 'content-type')
+        assert not ('content-type' != upper)
+        assert upper != 'other'
+        assert upper != 1
+        assert upper.__ne__(object()) is NotImplemented
+
+    def test_case_insensitive_move_to_end(self):
+        """Coerce string keys before changing their insertion order."""
+        obj = CaseInsensitiveDict([('First', 1), ('Second', 2), (3, 3)])
+        assert obj.move_to_end('FIRST') is None
+        assert list(obj) == ['Second', 3, 'First']
+        obj.move_to_end('SECOND', last=False)
+        assert list(obj) == ['Second', 3, 'First']
+        obj.move_to_end(3, last=False)
+        assert list(obj) == [3, 'Second', 'First']
+        with self.assertRaises(KeyError):
+            obj.move_to_end('missing')
+        assert obj['first'] == 1
+
     def test_capture_output(self):
         """Test the CaptureOutput class."""
         with CaptureOutput() as capturer:

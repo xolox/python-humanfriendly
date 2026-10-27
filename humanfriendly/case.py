@@ -74,6 +74,10 @@ class CaseInsensitiveDict(collections.OrderedDict):
         """Get the value of an existing item."""
         return super(CaseInsensitiveDict, self).get(self.coerce_key(key), default)
 
+    def move_to_end(self, key, last=True):
+        """Move an existing key to either end of the dictionary."""
+        return super(CaseInsensitiveDict, self).move_to_end(self.coerce_key(key), last=last)
+
     def pop(self, key, default=None):
         """Remove an item from a case insensitive dictionary."""
         return super(CaseInsensitiveDict, self).pop(self.coerce_key(key), default)
@@ -155,3 +159,8 @@ class CaseInsensitiveKey(unicode):
             return self._normalized == other.lower()
         else:
             return NotImplemented
+
+    def __ne__(self, other):
+        """Compare inequality using the same lowercase values as equality."""
+        equal = self.__eq__(other)
+        return NotImplemented if equal is NotImplemented else not equal
