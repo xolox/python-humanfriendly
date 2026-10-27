@@ -33,6 +33,8 @@ from humanfriendly.compat import basestring, unicode
 # Public identifiers that require documentation.
 __all__ = ("CaseInsensitiveDict", "CaseInsensitiveKey")
 
+_MISSING = object()
+
 
 class CaseInsensitiveDict(collections.OrderedDict):
 
@@ -74,8 +76,10 @@ class CaseInsensitiveDict(collections.OrderedDict):
         """Get the value of an existing item."""
         return super(CaseInsensitiveDict, self).get(self.coerce_key(key), default)
 
-    def pop(self, key, default=None):
+    def pop(self, key, default=_MISSING):
         """Remove an item from a case insensitive dictionary."""
+        if default is _MISSING:
+            return super(CaseInsensitiveDict, self).pop(self.coerce_key(key))
         return super(CaseInsensitiveDict, self).pop(self.coerce_key(key), default)
 
     def setdefault(self, key, default=None):
@@ -95,7 +99,7 @@ class CaseInsensitiveDict(collections.OrderedDict):
         elif other is not None:
             # Complain about unsupported values.
             msg = "'%s' object is not iterable"
-            type_name = type(value).__name__
+            type_name = type(other).__name__
             raise TypeError(msg % type_name)
         # Copy the keyword arguments (if any).
         for key, value in kw.items():
