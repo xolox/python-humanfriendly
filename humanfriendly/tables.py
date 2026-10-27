@@ -261,7 +261,7 @@ def format_robust_table(data, column_names):
         blocks.append(lines)
     # Calculate the width of the row delimiter.
     num_rows, num_columns = find_terminal_size()
-    longest_line = max(max(map(ansi_width, lines)) for lines in blocks)
+    longest_line = max([ansi_width(line) for lines in blocks for line in lines] or [0])
     delimiter = u"\n%s\n" % ('-' * min(longest_line, num_columns))
     # Force a delimiter at the start and end of the table.
     blocks.insert(0, "")

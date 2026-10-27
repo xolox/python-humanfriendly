@@ -130,6 +130,13 @@ class HumanFriendlyTestCase(TestCase):
 
     """Container for the `humanfriendly` test suite."""
 
+    def test_empty_robust_table(self):
+        """Empty query results produce no rows instead of raising ValueError."""
+        from humanfriendly.tables import format_robust_table
+        assert format_robust_table([], ['name', 'value']) == ''
+        assert format_robust_table(iter([]), ['name']) == ''
+        assert format_robust_table([[]], []) == ''
+
     def test_case_insensitive_dict(self):
         """Test the CaseInsensitiveDict class."""
         # Test support for the dict(iterable) signature.
