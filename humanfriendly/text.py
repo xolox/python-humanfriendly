@@ -255,10 +255,7 @@ def generate_slug(text, delimiter="-"):
     :raises: :exc:`~exceptions.ValueError` when the provided
              text is nonempty but results in an empty slug.
     """
-    slug = text.lower()
-    escaped = delimiter.replace("\\", "\\\\")
-    slug = re.sub("[^a-z0-9]+", escaped, slug)
-    slug = slug.strip(delimiter)
+    slug = delimiter.join(re.findall("[a-z0-9]+", text.lower()))
     if text and not slug:
         msg = "The provided text %r results in an empty slug!"
         raise ValueError(format(msg, text))

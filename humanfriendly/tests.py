@@ -370,6 +370,23 @@ class HumanFriendlyTestCase(TestCase):
         assert pluralize(1, 'box', 'boxes') == '1 box'
         assert pluralize(2, 'box', 'boxes') == '2 boxes'
 
+    def test_generate_slug_delimiter_preserves_content(self):
+        """Custom delimiters do not strip characters from real words."""
+        for text, delimiter, expected in [
+                ('status', 'st', 'status'),
+                (' android data! ', 'and', 'androidanddata'),
+                ('test!', 't-', 'test'),
+                ('test words test', 'st', 'teststwordssttest')]:
+            self.assertEqual(generate_slug(text, delimiter), expected)
+
+    def test_generate_slug_literal_delimiters(self):
+        """Punctuation and backslash separators remain literal."""
+        for delimiter in ('-', '_', '::', '\\', ''):
+            self.assertEqual(generate_slug(' one!! two ', delimiter), 'one' + delimiter + 'two')
+        self.assertEqual(generate_slug(''), '')
+        with self.assertRaises(ValueError):
+            generate_slug('!!!', 'and')
+
     def test_generate_slug(self):
         """Test :func:`humanfriendly.text.generate_slug()`."""
         # Test the basic functionality.
