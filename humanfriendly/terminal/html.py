@@ -204,7 +204,7 @@ class HTMLConverter(HTMLParser):
         if self.link_url:
             # Link text is captured literally so that we can reliably check
             # whether the text and the URL of the link are the same string.
-            self.link_text = data
+            self.link_text += data
         elif self.callback and self.preformatted_text_level == 0:
             # Text that is not part of a link and not preformatted text is
             # passed to the user defined callback to allow for arbitrary
@@ -227,7 +227,7 @@ class HTMLConverter(HTMLParser):
                 self.stack.pop(-1)
             new_style = self.current_style
             if tag == 'a':
-                if self.urls_match(self.link_text, self.link_url):
+                if not self.link_url or self.urls_match(self.link_text, self.link_url):
                     # Don't render the URL when it's part of the link text.
                     self.emit_style(new_style)
                 else:
@@ -237,6 +237,8 @@ class HTMLConverter(HTMLParser):
                     self.output.write(self.render_url(self.link_url))
                     self.emit_style(new_style)
                     self.output.write(')')
+                self.link_url = None
+                self.link_text = None
             else:
                 self.emit_style(new_style)
             if tag in ('code', 'pre'):
@@ -270,6 +272,7 @@ class HTMLConverter(HTMLParser):
             # this is the most intuitive way to present a link in a plain text
             # interface).
             self.link_url = next((v for n, v in attrs if n == 'href'), '')
+            self.link_text = ''
         elif tag == 'b' or tag == 'strong':
             self.push_styles(bold=True)
         elif tag == 'br':
