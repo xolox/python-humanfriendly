@@ -98,6 +98,7 @@ import time
 
 # Modules included in our package.
 from humanfriendly import Timer
+from humanfriendly.compat import monotonic
 from humanfriendly.deprecation import deprecated_args
 from humanfriendly.terminal import ANSI_ERASE_LINE
 
@@ -166,7 +167,7 @@ class Spinner(object):
         self.total = options.get('total')
         # Define instance variables.
         self.counter = 0
-        self.last_update = 0
+        self.last_update = None
         # Try to automatically discover whether the stream is connected to
         # a terminal, but don't fail if no isatty() method is available.
         if self.interactive is None:
@@ -199,8 +200,8 @@ class Spinner(object):
                   99% of the time.
         """
         if self.interactive:
-            time_now = time.time()
-            if time_now - self.last_update >= self.interval:
+            time_now = monotonic()
+            if self.last_update is None or time_now - self.last_update >= self.interval:
                 self.last_update = time_now
                 state = self.states[self.counter % len(self.states)]
                 label = label or self.label
@@ -226,7 +227,7 @@ class Spinner(object):
         This method doesn't redraw the spinner, you still have to call
         :func:`step()` in order to do that.
         """
-        time.sleep(MINIMUM_INTERVAL)
+        time.sleep(self.interval)
 
     def clear(self):
         """

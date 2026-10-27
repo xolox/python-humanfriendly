@@ -797,6 +797,31 @@ class HumanFriendlyTestCase(TestCase):
         self.assertTrue(all('%' in line for line in lines))
         self.assertEqual(sorted(set(lines)), sorted(lines))
 
+    def test_spinner_uses_elapsed_time(self):
+        """Keep redrawing after a wall-clock correction and at clock zero."""
+        from humanfriendly.terminal import spinners
+        stream = StringIO()
+        clock = [0.0]
+        with PatchedAttribute(spinners, 'monotonic', lambda: clock[0]):
+            with PatchedAttribute(spinners.time, 'time', lambda: 1000 - clock[0]):
+                spinner = Spinner(label='working', stream=stream, interactive=True, interval=1)
+                spinner.step()
+                assert spinner.counter == 1
+                clock[0] = 0.5
+                spinner.step()
+                assert spinner.counter == 1
+                clock[0] = 1.0
+                spinner.step()
+                assert spinner.counter == 2
+
+    def test_spinner_sleep_uses_configured_interval(self):
+        """Sleep for the interval chosen for the spinner's redraw cadence."""
+        from humanfriendly.terminal import spinners
+        sleep = MagicMock()
+        with PatchedAttribute(spinners.time, 'sleep', sleep):
+            Spinner(interval=0.7).sleep()
+        sleep.assert_called_once_with(0.7)
+
     def test_automatic_spinner(self):
         """
         Test :func:`humanfriendly.AutomaticSpinner`.
