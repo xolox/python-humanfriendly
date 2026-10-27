@@ -339,9 +339,9 @@ class HTMLConverter(HTMLParser):
             elif length == 3:
                 # Three hex digits (shorthand).
                 return (
-                    int(value[0], 16),
-                    int(value[1], 16),
-                    int(value[2], 16),
+                    int(value[0] * 2, 16),
+                    int(value[1] * 2, 16),
+                    int(value[2] * 2, 16),
                 )
         # Try to recognize a named color.
         value = value.lower()
