@@ -1010,6 +1010,39 @@ class HumanFriendlyTestCase(TestCase):
         # Make sure ansi_wrap() ends the text by resetting the ANSI styles.
         assert ansi_wrap(text, bold=True).endswith(ANSI_RESET)
 
+    def test_html_buffered_tail_keeps_style(self):
+        """Flush buffered character references before closing active styles."""
+        for tag in ('b', 'em', 'code', 'span style="color: red"'):
+            for tail in ('&', '&amp'):
+                result = html_to_ansi('<' + tag + '>tail ' + tail)
+                self.assertTrue(result.endswith('tail &' + ANSI_RESET))
+        self.assertEqual(html_to_ansi('tail &'), 'tail &')
+
+    def test_html_streaming_close_keeps_style(self):
+        """Explicit close also styles data buffered across feed calls."""
+        from humanfriendly.terminal.html import HTMLConverter
+        converter = HTMLConverter()
+        converter.feed('<b>tail ')
+        converter.feed('&amp')
+        converter.close()
+        self.assertEqual(converter.output.getvalue(), '\x1b[0m\x1b[1mtail &' + ANSI_RESET)
+        value = converter.output.getvalue()
+        converter.close()
+        self.assertEqual(converter.output.getvalue(), value)
+
+    def test_html_close_resets_style_after_callback_error(self):
+        """A callback failure during flushing still closes terminal styles."""
+        from humanfriendly.terminal.html import HTMLConverter
+
+        def callback(text):
+            raise ValueError('callback failed')
+
+        converter = HTMLConverter(callback=callback)
+        converter.feed('<b>tail &')
+        with self.assertRaises(ValueError):
+            converter.close()
+        self.assertTrue(converter.output.getvalue().endswith(ANSI_RESET))
+
     def test_html_to_ansi(self):
         """Test the :func:`humanfriendly.terminal.html_to_ansi()` function."""
         assert html_to_ansi("Just some plain text") == "Just some plain text"

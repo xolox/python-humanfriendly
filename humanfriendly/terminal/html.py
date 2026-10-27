@@ -167,10 +167,12 @@ class HTMLConverter(HTMLParser):
         the input but a style is still active. This is intended to prevent
         malformed HTML from messing up terminal output.
         """
-        if any(self.stack):
-            self.output.write(ANSI_RESET)
-            self.stack = []
-        HTMLParser.close(self)
+        try:
+            HTMLParser.close(self)
+        finally:
+            if any(self.stack):
+                self.output.write(ANSI_RESET)
+                self.stack = []
 
     def emit_style(self, style=None):
         """
