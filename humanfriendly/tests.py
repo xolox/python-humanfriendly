@@ -490,6 +490,22 @@ class HumanFriendlyTestCase(TestCase):
         with self.assertRaises(InvalidDate):
             parse_date('2013-06-XY')
 
+    def test_parse_date_rejects_invalid_calendar_values(self):
+        """Raise InvalidDate for dates that cannot be used as datetimes."""
+        for value in ['2023-02-29', '2024-02-30', '2024-04-31', '2024-00-10',
+                      '2024-13-10', '2024-01-00', '0000-01-01', '10000-01-01',
+                      '2024-01-01 24:00:00', '2024-01-01 12:60:00',
+                      '2024-01-01 12:00:60']:
+            with self.assertRaises(InvalidDate):
+                parse_date(value)
+
+    def test_parse_date_preserves_valid_and_partial_dates(self):
+        """Keep leap days and the existing defaults for omitted components."""
+        assert parse_date('2024-02-29') == (2024, 2, 29, 0, 0, 0)
+        assert parse_date('2024') == (2024, 1, 1, 0, 0, 0)
+        assert parse_date('2024-02') == (2024, 2, 1, 0, 0, 0)
+        assert parse_date('2024-02-29 23:59:59') == (2024, 2, 29, 23, 59, 59)
+
     def test_format_size(self):
         """Test :func:`humanfriendly.format_size()`."""
         self.assertEqual('0 bytes', format_size(0))

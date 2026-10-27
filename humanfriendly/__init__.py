@@ -582,10 +582,12 @@ def parse_date(datestring):
         if len(tokens) >= 2:
             date_parts = list(map(int, tokens[0].split('-'))) + [1, 1]
             time_parts = list(map(int, tokens[1].split(':'))) + [0, 0, 0]
-            return tuple(date_parts[0:3] + time_parts[0:3])
+            result = tuple(date_parts[0:3] + time_parts[0:3])
         else:
             year, month, day = (list(map(int, datestring.split('-'))) + [1, 1])[0:3]
-            return (year, month, day, 0, 0, 0)
+            result = (year, month, day, 0, 0, 0)
+        datetime.datetime(*result)
+        return result
     except Exception:
         msg = "Invalid date! (expected 'YYYY-MM-DD' or 'YYYY-MM-DD HH:MM:SS' but got: %r)"
         raise InvalidDate(format(msg, datestring))
