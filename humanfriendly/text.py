@@ -421,6 +421,8 @@ def tokenize(text):
     [42.5, 'MB']
     >>> tokenize('42.5 MB')
     [42.5, 'MB']
+    >>> tokenize('2²')
+    [2, '²']
     """
     tokenized_input = []
     for token in re.split(r'(\d+(?:\.\d+)?)', text):
@@ -428,7 +430,15 @@ def tokenize(text):
         if re.match(r'\d+\.\d+', token):
             tokenized_input.append(float(token))
         elif token.isdigit():
-            tokenized_input.append(int(token))
+            # Some Unicode digit characters that pass str.isdigit() can't
+            # actually be converted to a number (for example superscript two),
+            # in which case we keep the token as a string instead of raising
+            # ValueError and letting it bubble up out of callers like
+            # parse_size() and parse_timespan().
+            try:
+                tokenized_input.append(int(token))
+            except ValueError:
+                tokenized_input.append(token)
         elif token:
             tokenized_input.append(token)
     return tokenized_input
