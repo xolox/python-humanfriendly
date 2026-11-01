@@ -113,6 +113,7 @@ from humanfriendly.text import (
     generate_slug,
     pluralize,
     random_string,
+    tokenize,
     trim_empty_lines,
 )
 from humanfriendly.usage import (
@@ -481,6 +482,8 @@ class HumanFriendlyTestCase(TestCase):
         self.assertEqual(60 * 60 * 24 * 7 * 5, parse_timespan('5 weeks'))
         with self.assertRaises(InvalidTimespan):
             parse_timespan('1z')
+        with self.assertRaises(InvalidTimespan):
+            parse_timespan("2²")
 
     def test_parse_date(self):
         """Test :func:`humanfriendly.parse_date()`."""
@@ -537,6 +540,8 @@ class HumanFriendlyTestCase(TestCase):
             parse_size('1q')
         with self.assertRaises(InvalidSize):
             parse_size('a')
+        with self.assertRaises(InvalidSize):
+            parse_size("2²")
 
     def test_format_length(self):
         """Test :func:`humanfriendly.format_length()`."""
@@ -743,6 +748,15 @@ class HumanFriendlyTestCase(TestCase):
         self.assertEqual(split('foo, bar'), ['foo', 'bar'])
         self.assertEqual(split('foo, bar, baz'), ['foo', 'bar', 'baz'])
         self.assertEqual(split('foo,bar,baz'), ['foo', 'bar', 'baz'])
+
+    def test_tokenize(self):
+        """Test tokenize()."""
+        self.assertEqual(tokenize("42"), [42])
+        self.assertEqual(tokenize("42MB"), [42, "MB"])
+        self.assertEqual(tokenize("42.5MB"), [42.5, "MB"])
+        # Unicode digit characters that isdigit() accepts but int() rejects
+        # (such as superscript two) stay as string tokens
+        self.assertEqual(tokenize("2²"), [2, "²"])
 
     def test_timer(self):
         """Test :func:`humanfriendly.Timer`."""
