@@ -111,6 +111,7 @@ from humanfriendly.text import (
     concatenate,
     dedent,
     generate_slug,
+    join_lines,
     pluralize,
     random_string,
     trim_empty_lines,
@@ -129,6 +130,21 @@ from mock import MagicMock
 class HumanFriendlyTestCase(TestCase):
 
     """Container for the `humanfriendly` test suite."""
+
+    def test_join_lines_consecutive_short_lines(self):
+        """Join every hard wrap even when an intervening line has one character."""
+        assert join_lines('a\nb\nc\nd') == 'a b c d'
+        assert join_lines('one\na\nword') == 'one a word'
+
+    def test_join_lines_windows_line_endings(self):
+        """Join CRLF hard wraps without leaving carriage returns behind."""
+        assert join_lines('first\r\nsecond\r\nthird') == 'first second third'
+        assert join_lines('a\r\nb\r\nc') == 'a b c'
+
+    def test_join_lines_preserves_paragraphs_and_indentation(self):
+        """Leave paragraph boundaries and indented lines intact."""
+        for text in ('a\n\nb', 'a\r\n\r\nb', 'a\n b', 'a \nb', '\na\n', ''):
+            assert join_lines(text) == text
 
     def test_case_insensitive_dict(self):
         """Test the CaseInsensitiveDict class."""

@@ -289,7 +289,7 @@ def join_lines(text):
     break :func:`join_lines()` (in that case you can use :func:`dedent()`
     before calling :func:`join_lines()`).
     """
-    return re.sub(r'(\S)\n(\S)', r'\1 \2', text)
+    return re.sub(r'(?<=\S)\r?\n(?=\S)', ' ', text)
 
 
 def pluralize(count, singular, plural=None):
