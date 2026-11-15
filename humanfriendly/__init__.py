@@ -235,7 +235,7 @@ def parse_size(size, binary=False):
         normalized_unit = tokens[1].lower() if len(tokens) == 2 and is_string(tokens[1]) else ''
         # If the input contains only a number, it's assumed to be the number of
         # bytes. The second token can also explicitly reference the unit bytes.
-        if len(tokens) == 1 or normalized_unit.startswith('b'):
+        if len(tokens) == 1 or normalized_unit in ('b', 'byte', 'bytes'):
             return int(tokens[0])
         # Otherwise we expect two tokens: A number and a unit.
         if normalized_unit:
@@ -252,7 +252,7 @@ def parse_size(size, binary=False):
                 # symbols (KB, MB, GB, etc) and names (kilobyte, megabyte,
                 # gigabyte, etc) according to the caller's preference.
                 if (normalized_unit in (unit.decimal.symbol.lower(), unit.decimal.name.lower()) or
-                        normalized_unit.startswith(unit.decimal.symbol[0].lower())):
+                        normalized_unit == unit.decimal.symbol[0].lower()):
                     return int(tokens[0] * (unit.binary.divider if binary else unit.decimal.divider))
     # We failed to parse the size specification.
     msg = "Failed to parse size! (input %r was tokenized as %r)"
@@ -319,9 +319,9 @@ def parse_length(length):
         # Otherwise we expect to find two tokens: A number and a unit.
         if len(tokens) == 2 and is_string(tokens[1]):
             normalized_unit = tokens[1].lower()
-            # Try to match the first letter of the unit.
+            # Match the complete symbol or known unit name.
             for unit in length_size_units:
-                if normalized_unit.startswith(unit['prefix']):
+                if normalized_unit in (unit['prefix'], unit['singular'], unit['plural']):
                     return tokens[0] * unit['divider']
     # We failed to parse the length specification.
     msg = "Failed to parse length! (input %r was tokenized as %r)"

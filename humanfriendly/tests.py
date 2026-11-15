@@ -538,6 +538,19 @@ class HumanFriendlyTestCase(TestCase):
         with self.assertRaises(InvalidSize):
             parse_size('a')
 
+    def test_parse_size_rejects_unknown_unit_words(self):
+        """Reject words that merely start with a known size prefix."""
+        for value in ('1 taco', '1 person', '1 potato', '5 ghosts', '10 microns',
+                      '2 millibytes', '1 banana', '1 bread'):
+            with self.assertRaises(InvalidSize):
+                parse_size(value)
+            with self.assertRaises(InvalidSize):
+                parse_size(value, binary=True)
+        for unit, expected in (('b', 1), ('byte', 1), ('bytes', 1), ('K', 1000),
+                               ('KB', 1000), ('kilobytes', 1000), ('KiB', 1024),
+                               ('kibibytes', 1024)):
+            self.assertEqual(expected, parse_size('1 ' + unit))
+
     def test_format_length(self):
         """Test :func:`humanfriendly.format_length()`."""
         self.assertEqual('0 metres', format_length(0))
@@ -564,6 +577,15 @@ class HumanFriendlyTestCase(TestCase):
             parse_length('1z')
         with self.assertRaises(InvalidLength):
             parse_length('a')
+
+    def test_parse_length_rejects_unknown_unit_words(self):
+        """Keep metre names and exact symbols while rejecting unrelated words."""
+        for value in ('1 moon', '1 monkey', '1 cmake', '1 kmph', '1 mmfoo', '1 nmfoo'):
+            with self.assertRaises(InvalidLength):
+                parse_length(value)
+        for unit, expected in (('m', 1), ('metre', 1), ('metres', 1),
+                               ('cm', 0.01), ('mm', 0.001), ('nm', 1e-9), ('km', 1000)):
+            self.assertEqual(expected, parse_length('1 ' + unit))
 
     def test_format_number(self):
         """Test :func:`humanfriendly.format_number()`."""
