@@ -119,7 +119,7 @@ A dictionary with (name, number) pairs of text styles (effects). Used by
 styles. Only widely supported text styles are included here.
 """
 
-CLEAN_OUTPUT_PATTERN = re.compile(u'(\r|\n|\b|%s)' % re.escape(ANSI_ERASE_LINE))
+CLEAN_OUTPUT_PATTERN = re.compile(u'(\r|\n|\b|%s0?K)' % re.escape(ANSI_CSI))
 """
 A compiled regular expression used to separate significant characters from other text.
 
@@ -334,7 +334,9 @@ def clean_terminal_output(text):
 
     This function emulates the effect of backspace (0x08), carriage return
     (0x0D) and line feed (0x0A) characters and the ANSI 'erase line' escape
-    sequence on interactive terminals. It's intended to clean up command output
+    sequence on interactive terminals. Erasing a line with ``ESC[K`` or
+    ``ESC[0K`` removes text from the cursor to the end of the line without
+    moving the cursor. It's intended to clean up command output
     that was originally meant to be rendered on an interactive terminal and
     that has been captured using e.g. the :man:`script` program [#]_ or the
     :mod:`pty` module [#]_.
@@ -376,11 +378,14 @@ def clean_terminal_output(text):
         elif token == '\b':
             # Seek back one character in the current line.
             current_position = max(0, current_position - 1)
+        elif token in (ANSI_ERASE_LINE, ANSI_CSI + '0K'):
+            # Erase to the right without moving the cursor or losing the prefix.
+            current_line = current_line[:current_position]
         else:
             if token == '\n':
                 # Capture the current line.
                 cleaned_lines.append(current_line)
-            if token in ('\n', ANSI_ERASE_LINE):
+            if token == '\n':
                 # Clear the current line.
                 current_line = ''
                 current_position = 0

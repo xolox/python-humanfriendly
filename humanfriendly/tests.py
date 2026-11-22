@@ -1129,6 +1129,44 @@ class HumanFriendlyTestCase(TestCase):
         # Trailing empty lines should be stripped.
         assert clean_terminal_output('foo\nbar\nbaz\n\n\n') == ['foo', 'bar', 'baz']
 
+    def test_clean_output_erase_line_preserves_prefix(self):
+        """Erasing to the right must not discard text before the cursor."""
+        for erase in (ANSI_ERASE_LINE, ANSI_CSI + '0K'):
+            assert clean_terminal_output('ready' + erase) == ['ready']
+
+    def test_clean_output_erase_line_progress(self):
+        """Keep a shorter progress message after erasing the old suffix."""
+        for erase in (ANSI_ERASE_LINE, ANSI_CSI + '0K'):
+            text = 'progress: 100%\rdone' + erase + '\n'
+            assert clean_terminal_output(text) == ['done']
+
+    def test_clean_output_erase_line_cursor(self):
+        """Erasing must leave the cursor at its current position."""
+        for erase in (ANSI_ERASE_LINE, ANSI_CSI + '0K'):
+            assert clean_terminal_output('abcdef\b\b' + erase + 'XY') == ['abcdXY']
+
+    def test_clean_output_erase_line_carriage_return(self):
+        """A later carriage return can overwrite the preserved prefix."""
+        for erase in (ANSI_ERASE_LINE, ANSI_CSI + '0K'):
+            assert clean_terminal_output('abcdef\b\b' + erase + '\rXY') == ['XYcd']
+
+    def test_clean_output_erase_line_newline(self):
+        """Keep erased lines separate from the following line."""
+        for erase in (ANSI_ERASE_LINE, ANSI_CSI + '0K'):
+            text = 'abcdef\rxy' + erase + '\nnext' + erase
+            assert clean_terminal_output(text) == ['xy', 'next']
+
+    def test_clean_output_erase_line_repeated(self):
+        """Repeated erases must preserve text left of each cursor position."""
+        for erase in (ANSI_ERASE_LINE, ANSI_CSI + '0K'):
+            text = 'abcdef\b\b' + erase + '\b' + erase + 'Z'
+            assert clean_terminal_output(text) == ['abcZ']
+
+    def test_clean_output_erase_line_start(self):
+        """Erasing from column zero must still clear the entire line."""
+        for erase in (ANSI_ERASE_LINE, ANSI_CSI + '0K'):
+            assert clean_terminal_output('old\r' + erase + 'new') == ['new']
+
     def test_find_terminal_size(self):
         """Test :func:`humanfriendly.terminal.find_terminal_size()`."""
         lines, columns = find_terminal_size()
